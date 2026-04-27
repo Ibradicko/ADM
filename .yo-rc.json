@@ -1,0 +1,33 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "jwt",
+    "baseName": "admSupervisionVentes",
+    "buildTool": "maven",
+    "cacheProvider": "caffeine",
+    "clientFramework": "angular",
+    "clientTestFrameworks": [],
+    "clientTheme": "none",
+    "creationTimestamp": 1777295279786,
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "enableHibernateCache": true,
+    "enableTranslation": true,
+    "entities": [],
+    "feignClient": null,
+    "jhipsterVersion": "9.0.0",
+    "jwtSecretKey": "M2FkNjMwN2NhNjc5ZGEzMjcxYmZlNThhNTIzMTUwYzBkNTBkMGM0YmQ1YmY0NDU2MTBhOGMyNTdiZGZjMTE5ZWRlNmNiMzM3NWM5ZTQ4YTYyNWQ5YzFlMDRjZDBkZGQ3ZGQ3YzRhMTM1ZjE0NjhkYmUyZDY4MGU5OWQ2ZDZlYjI=",
+    "languages": ["en"],
+    "microfrontend": null,
+    "microfrontends": [],
+    "nativeLanguage": "en",
+    "packageName": "com.adm.supervision",
+    "prodDatabaseType": "postgresql",
+    "reactive": false,
+    "serverPort": null,
+    "serviceDiscoveryType": null,
+    "syncUserWithIdp": null,
+    "testFrameworks": [],
+    "withAdminUi": true
+  }
+}
