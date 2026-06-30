@@ -1,0 +1,30 @@
+{
+  "admSupervisionVentesApp": {
+    "codeBarresProduit": {
+      "home": {
+        "title": "Code Barres Produits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Code Barres Produit",
+        "createOrEditLabel": "Create or edit a Code Barres Produit",
+        "notFound": "No Code Barres Produits found"
+      },
+      "created": "A new Code Barres Produit is created with identifier {{ param }}",
+      "updated": "A Code Barres Produit is updated with identifier {{ param }}",
+      "deleted": "A Code Barres Produit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Code Barres Produit {{ id }}?"
+      },
+      "detail": {
+        "title": "Code Barres Produit"
+      },
+      "id": "ID",
+      "code": "Code",
+      "type": "Type",
+      "principal": "Principal",
+      "genereParSysteme": "Genere Par Systeme",
+      "actif": "Actif",
+      "dateAffectation": "Date Affectation",
+      "produit": "Produit"
+    }
+  }
+}

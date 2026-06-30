@@ -1,0 +1,959 @@
+<section class="adm-page adm-settings">
+  <header class="adm-settings-hero">
+    <div>
+      <p class="adm-page__eyebrow" jhiTranslate="settingsCenter.eyebrow">Functional administration</p>
+      <h1 jhiTranslate="settingsCenter.title">ADM management settings</h1>
+      <p>
+        Configurez les règles utiles au quotidien : ventes, encaissements, boutique, stock, rôles et accès, sans manipulation technique.
+      </p>
+    </div>
+    <div class="adm-page__actions">
+      <a routerLink="/account/settings" class="adm-button adm-button--ghost" jhiTranslate="settingsCenter.actions.myProfile">My profile</a>
+      <button type="button" class="adm-button adm-button--primary" (click)="recharger()" [disabled]="chargement()">
+        {{ (chargement() ? 'settingsCenter.actions.refreshing' : 'settingsCenter.actions.refresh') | translate }}
+      </button>
+    </div>
+  </header>
+
+  @if (message(); as feedback) {
+    <div
+      class="adm-inline-alert"
+      [class.adm-inline-alert--success]="feedback.type === 'success'"
+      [class.adm-inline-alert--danger]="feedback.type === 'danger'"
+      [class.adm-inline-alert--info]="feedback.type === 'info'"
+    >
+      {{ feedback.key | translate: feedback.params }}
+    </div>
+  }
+
+  <section class="adm-settings-board">
+    <article class="adm-settings-metric">
+      <span jhiTranslate="settingsCenter.kpis.activeParameters">Active parameters</span>
+      <strong>{{ parametresActifs() }}</strong>
+      <small jhiTranslate="settingsCenter.kpis.activeParametersHint">Applied general rules</small>
+    </article>
+    <article class="adm-settings-metric">
+      <span jhiTranslate="settingsCenter.kpis.payments">Payments</span>
+      <strong>{{ modesPaiement().length }}</strong>
+      <small jhiTranslate="settingsCenter.kpis.paymentsHint">Methods available at checkout</small>
+    </article>
+    <article class="adm-settings-metric">
+      <span jhiTranslate="settingsCenter.kpis.businessProfiles">Business profiles</span>
+      <strong>{{ profilsActifs().length }}</strong>
+      <small jhiTranslate="settingsCenter.kpis.businessProfilesHint">Active access roles</small>
+    </article>
+    <article class="adm-settings-metric">
+      <span jhiTranslate="settingsCenter.kpis.activeAssignments">Active assignments</span>
+      <strong>{{ affectationsActives().length }}</strong>
+      <small jhiTranslate="settingsCenter.kpis.activeAssignmentsHint">Users assigned to shops</small>
+    </article>
+  </section>
+
+  <article class="adm-card adm-settings-nav">
+    <div class="adm-settings-tabs">
+      @if (peutAdministrerGlobal()) {
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'global'"
+          (click)="onglet.set('global')"
+          jhiTranslate="settingsCenter.tabs.global"
+        >
+          Global
+        </button>
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'paiement'"
+          (click)="onglet.set('paiement')"
+          jhiTranslate="settingsCenter.tabs.payments"
+        >
+          Payments
+        </button>
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'barcode'"
+          (click)="onglet.set('barcode')"
+          jhiTranslate="settingsCenter.tabs.barcodes"
+        >
+          Barcodes
+        </button>
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'profils'"
+          (click)="onglet.set('profils')"
+          jhiTranslate="settingsCenter.tabs.profiles"
+        >
+          Profiles
+        </button>
+      }
+      <button
+        type="button"
+        class="adm-tab-button"
+        [class.adm-tab-button--active]="onglet() === 'affectations'"
+        (click)="onglet.set('affectations')"
+      >
+        @if (peutAdministrerGlobal()) {
+          <span jhiTranslate="settingsCenter.tabs.assignments">Assignments</span>
+        } @else {
+          <span jhiTranslate="settingsCenter.tabs.shopUsers">Shop users</span>
+        }
+      </button>
+      @if (peutAdministrerGlobal()) {
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'referentiels'"
+          (click)="onglet.set('referentiels')"
+          jhiTranslate="settingsCenter.tabs.referenceData"
+        >
+          Reference data
+        </button>
+      }
+    </div>
+    <label class="adm-field adm-settings-search">
+      <span jhiTranslate="settingsCenter.fields.search">Search</span>
+      <input
+        type="search"
+        [ngModel]="recherche()"
+        (ngModelChange)="recherche.set($event)"
+        [placeholder]="'settingsCenter.placeholders.search' | translate"
+      />
+    </label>
+  </article>
+
+  @if (onglet() === 'global' && peutAdministrerGlobal()) {
+    <section class="adm-settings-stack">
+      <article class="adm-card adm-card--spaced adm-settings-scope">
+        <div>
+          <h2 jhiTranslate="settingsCenter.sections.globalSettings">Global settings</h2>
+          <p>
+            Choisissez d abord la portee a modifier. Les regles generales servent de base commune, les regles boutique permettent une
+            adaptation locale.
+          </p>
+        </div>
+        <div class="adm-settings-scope__actions" role="group" [attr.aria-label]="'settingsCenter.accessibility.settingsScope' | translate">
+          <button
+            type="button"
+            class="adm-scope-button"
+            [class.adm-scope-button--active]="porteeParametres() === 'general'"
+            (click)="porteeParametres.set('general')"
+          >
+            Regles generales
+            <span jhiTranslate="settingsCenter.scopes.platformBase">Shared platform base</span>
+          </button>
+          <button
+            type="button"
+            class="adm-scope-button"
+            [class.adm-scope-button--active]="porteeParametres() === 'boutique'"
+            (click)="porteeParametres.set('boutique')"
+          >
+            Regles par boutique
+            <span jhiTranslate="settingsCenter.scopes.shopAdaptation">Adaptation by point of sale</span>
+          </button>
+        </div>
+      </article>
+
+      @if (porteeParametres() === 'general') {
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="settingsCenter.sections.generalRules">General rules</h2>
+              <p jhiTranslate="settingsCenter.hints.generalRules">These values apply by default when a shop has no specific rule.</p>
+            </div>
+          </div>
+
+          <div class="adm-settings-controlled-list">
+            @for (definition of parametresGlobauxControles; track definition.code) {
+              <article class="adm-settings-controlled-row">
+                <div>
+                  <strong>{{ definition.labelKey | translate }}</strong>
+                  <p>{{ definition.descriptionKey | translate }}</p>
+                </div>
+                <div class="adm-settings-controlled-row__controls">
+                  <label class="adm-field">
+                    <span jhiTranslate="settingsCenter.fields.appliedValue">Applied value</span>
+                    @if (definition.type === 'boolean') {
+                      <select
+                        [ngModel]="valeursGlobales()[definition.code]"
+                        (ngModelChange)="definirValeurGlobale(definition.code, $event)"
+                      >
+                        <option value="true" jhiTranslate="settingsCenter.common.yes">Yes</option>
+                        <option value="false" jhiTranslate="settingsCenter.common.no">No</option>
+                      </select>
+                    } @else {
+                      <input
+                        [type]="definition.type === 'number' ? 'number' : 'text'"
+                        [ngModel]="valeursGlobales()[definition.code]"
+                        (ngModelChange)="definirValeurGlobale(definition.code, $event)"
+                      />
+                    }
+                  </label>
+                  <label class="adm-field adm-field--checkbox">
+                    <input
+                      type="checkbox"
+                      [ngModel]="actifsGlobaux()[definition.code]"
+                      (ngModelChange)="definirActifGlobal(definition.code, !!$event)"
+                    />
+                    <span jhiTranslate="settingsCenter.fields.useRule">Use this rule</span>
+                  </label>
+                  @if (permissionsUi.peutGererParametres()) {
+                    <button
+                      type="button"
+                      class="adm-button adm-button--primary"
+                      (click)="enregistrerParametreGlobal(definition)"
+                      [disabled]="enregistrement()"
+                    >
+                      <span jhiTranslate="settingsCenter.actions.save">Save</span>
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        </article>
+      }
+
+      @if (porteeParametres() === 'boutique') {
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading adm-section-heading--split">
+            <div>
+              <h2 jhiTranslate="settingsCenter.sections.shopRules">Rules by shop</h2>
+              <p jhiTranslate="settingsCenter.hints.shopRules">Adapt selected behavior for a specific shop.</p>
+            </div>
+            <div class="adm-field adm-settings-shop-select">
+              <span jhiTranslate="settingsCenter.fields.targetShop">Target shop</span>
+              <details class="adm-search-select" #boutiqueParametresSelect>
+                <summary>
+                  <span>{{ libelleBoutique(boutiqueParametresId()) }}</span>
+                </summary>
+                <div class="adm-search-select__panel">
+                  <input
+                    type="search"
+                    [ngModel]="rechercheBoutiqueParametres()"
+                    (ngModelChange)="rechercheBoutiqueParametres.set($event)"
+                    [placeholder]="'settingsCenter.placeholders.searchShop' | translate"
+                  />
+                  <button
+                    type="button"
+                    class="adm-search-select__option"
+                    (click)="selectionnerBoutiqueParametres(null, boutiqueParametresSelect)"
+                  >
+                    <span jhiTranslate="settingsCenter.common.select">Select</span>
+                  </button>
+                  @for (boutique of boutiquesParametresFiltrees(); track boutique.id) {
+                    <button
+                      type="button"
+                      class="adm-search-select__option"
+                      [class.adm-search-select__option--active]="boutique.id === boutiqueParametresId()"
+                      (click)="selectionnerBoutiqueParametres(boutique.id, boutiqueParametresSelect)"
+                    >
+                      <strong>{{ boutique.nom }}</strong>
+                      <small>{{ boutique.code }} · {{ boutique.emplacement ?? boutique.type ?? '--' }}</small>
+                    </button>
+                  } @empty {
+                    <div class="adm-search-select__empty" jhiTranslate="settingsCenter.empty.noSearchResult">No result found.</div>
+                  }
+                </div>
+              </details>
+            </div>
+          </div>
+
+          @if (boutiqueSelectionnee(); as boutique) {
+            <div class="adm-settings-controlled-list">
+              @for (definition of parametresBoutiqueControles; track definition.code) {
+                <article class="adm-settings-controlled-row">
+                  <div>
+                    <strong>{{ definition.labelKey | translate }}</strong>
+                    <p>{{ definition.descriptionKey | translate }}</p>
+                  </div>
+                  <div class="adm-settings-controlled-row__controls">
+                    <label class="adm-field">
+                      <span jhiTranslate="settingsCenter.fields.shopValue">Value for this shop</span>
+                      @if (definition.type === 'boolean') {
+                        <select
+                          [ngModel]="valeursBoutique()[definition.code]"
+                          (ngModelChange)="definirValeurBoutique(definition.code, $event)"
+                        >
+                          <option value="true" jhiTranslate="settingsCenter.common.yes">Yes</option>
+                          <option value="false" jhiTranslate="settingsCenter.common.no">No</option>
+                        </select>
+                      } @else {
+                        <input
+                          [type]="definition.type === 'number' ? 'number' : 'text'"
+                          [ngModel]="valeursBoutique()[definition.code]"
+                          (ngModelChange)="definirValeurBoutique(definition.code, $event)"
+                        />
+                      }
+                    </label>
+                    <label class="adm-field adm-field--checkbox">
+                      <input
+                        type="checkbox"
+                        [ngModel]="actifsBoutique()[definition.code]"
+                        (ngModelChange)="definirActifBoutique(definition.code, !!$event)"
+                      />
+                      <span jhiTranslate="settingsCenter.fields.apply">Apply</span>
+                    </label>
+                    <button
+                      type="button"
+                      class="adm-button adm-button--primary"
+                      (click)="enregistrerParametreBoutique(definition)"
+                      [disabled]="enregistrement()"
+                    >
+                      <span jhiTranslate="settingsCenter.actions.save">Save</span>
+                    </button>
+                  </div>
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="adm-empty-inline" jhiTranslate="settingsCenter.empty.noAvailableShop">
+              No shop is available for your current profile.
+            </div>
+          }
+        </article>
+      }
+    </section>
+  }
+
+  @if (onglet() === 'paiement' && peutAdministrerGlobal()) {
+    <section class="adm-settings-layout">
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="settingsCenter.sections.paymentMethods">Payment methods</h2>
+            <p jhiTranslate="settingsCenter.hints.paymentMethods">Choose the payment methods available for sales and royalty payments.</p>
+          </div>
+        </div>
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="settingsCenter.fields.label">Label</th>
+                <th jhiTranslate="settingsCenter.fields.status">Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (mode of modesPaiement(); track mode.id) {
+                <tr>
+                  <td>{{ mode.libelle }}</td>
+                  <td>
+                    <span class="adm-pill" [class.adm-pill--success]="mode.actif" [class.adm-pill--warning]="!mode.actif">
+                      {{ (mode.actif ? 'settingsCenter.status.active' : 'settingsCenter.status.inactive') | translate }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    @if (permissionsUi.peutGererParametres()) {
+                      <button type="button" class="adm-button adm-button--ghost" (click)="basculerActif('paiement', mode)">
+                        {{ (mode.actif ? 'settingsCenter.actions.disable' : 'settingsCenter.actions.enable') | translate }}
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="adm-card adm-card--spaced adm-settings-form-card">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="settingsCenter.sections.newPaymentMethod">New payment method</h2>
+            <p jhiTranslate="settingsCenter.hints.newPaymentMethod">Only add methods that shops actually accept.</p>
+          </div>
+        </div>
+
+        @if (permissionsUi.peutGererParametres()) {
+          <div class="adm-form-grid">
+            <label class="adm-field adm-field--full">
+              <span jhiTranslate="settingsCenter.fields.label">Label</span>
+              <input type="text" [ngModel]="nouveauLibellePaiement()" (ngModelChange)="nouveauLibellePaiement.set($event)" />
+            </label>
+            <label class="adm-field adm-field--checkbox">
+              <input type="checkbox" [ngModel]="nouveauPaiementActif()" (ngModelChange)="nouveauPaiementActif.set(!!$event)" />
+              <span jhiTranslate="settingsCenter.fields.active">Active</span>
+            </label>
+          </div>
+          <button type="button" class="adm-button adm-button--primary" (click)="creerModePaiement()" [disabled]="enregistrement()">
+            <span jhiTranslate="settingsCenter.actions.add">Add</span>
+          </button>
+        } @else {
+          <div class="adm-empty-inline" jhiTranslate="settingsCenter.readOnly.paymentMethods">
+            You have read-only access to payment methods.
+          </div>
+        }
+      </article>
+    </section>
+  }
+
+  @if (onglet() === 'barcode' && peutAdministrerGlobal()) {
+    <section class="adm-settings-layout">
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="settingsCenter.sections.barcodeRules">Barcode rules</h2>
+            <p jhiTranslate="settingsCenter.hints.barcodeRules">
+              Define the format used to generate barcodes for checkout, stock and inventory scanning.
+            </p>
+          </div>
+        </div>
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="settingsCenter.fields.format">Format</th>
+                <th jhiTranslate="settingsCenter.fields.prefix">Prefix</th>
+                <th jhiTranslate="settingsCenter.fields.length">Length</th>
+                <th jhiTranslate="settingsCenter.fields.status">Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (parametre of parametresCodeBarres(); track parametre.id) {
+                <tr>
+                  <td>{{ parametre.formatParDefaut }}</td>
+                  <td>
+                    <span class="adm-code">{{ parametre.prefixe ?? '--' }}</span>
+                  </td>
+                  <td>{{ parametre.longueur ?? '--' }}</td>
+                  <td>
+                    <span class="adm-pill" [class.adm-pill--success]="parametre.actif" [class.adm-pill--warning]="!parametre.actif">
+                      {{ (parametre.actif ? 'settingsCenter.status.active' : 'settingsCenter.status.inactive') | translate }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    @if (permissionsUi.peutGererParametres()) {
+                      <button type="button" class="adm-button adm-button--ghost" (click)="basculerActif('barcode', parametre)">
+                        {{ (parametre.actif ? 'settingsCenter.actions.disable' : 'settingsCenter.actions.enable') | translate }}
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="adm-card adm-card--spaced adm-settings-form-card">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="settingsCenter.sections.newBarcodeRule">New barcode rule</h2>
+            <p jhiTranslate="settingsCenter.hints.newBarcodeRule">Use a format compatible with scanners and label printing.</p>
+          </div>
+        </div>
+
+        @if (permissionsUi.peutGererParametres()) {
+          <div class="adm-form-grid">
+            <label class="adm-field">
+              <span jhiTranslate="settingsCenter.fields.format">Format</span>
+              <select [ngModel]="nouveauFormatBarcode()" (ngModelChange)="nouveauFormatBarcode.set($event)">
+                @for (format of formatsBarcode; track format) {
+                  <option [value]="format">{{ format }}</option>
+                }
+              </select>
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="settingsCenter.fields.labelPrefix">Label prefix</span>
+              <input type="text" [ngModel]="nouveauPrefixeBarcode()" (ngModelChange)="nouveauPrefixeBarcode.set($event)" />
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="settingsCenter.fields.length">Length</span>
+              <input
+                type="number"
+                min="8"
+                max="30"
+                [ngModel]="nouvelleLongueurBarcode()"
+                (ngModelChange)="nouvelleLongueurBarcode.set($event ? +$event : null)"
+              />
+            </label>
+            <label class="adm-field adm-field--checkbox">
+              <input type="checkbox" [ngModel]="nouveauBarcodeActif()" (ngModelChange)="nouveauBarcodeActif.set(!!$event)" />
+              <span jhiTranslate="settingsCenter.fields.active">Active</span>
+            </label>
+          </div>
+          <button type="button" class="adm-button adm-button--primary" (click)="creerParametreBarcode()" [disabled]="enregistrement()">
+            <span jhiTranslate="settingsCenter.actions.add">Add</span>
+          </button>
+        } @else {
+          <div class="adm-empty-inline" jhiTranslate="settingsCenter.readOnly.barcodeRules">
+            You have read-only access to barcode settings.
+          </div>
+        }
+      </article>
+    </section>
+  }
+
+  @if (onglet() === 'profils' && peutAdministrerGlobal()) {
+    <section class="adm-settings-layout">
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="settingsCenter.sections.profilesPermissions">Profiles and permissions</h2>
+            <p jhiTranslate="settingsCenter.hints.profilesPermissions">Profiles determine visible menus and authorized actions.</p>
+          </div>
+        </div>
+        <div class="adm-settings-profile-list">
+          @for (profil of profilsActifs(); track profil.id) {
+            <article class="adm-settings-profile">
+              <div>
+                <strong>{{ profil.libelle }}</strong>
+              </div>
+              <div class="adm-authority-list">
+                @for (permission of profil.permissionses ?? []; track permission.id) {
+                  <span class="adm-chip">{{ libellePermission(permission) }}</span>
+                } @empty {
+                  <span class="adm-chip" jhiTranslate="settingsCenter.empty.noPermission">No permission</span>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </article>
+
+      <article class="adm-card adm-card--spaced adm-settings-form-card">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="settingsCenter.sections.newProfile">New profile</h2>
+            <p jhiTranslate="settingsCenter.hints.newProfile">Create a clear role, then select its allowed actions.</p>
+          </div>
+        </div>
+
+        @if (permissionsUi.peutGererParametres()) {
+          <div class="adm-form-grid">
+            <label class="adm-field">
+              <span jhiTranslate="settingsCenter.fields.label">Label</span>
+              <input type="text" [ngModel]="nouveauLibelleProfil()" (ngModelChange)="nouveauLibelleProfil.set($event)" />
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="settingsCenter.fields.status">Status</span>
+              <select [ngModel]="nouveauProfilStatut()" (ngModelChange)="nouveauProfilStatut.set($event)">
+                <option value="ACTIF" jhiTranslate="settingsCenter.status.active">Active</option>
+                <option value="INACTIF" jhiTranslate="settingsCenter.status.inactive">Inactive</option>
+                <option value="SUSPENDU" jhiTranslate="settingsCenter.status.suspended">Suspended</option>
+              </select>
+            </label>
+            <label class="adm-field adm-field--full">
+              <span jhiTranslate="settingsCenter.fields.description">Description</span>
+              <textarea rows="3" [ngModel]="nouvelleDescriptionProfil()" (ngModelChange)="nouvelleDescriptionProfil.set($event)"></textarea>
+            </label>
+          </div>
+
+          <div class="adm-settings-permissions">
+            @for (groupe of permissionsParModule(); track groupe.module) {
+              <section>
+                <h3>{{ groupe.module }}</h3>
+                <div class="adm-settings-check-grid">
+                  @for (permission of groupe.permissions; track permission.id) {
+                    <label class="adm-check">
+                      <input
+                        type="checkbox"
+                        [checked]="permissionCochee(permission.id)"
+                        (change)="basculerPermission(permission.id, $any($event.target).checked)"
+                      />
+                      <span>
+                        <strong>{{ permission.libelle }}</strong>
+                        <small>{{ permission.module }}</small>
+                      </span>
+                    </label>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+
+          <button type="button" class="adm-button adm-button--primary" (click)="creerProfil()" [disabled]="enregistrement()">
+            <span jhiTranslate="settingsCenter.actions.createProfile">Create profile</span>
+          </button>
+        } @else {
+          <div class="adm-empty-inline" jhiTranslate="settingsCenter.readOnly.profiles">
+            You can view profiles but cannot change permissions.
+          </div>
+        }
+      </article>
+    </section>
+  }
+
+  @if (onglet() === 'affectations') {
+    <section class="adm-settings-layout">
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="settingsCenter.sections.userAssignments">User assignments</h2>
+            <p jhiTranslate="settingsCenter.hints.userAssignments">Assign a user role for a shop and validity period.</p>
+          </div>
+        </div>
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="settingsCenter.fields.user">User</th>
+                <th jhiTranslate="settingsCenter.fields.shop">Shop</th>
+                <th jhiTranslate="settingsCenter.fields.role">Role</th>
+                <th jhiTranslate="settingsCenter.fields.period">Period</th>
+                <th jhiTranslate="settingsCenter.fields.status">Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (affectation of affectationsVisibles(); track affectation.id) {
+                <tr>
+                  <td>{{ affectation.user?.login ?? '--' }}</td>
+                  <td>{{ affectation.boutique?.nom ?? '--' }}</td>
+                  <td>{{ libelleProfil(affectation.profil?.code) }}</td>
+                  <td>{{ formatDate(affectation.dateDebut) }} - {{ formatDate(affectation.dateFin) }}</td>
+                  <td>
+                    <span class="adm-pill" [class.adm-pill--success]="affectation.actif" [class.adm-pill--warning]="!affectation.actif">
+                      {{
+                        (affectation.actif ? 'settingsCenter.status.activeFeminine' : 'settingsCenter.status.inactiveFeminine') | translate
+                      }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    @if (peutGererAffectationsBoutique()) {
+                      <button type="button" class="adm-button adm-button--ghost" (click)="basculerAffectation(affectation)">
+                        {{ (affectation.actif ? 'settingsCenter.actions.disable' : 'settingsCenter.actions.enable') | translate }}
+                      </button>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" jhiTranslate="settingsCenter.empty.noAssignment">No assignment found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <div class="adm-settings-form-stack">
+        @if (peutCreerBoutique()) {
+          <article class="adm-card adm-card--spaced">
+            <div class="adm-section-heading">
+              <div>
+                <h2 jhiTranslate="settingsCenter.sections.newShop">New shop</h2>
+                <p jhiTranslate="settingsCenter.hints.newShop">Create the point of sale, then assign a tenant from the shop list.</p>
+              </div>
+            </div>
+
+            <div class="adm-form-grid">
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.shopName">Shop name</span>
+                <input type="text" [ngModel]="nouvelleBoutiqueNom()" (ngModelChange)="nouvelleBoutiqueNom.set($event)" />
+                <small jhiTranslate="settingsCenter.help.shopName">Trading name used in sales and reports.</small>
+              </label>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.type">Type</span>
+                <select [ngModel]="nouvelleBoutiqueType()" (ngModelChange)="nouvelleBoutiqueType.set($event)">
+                  @for (type of typesBoutique; track type) {
+                    <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+                <small jhiTranslate="settingsCenter.help.shopType">Category used for ADM analysis.</small>
+              </label>
+              <label class="adm-field adm-field--full">
+                <span jhiTranslate="settingsCenter.fields.location">Location</span>
+                <input type="text" [ngModel]="nouvelleBoutiqueEmplacement()" (ngModelChange)="nouvelleBoutiqueEmplacement.set($event)" />
+                <small jhiTranslate="settingsCenter.help.location">Specify the terminal, hall, gate or operating area.</small>
+              </label>
+              <label class="adm-field adm-field--full">
+                <span jhiTranslate="settingsCenter.fields.shopPhone">Shop phone</span>
+                <input
+                  type="tel"
+                  inputmode="numeric"
+                  maxlength="8"
+                  pattern="[0-9]*"
+                  [ngModel]="nouvelleBoutiqueTelephone()"
+                  (ngModelChange)="nouvelleBoutiqueTelephone.set($event)"
+                />
+                @if (!telephoneMaliValide(nouvelleBoutiqueTelephone())) {
+                  <small class="text-danger" jhiTranslate="settingsCenter.validation.maliPhone"
+                    >A Mali phone number must contain exactly 8 digits.</small
+                  >
+                } @else {
+                  <small jhiTranslate="settingsCenter.help.maliPhone">8 digits, without spaces or country code.</small>
+                }
+              </label>
+            </div>
+            <button
+              type="button"
+              class="adm-button adm-button--primary"
+              (click)="creerBoutique()"
+              [disabled]="enregistrement() || !telephoneMaliValide(nouvelleBoutiqueTelephone())"
+            >
+              <span jhiTranslate="settingsCenter.actions.createShop">Create shop</span>
+            </button>
+          </article>
+        }
+
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              @if (peutGererAffectationsBoutique()) {
+                <h2 jhiTranslate="settingsCenter.sections.newShopUser">New shop user</h2>
+                <p jhiTranslate="settingsCenter.hints.newShopUser">The account is created and assigned to a shop with the selected role.</p>
+              } @else {
+                <h2 jhiTranslate="settingsCenter.sections.newSellerUser">New seller user</h2>
+                <p jhiTranslate="settingsCenter.hints.newSellerUser">Create a seller account only for one of your assigned shops.</p>
+              }
+            </div>
+          </div>
+
+          @if (peutCreerUtilisateurBoutique()) {
+            <div class="adm-form-grid">
+              <div class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.shop">Shop</span>
+                <details class="adm-search-select" #nouvelUtilisateurBoutiqueSelect>
+                  <summary>
+                    <span>{{ libelleBoutique(nouvelUtilisateurBoutiqueId()) }}</span>
+                  </summary>
+                  <div class="adm-search-select__panel">
+                    <input
+                      type="search"
+                      [ngModel]="rechercheNouvelUtilisateurBoutique()"
+                      (ngModelChange)="rechercheNouvelUtilisateurBoutique.set($event)"
+                      [placeholder]="'settingsCenter.placeholders.searchShop' | translate"
+                    />
+                    <button
+                      type="button"
+                      class="adm-search-select__option"
+                      (click)="selectionnerNouvelUtilisateurBoutique(null, nouvelUtilisateurBoutiqueSelect)"
+                    >
+                      <span jhiTranslate="settingsCenter.common.select">Select</span>
+                    </button>
+                    @for (boutique of boutiquesNouvelUtilisateurFiltrees(); track boutique.id) {
+                      <button
+                        type="button"
+                        class="adm-search-select__option"
+                        [class.adm-search-select__option--active]="boutique.id === nouvelUtilisateurBoutiqueId()"
+                        (click)="selectionnerNouvelUtilisateurBoutique(boutique.id, nouvelUtilisateurBoutiqueSelect)"
+                      >
+                        <strong>{{ boutique.nom }}</strong>
+                        <small>{{ boutique.code }} · {{ boutique.emplacement ?? boutique.type ?? '--' }}</small>
+                      </button>
+                    } @empty {
+                      <div class="adm-search-select__empty" jhiTranslate="settingsCenter.empty.noSearchResult">No result found.</div>
+                    }
+                  </div>
+                </details>
+                <small jhiTranslate="settingsCenter.help.managerScope">Managers only see shops within their scope.</small>
+              </div>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.role">Role</span>
+                <select [ngModel]="nouvelUtilisateurProfilId()" (ngModelChange)="nouvelUtilisateurProfilId.set($event)">
+                  <option [ngValue]="null" jhiTranslate="settingsCenter.common.select">Select</option>
+                  @for (profil of profilsUtilisateursBoutique(); track profil.id) {
+                    <option [ngValue]="profil.id">{{ profil.libelle }}</option>
+                  }
+                </select>
+                <small jhiTranslate="settingsCenter.help.role">The role determines visible menus and authorized actions.</small>
+              </label>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.firstName">First name</span>
+                <input type="text" [ngModel]="nouvelUtilisateurPrenom()" (ngModelChange)="nouvelUtilisateurPrenom.set($event)" />
+              </label>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.lastName">Last name</span>
+                <input type="text" [ngModel]="nouvelUtilisateurNom()" (ngModelChange)="nouvelUtilisateurNom.set($event)" />
+              </label>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.login">Login</span>
+                <input type="text" [ngModel]="nouvelUtilisateurLogin()" (ngModelChange)="nouvelUtilisateurLogin.set($event)" />
+                <small jhiTranslate="settingsCenter.help.login">Required identifier for sign-in.</small>
+              </label>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.email">Email</span>
+                <input type="email" [ngModel]="nouvelUtilisateurEmail()" (ngModelChange)="nouvelUtilisateurEmail.set($event)" />
+                @if (nouvelUtilisateurEmail().trim() && !emailValide(nouvelUtilisateurEmail())) {
+                  <small class="text-danger" jhiTranslate="settingsCenter.validation.invalidEmail">Invalid email address.</small>
+                } @else {
+                  <small jhiTranslate="settingsCenter.help.userEmail">Used for activation and password recovery.</small>
+                }
+              </label>
+            </div>
+            <button
+              type="button"
+              class="adm-button adm-button--primary"
+              (click)="creerUtilisateurBoutique()"
+              [disabled]="enregistrement() || (nouvelUtilisateurEmail().trim() && !emailValide(nouvelUtilisateurEmail()))"
+            >
+              <span jhiTranslate="settingsCenter.actions.createAndAssign">Create and assign</span>
+            </button>
+          } @else {
+            <div class="adm-empty-inline" jhiTranslate="settingsCenter.readOnly.users">
+              You can view assignments but cannot create users.
+            </div>
+          }
+        </article>
+
+        @if (peutGererAffectationsBoutique()) {
+          <article class="adm-card adm-card--spaced adm-settings-form-card">
+            <div class="adm-section-heading">
+              <div>
+                <h2 jhiTranslate="settingsCenter.sections.newAssignment">New assignment</h2>
+                <p jhiTranslate="settingsCenter.hints.newAssignment">A user can have different permissions depending on the shop.</p>
+              </div>
+            </div>
+
+            <div class="adm-form-grid">
+              <div class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.user">User</span>
+                <details class="adm-search-select" #affectationUtilisateurSelect>
+                  <summary>
+                    <span>{{ libelleUtilisateur(affectationUserId()) }}</span>
+                  </summary>
+                  <div class="adm-search-select__panel">
+                    <input
+                      type="search"
+                      [ngModel]="rechercheAffectationUtilisateur()"
+                      (ngModelChange)="rechercheAffectationUtilisateur.set($event)"
+                      [placeholder]="'settingsCenter.placeholders.searchUser' | translate"
+                    />
+                    <button
+                      type="button"
+                      class="adm-search-select__option"
+                      (click)="selectionnerAffectationUtilisateur(null, affectationUtilisateurSelect)"
+                    >
+                      <span jhiTranslate="settingsCenter.common.select">Select</span>
+                    </button>
+                    @for (user of utilisateursAffectationFiltres(); track user.id) {
+                      <button
+                        type="button"
+                        class="adm-search-select__option"
+                        [class.adm-search-select__option--active]="user.id === affectationUserId()"
+                        (click)="selectionnerAffectationUtilisateur(user.id ?? null, affectationUtilisateurSelect)"
+                      >
+                        <strong>{{ user.login }}</strong>
+                        <small>{{ formatUtilisateur(user) }}</small>
+                      </button>
+                    } @empty {
+                      <div class="adm-search-select__empty" jhiTranslate="settingsCenter.empty.noSearchResult">No result found.</div>
+                    }
+                  </div>
+                </details>
+              </div>
+              <div class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.shop">Shop</span>
+                <details class="adm-search-select" #affectationBoutiqueSelect>
+                  <summary>
+                    <span>{{ libelleBoutique(affectationBoutiqueId()) }}</span>
+                  </summary>
+                  <div class="adm-search-select__panel">
+                    <input
+                      type="search"
+                      [ngModel]="rechercheAffectationBoutique()"
+                      (ngModelChange)="rechercheAffectationBoutique.set($event)"
+                      [placeholder]="'settingsCenter.placeholders.searchShop' | translate"
+                    />
+                    <button
+                      type="button"
+                      class="adm-search-select__option"
+                      (click)="selectionnerAffectationBoutique(null, affectationBoutiqueSelect)"
+                    >
+                      <span jhiTranslate="settingsCenter.common.select">Select</span>
+                    </button>
+                    @for (boutique of boutiquesAffectationFiltrees(); track boutique.id) {
+                      <button
+                        type="button"
+                        class="adm-search-select__option"
+                        [class.adm-search-select__option--active]="boutique.id === affectationBoutiqueId()"
+                        (click)="selectionnerAffectationBoutique(boutique.id, affectationBoutiqueSelect)"
+                      >
+                        <strong>{{ boutique.nom }}</strong>
+                        <small>{{ boutique.code }} · {{ boutique.emplacement ?? boutique.type ?? '--' }}</small>
+                      </button>
+                    } @empty {
+                      <div class="adm-search-select__empty" jhiTranslate="settingsCenter.empty.noSearchResult">No result found.</div>
+                    }
+                  </div>
+                </details>
+              </div>
+              <div class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.profile">Profile</span>
+                <details class="adm-search-select" #affectationProfilSelect>
+                  <summary>
+                    <span>{{ libelleProfilParId(affectationProfilId()) }}</span>
+                  </summary>
+                  <div class="adm-search-select__panel">
+                    <input
+                      type="search"
+                      [ngModel]="rechercheAffectationProfil()"
+                      (ngModelChange)="rechercheAffectationProfil.set($event)"
+                      [placeholder]="'settingsCenter.placeholders.searchProfile' | translate"
+                    />
+                    <button
+                      type="button"
+                      class="adm-search-select__option"
+                      (click)="selectionnerAffectationProfil(null, affectationProfilSelect)"
+                    >
+                      <span jhiTranslate="settingsCenter.common.select">Select</span>
+                    </button>
+                    @for (profil of profilsAffectationFiltres(); track profil.id) {
+                      <button
+                        type="button"
+                        class="adm-search-select__option"
+                        [class.adm-search-select__option--active]="profil.id === affectationProfilId()"
+                        (click)="selectionnerAffectationProfil(profil.id, affectationProfilSelect)"
+                      >
+                        <strong>{{ profil.libelle }}</strong>
+                        <small>{{ profil.code }}</small>
+                      </button>
+                    } @empty {
+                      <div class="adm-search-select__empty" jhiTranslate="settingsCenter.empty.noSearchResult">No result found.</div>
+                    }
+                  </div>
+                </details>
+              </div>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.startDate">Start date</span>
+                <input type="date" [ngModel]="affectationDateDebut()" (ngModelChange)="affectationDateDebut.set($event)" />
+              </label>
+              <label class="adm-field">
+                <span jhiTranslate="settingsCenter.fields.endDate">End date</span>
+                <input type="date" [ngModel]="affectationDateFin()" (ngModelChange)="affectationDateFin.set($event)" />
+              </label>
+              <label class="adm-field adm-field--checkbox">
+                <input type="checkbox" [ngModel]="affectationActive()" (ngModelChange)="affectationActive.set(!!$event)" />
+                <span jhiTranslate="settingsCenter.fields.active">Active</span>
+              </label>
+            </div>
+            <button type="button" class="adm-button adm-button--primary" (click)="creerAffectation()" [disabled]="enregistrement()">
+              Affecter
+            </button>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  @if (onglet() === 'referentiels' && peutAdministrerGlobal()) {
+    <section class="adm-settings-referentials">
+      <article class="adm-card adm-card--spaced">
+        <h2 jhiTranslate="settingsCenter.reference.commercialStructure">Commercial structure</h2>
+        <a routerLink="/boutique" class="adm-settings-link" jhiTranslate="settingsCenter.reference.shops">Shops</a>
+        <a routerLink="/locataire" class="adm-settings-link" jhiTranslate="settingsCenter.reference.tenants">Tenants</a>
+        <a routerLink="/exploitation-boutique" class="adm-settings-link" jhiTranslate="settingsCenter.reference.contracts"
+          >Contracts and operations</a
+        >
+      </article>
+      <article class="adm-card adm-card--spaced">
+        <h2 jhiTranslate="settingsCenter.reference.productCatalogue">Product catalogue</h2>
+        <a routerLink="/groupe-article" class="adm-settings-link" jhiTranslate="settingsCenter.reference.productGroups">Product groups</a>
+        <a routerLink="/famille-article" class="adm-settings-link" jhiTranslate="settingsCenter.reference.families">Families</a>
+        <a routerLink="/sous-famille-article" class="adm-settings-link" jhiTranslate="settingsCenter.reference.subfamilies">Subfamilies</a>
+        <a routerLink="/unite-mesure" class="adm-settings-link" jhiTranslate="settingsCenter.reference.units">Units of measure</a>
+      </article>
+      <article class="adm-card adm-card--spaced">
+        <h2 jhiTranslate="settingsCenter.reference.financeControl">Finance and control</h2>
+        <a routerLink="/regle-redevance" class="adm-settings-link" jhiTranslate="settingsCenter.reference.royaltyRules">Royalty rules</a>
+        <a routerLink="/rapport-export" class="adm-settings-link" jhiTranslate="settingsCenter.reference.exports">Exports</a>
+        <a routerLink="/journal-audit" class="adm-settings-link" jhiTranslate="settingsCenter.reference.auditLog">Audit log</a>
+      </article>
+    </section>
+  }
+</section>

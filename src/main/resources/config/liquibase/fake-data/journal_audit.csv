@@ -1,0 +1,31 @@
+id;type_action;entite_concernee;identifiant_entite;description;adresse_ip;date_action
+1;MODIFICATION;ick lightly at;rapidly discourse;../fake-data/blob/hipster.txt;mythology finished;2026-05-04T12:07:44
+2;MOUVEMENT_STOCK;sweetly;worth minor pale;../fake-data/blob/hipster.txt;versus address;2026-05-05T04:12:39
+3;CONNEXION;so an than;yuck;../fake-data/blob/hipster.txt;frizz of;2026-05-04T18:45:45
+4;VENTE_ANNULEE;diligent frail;till astride ill;../fake-data/blob/hipster.txt;guard aw;2026-05-04T21:29:58
+5;MOUVEMENT_STOCK;quirkily woot eek;dearest;../fake-data/blob/hipster.txt;digit;2026-05-04T15:58:03
+6;INVENTAIRE;oof;opposite;../fake-data/blob/hipster.txt;joyously apud unselfish;2026-05-05T03:35:56
+7;DECONNEXION;easily mysteriously;bah huzzah colorfully;../fake-data/blob/hipster.txt;eek accompany tight;2026-05-04T23:23:31
+8;MOUVEMENT_STOCK;per cork;ouch now ha;../fake-data/blob/hipster.txt;bitter and;2026-05-05T02:20:35
+9;RETOUR_VENTE;energetically even;ponder coin inside;../fake-data/blob/hipster.txt;amnesty forecast guard;2026-05-05T00:59:29
+10;VENTE_VALIDEE;camouflage;torn hmph;../fake-data/blob/hipster.txt;developmental;2026-05-04T17:12:53
+11;CREATION;travel fooey;dally legitimize;../fake-data/blob/hipster.txt;including;2026-05-04T13:56:35
+12;CHANGEMENT_CODE_BARRES;good distant;drat;../fake-data/blob/hipster.txt;always;2026-05-04T17:57:48
+13;VENTE_VALIDEE;incidentally;idle;../fake-data/blob/hipster.txt;noon whereas annually;2026-05-04T13:21:37
+14;DECONNEXION;woot;repeatedly atop;../fake-data/blob/hipster.txt;violent;2026-05-05T02:42:12
+15;MODIFICATION;phew;suddenly deliberately;../fake-data/blob/hipster.txt;pneumonia;2026-05-04T21:37:02
+16;MODIFICATION;beyond;gee;../fake-data/blob/hipster.txt;ouch frilly vainly;2026-05-05T04:53:47
+17;MODIFICATION;following rosy massive;noisily modulo woot;../fake-data/blob/hipster.txt;gladly encouragement alongside;2026-05-05T06:08:37
+18;DECONNEXION;upon;and raw;../fake-data/blob/hipster.txt;split boo thankfully;2026-05-04T17:55:47
+19;VENTE_VALIDEE;downright;gruesome pull;../fake-data/blob/hipster.txt;wherever break tame;2026-05-04T11:32:56
+20;VENTE_VALIDEE;why sleepily;gosh;../fake-data/blob/hipster.txt;rough;2026-05-04T16:56:29
+21;DECONNEXION;nor;considering ugh;../fake-data/blob/hipster.txt;out nippy;2026-05-04T21:53:20
+22;CONNEXION;hence but indeed;entry prudent or;../fake-data/blob/hipster.txt;per reasonable repurpose;2026-05-05T00:08:58
+23;CHANGEMENT_PRIX;bah mmm;behind;../fake-data/blob/hipster.txt;that tune justly;2026-05-04T13:20:19
+24;CHANGEMENT_PRIX;rear;jogging;../fake-data/blob/hipster.txt;anenst phew rapidly;2026-05-04T15:05:50
+25;CHANGEMENT_PRIX;ack burdensome;bogus print;../fake-data/blob/hipster.txt;obligation near so;2026-05-04T13:36:45
+26;CONNEXION;revoke;of;../fake-data/blob/hipster.txt;whether ferret whereas;2026-05-05T02:19:50
+27;VENTE_ANNULEE;meanwhile;because pish;../fake-data/blob/hipster.txt;graft serpentine giant;2026-05-04T14:26:20
+28;CHANGEMENT_TAUX_REDEVANCE;ha cautiously;but;../fake-data/blob/hipster.txt;doodle chilly;2026-05-04T10:43:56
+29;DECONNEXION;awkwardly;till;../fake-data/blob/hipster.txt;display brr into;2026-05-04T20:58:16
+30;VENTE_VALIDEE;bah meanwhile;yawningly;../fake-data/blob/hipster.txt;ack;2026-05-04T17:28:39

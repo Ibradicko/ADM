@@ -1,0 +1,94 @@
+{
+  "auditSupervision": {
+    "eyebrow": "Control and traceability",
+    "title": "Audit and supervision",
+    "subtitle": "Sensitive action log, operational alerts and control signals.",
+    "actions": {
+      "reporting": "Reporting center",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "openModule": "Open module",
+      "viewStock": "View stock"
+    },
+    "restricted": {
+      "title": "Limited access",
+      "description": "Your profile cannot view supervision data."
+    },
+    "kpis": {
+      "filteredEvents": "Filtered events",
+      "sensitiveEvents": "Sensitive events",
+      "unknownScans": "Open unknown scans",
+      "stockAlerts": "Stock alerts",
+      "recentExports": "Recent exports",
+      "impactedShops": "Impacted shops"
+    },
+    "fields": {
+      "shop": "Shop",
+      "action": "Action",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "search": "Search",
+      "date": "Date",
+      "entity": "Entity",
+      "user": "User",
+      "identifier": "Identifier",
+      "ipAddress": "IP address",
+      "description": "Description",
+      "scannedCode": "Scanned code",
+      "sourceScreen": "Source screen",
+      "product": "Product",
+      "quantity": "Quantity",
+      "threshold": "Threshold",
+      "reference": "Reference",
+      "type": "Type",
+      "format": "Format"
+    },
+    "filters": {
+      "allShops": "All shops",
+      "allActions": "All actions",
+      "searchPlaceholder": "Action, entity, user, shop..."
+    },
+    "sections": {
+      "auditLog": "Audit log",
+      "eventDetail": "Event details",
+      "unknownScans": "Unknown scans to process",
+      "stockAndExports": "Stock alerts and recent exports"
+    },
+    "count": {
+      "events": "{{count}} event(s) after filtering.",
+      "unresolvedScans": "{{count}} unresolved scan(s)."
+    },
+    "hints": {
+      "eventDetail": "Quick view of an action for audit or control.",
+      "selectEvent": "Select a log row to display its details.",
+      "crossFunctionalView": "Cross-functional supervision view."
+    },
+    "empty": {
+      "noEvent": "No event for the current filters.",
+      "noDescription": "No detailed description.",
+      "noSelectedEvent": "No event selected",
+      "noUnknownScan": "No unknown scan awaiting processing.",
+      "noStockAlert": "No stock alert for the selection.",
+      "noRecentExport": "No recent export."
+    },
+    "messages": {
+      "loadFailed": "The audit and supervision module could not be loaded."
+    },
+    "actionTypes": {
+      "CONNEXION": "Sign-in",
+      "CREATION": "Creation",
+      "MODIFICATION": "Modification",
+      "DESACTIVATION": "Deactivation",
+      "CHANGEMENT_PRIX": "Price change",
+      "CHANGEMENT_TAUX_REDEVANCE": "Royalty rate change",
+      "CHANGEMENT_CODE_BARRES": "Barcode change",
+      "VENTE_VALIDEE": "Validated sale",
+      "VENTE_ANNULEE": "Cancelled sale",
+      "RETOUR_VENTE": "Sale return",
+      "MOUVEMENT_STOCK": "Stock movement",
+      "INVENTAIRE": "Inventory",
+      "PARAMETRAGE": "Settings change",
+      "EXPORT": "Export"
+    }
+  }
+}

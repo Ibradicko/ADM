@@ -1,0 +1,56 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (familleArticle(); as familleArticleRef) {
+      <div>
+        <h2 data-cy="familleArticleDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.familleArticle.detail.title">Famille Article</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ familleArticleRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.code">Code</span></dt>
+          <dd>
+            <span>{{ familleArticleRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.libelle">Libelle</span></dt>
+          <dd>
+            <span>{{ familleArticleRef.libelle }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutGeneral.' + (familleArticleRef.statut ?? 'null')">{{
+              { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[familleArticleRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.groupeArticle">Groupe Article</span></dt>
+          <dd>
+            @if (familleArticle()!.groupeArticle) {
+              <div>
+                <a [routerLink]="['/groupe-article', familleArticle()!.groupeArticle?.id, 'view']">{{
+                  familleArticleRef.groupeArticle?.libelle
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/famille-article', familleArticleRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

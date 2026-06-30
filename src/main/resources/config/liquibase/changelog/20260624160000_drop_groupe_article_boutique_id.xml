@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        GroupeArticle est un niveau de catalogue global (non rattache a une boutique) dans le
+        domaine applicatif actuel : l'entite JPA GroupeArticle n'expose plus de champ boutique.
+        La colonne boutique_id (NOT NULL + FK) heritee du schema initial empechait toute
+        insertion de groupe d'article sans boutique, ce qui bloquait le seed de donnees de test
+        et le demarrage de l'application. On aligne le schema sur le modele de domaine.
+    -->
+    <changeSet id="20260624160000-1" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyTableName="groupe_article" foreignKeyName="fk_groupe_article__boutique_id"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="groupe_article" constraintName="fk_groupe_article__boutique_id"/>
+    </changeSet>
+
+    <changeSet id="20260624160000-2" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="groupe_article" columnName="boutique_id"/>
+        </preConditions>
+        <dropColumn tableName="groupe_article" columnName="boutique_id"/>
+    </changeSet>
+</databaseChangeLog>

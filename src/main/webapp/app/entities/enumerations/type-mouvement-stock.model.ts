@@ -1,0 +1,17 @@
+export enum TypeMouvementStock {
+  ENTREE = 'ENTREE',
+
+  SORTIE = 'SORTIE',
+
+  AJUSTEMENT = 'AJUSTEMENT',
+
+  TRANSFERT = 'TRANSFERT',
+
+  INVENTAIRE = 'INVENTAIRE',
+
+  PERTE = 'PERTE',
+
+  RETOUR_CLIENT = 'RETOUR_CLIENT',
+
+  VENTE = 'VENTE',
+}

@@ -1,0 +1,119 @@
+﻿<div>
+  <h2 id="page-heading" data-cy="LigneCalculRedevanceHeading">
+    <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.home.title">Ligne Calcul Redevances</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        [hidden]="!permissionsUi.peutGererRedevances()"
+        class="btn btn-primary jh-create-entity create-ligne-calcul-redevance"
+        [routerLink]="['/ligne-calcul-redevance/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.home.createLabel">Create a new Ligne Calcul Redevance</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (ligneCalculRedevances().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.home.notFound">No Ligne Calcul Redevances found</span>
+    </div>
+  } @else {
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="baseCalcul">
+              <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.baseCalcul">Base Calcul</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="tauxApplique">
+              <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.tauxApplique">Taux Applique</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="montantRedevance">
+              <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.montantRedevance">Montant Redevance</span>
+              <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="calcul.reference">
+              <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.calcul">Calcul</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="vente.numeroTicket">
+              <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.vente">Vente</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ligneCalculRedevance of ligneCalculRedevances(); track trackId(ligneCalculRedevance); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+              <td>
+                <a [routerLink]="['/ligne-calcul-redevance', ligneCalculRedevance.id, 'view']">{{ ligneCalculRedevance.id }}</a>
+              </td>
+              <td>{{ ligneCalculRedevance.baseCalcul }}</td>
+              <td>{{ ligneCalculRedevance.tauxApplique }}</td>
+              <td>{{ ligneCalculRedevance.montantRedevance }}</td>
+              <td>
+                @if (ligneCalculRedevance.calcul) {
+                  <div>
+                    <a [routerLink]="['/calcul-redevance', ligneCalculRedevance.calcul.id, 'view']">{{
+                      ligneCalculRedevance.calcul.reference
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (ligneCalculRedevance.vente) {
+                  <div>
+                    <a [routerLink]="['/vente', ligneCalculRedevance.vente.id, 'view']">{{ ligneCalculRedevance.vente.numeroTicket }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/ligne-calcul-redevance', ligneCalculRedevance.id, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
+                    <fa-icon icon="eye" />
+                  </a>
+                  <a
+                    [routerLink]="['/ligne-calcul-redevance', ligneCalculRedevance.id, 'edit']"
+                    class="adm-icon-button"
+                    data-cy="entityEditButton"
+                    [hidden]="!permissionsUi.peutGererRedevances()"
+                    title="Modifier"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                  </a>
+                  <button
+                    type="button"
+                    (click)="delete(ligneCalculRedevance)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    [hidden]="!permissionsUi.peutGererRedevances()"
+                    title="Supprimer"
+                  >
+                    <fa-icon icon="times" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

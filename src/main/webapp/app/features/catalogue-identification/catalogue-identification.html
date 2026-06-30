@@ -1,0 +1,634 @@
+<section class="adm-page">
+  <header class="adm-page__header">
+    <div>
+      <p class="adm-page__eyebrow" jhiTranslate="catalogueIdentification.eyebrow">Catalogue and identification</p>
+      <h1 jhiTranslate="catalogueIdentification.title">Barcodes and labels</h1>
+      <p jhiTranslate="catalogueIdentification.subtitle">Scan lookup, product assignment, anomaly resolution and print batch tracking.</p>
+    </div>
+    <div class="adm-page__actions">
+      <a routerLink="/produit" class="adm-button adm-button--ghost" jhiTranslate="catalogueIdentification.actions.productCatalogue"
+        >Product catalogue</a
+      >
+      <button type="button" class="adm-button" (click)="recharger()" [disabled]="chargement() || enregistrement()">
+        {{ (chargement() ? 'catalogueIdentification.actions.refreshing' : 'catalogueIdentification.actions.refresh') | translate }}
+      </button>
+    </div>
+  </header>
+
+  @if (message(); as feedback) {
+    <div
+      class="alert"
+      [class.alert-success]="feedback.type === 'success'"
+      [class.alert-danger]="feedback.type === 'danger'"
+      [class.alert-info]="feedback.type === 'info'"
+    >
+      {{ feedback.key | translate }}
+    </div>
+  }
+
+  @if (!permissionsUi.peutVoirEcran('produits')) {
+    <article class="adm-card">
+      <div class="adm-empty-state">
+        <strong jhiTranslate="catalogueIdentification.access.title">Restricted access</strong>
+        <p jhiTranslate="catalogueIdentification.access.description">Your profile cannot open the product identification centre.</p>
+      </div>
+    </article>
+  } @else {
+    <section class="adm-kpi-grid">
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="catalogueIdentification.kpis.identifiedProducts">Identified products</span>
+        <strong>{{ totalProduitsIdentifies() }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="catalogueIdentification.kpis.activeCodes">Active codes</span>
+        <strong>{{ totalCodesActifs() }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="catalogueIdentification.kpis.openScans">Open scans</span>
+        <strong>{{ totalScansOuverts() }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="catalogueIdentification.kpis.printBatches">Print batches</span>
+        <strong>{{ totalLotsImpression() }}</strong>
+      </article>
+    </section>
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-toolbar">
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'recherche'"
+          (click)="onglet.set('recherche')"
+        >
+          <span jhiTranslate="catalogueIdentification.tabs.search">Scan search</span>
+        </button>
+        <button type="button" class="adm-tab-button" [class.adm-tab-button--active]="onglet() === 'codes'" (click)="onglet.set('codes')">
+          <span jhiTranslate="catalogueIdentification.tabs.barcodes">Barcodes</span>
+        </button>
+        <button type="button" class="adm-tab-button" [class.adm-tab-button--active]="onglet() === 'scans'" (click)="onglet.set('scans')">
+          <span jhiTranslate="catalogueIdentification.tabs.unknownScans">Unknown scans</span>
+        </button>
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'etiquettes'"
+          (click)="onglet.set('etiquettes')"
+        >
+          <span jhiTranslate="catalogueIdentification.tabs.labels">Labels</span>
+        </button>
+        <button
+          type="button"
+          class="adm-tab-button"
+          [class.adm-tab-button--active]="onglet() === 'historique'"
+          (click)="onglet.set('historique')"
+        >
+          <span jhiTranslate="catalogueIdentification.tabs.history">History</span>
+        </button>
+
+        <label class="adm-field adm-field--grow">
+          <span jhiTranslate="catalogueIdentification.fields.globalSearch">Global search</span>
+          <input
+            type="search"
+            [ngModel]="rechercheGlobale()"
+            (ngModelChange)="rechercheGlobale.set($event)"
+            [placeholder]="'catalogueIdentification.placeholders.globalSearch' | translate"
+          />
+        </label>
+
+        <label class="adm-field">
+          <span jhiTranslate="catalogueIdentification.fields.shop">Shop</span>
+          <select class="adm-select" [ngModel]="filtreBoutique()" (ngModelChange)="filtreBoutique.set($event)">
+            <option value="ALL" jhiTranslate="catalogueIdentification.common.allFeminine">All</option>
+            @for (boutique of boutiquesDisponibles(); track boutique.id) {
+              <option [value]="boutique.id">{{ boutique.nom }}</option>
+            }
+          </select>
+        </label>
+
+        <button
+          type="button"
+          class="adm-button adm-button--ghost"
+          (click)="reinitialiserFiltres()"
+          jhiTranslate="catalogueIdentification.actions.reset"
+        >
+          Reset
+        </button>
+      </div>
+    </article>
+
+    @if (onglet() === 'recherche') {
+      <section class="adm-two-columns">
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.search.title">Search by scan or barcode</h2>
+              <p jhiTranslate="catalogueIdentification.search.description">
+                Quickly find an identified product or anomalies associated with a code.
+              </p>
+            </div>
+          </div>
+
+          <div class="adm-form-grid">
+            <label class="adm-field adm-field--full">
+              <span jhiTranslate="catalogueIdentification.fields.scannedCode">Scanned code</span>
+              <input
+                class="adm-input"
+                type="search"
+                [ngModel]="rechercheCodeBarres()"
+                (ngModelChange)="rechercheCodeBarres.set($event)"
+                [placeholder]="'catalogueIdentification.placeholders.scanBarcode' | translate"
+              />
+            </label>
+          </div>
+
+          @if (!rechercheCodeBarres().trim()) {
+            <div class="adm-empty-inline" jhiTranslate="catalogueIdentification.search.enterCode">
+              Enter a code to display product matches and scans to process.
+            </div>
+          } @else if (resultatsRechercheCodeBarres().length === 0) {
+            <div class="adm-empty-inline" jhiTranslate="catalogueIdentification.search.noDirectMatch">
+              No direct match found among active barcodes.
+            </div>
+          } @else {
+            <div class="adm-list-panel">
+              @for (codeBarres of resultatsRechercheCodeBarres(); track codeBarres.id) {
+                <div class="adm-list-panel__row">
+                  <div>
+                    <strong class="adm-code">{{ codeBarres.code }}</strong>
+                    <small
+                      >{{ codeBarres.produit?.designation || ('catalogueIdentification.common.productNotProvided' | translate) }} -
+                      {{
+                        produitParId(codeBarres.produit?.id)?.boutique?.nom || ('catalogueIdentification.common.noShop' | translate)
+                      }}</small
+                    >
+                  </div>
+                  <div class="adm-inline-actions">
+                    <span class="adm-pill" [class.adm-pill--success]="codeBarres.actif" [class.adm-pill--warning]="!codeBarres.actif">
+                      {{
+                        (codeBarres.actif ? 'catalogueIdentification.status.active' : 'catalogueIdentification.status.inactive') | translate
+                      }}
+                    </span>
+                    @if (codeBarres.produit?.id) {
+                      <button type="button" class="adm-button adm-button--ghost" (click)="selectionnerProduit(codeBarres.produit!.id)">
+                        <span jhiTranslate="catalogueIdentification.actions.select">Select</span>
+                      </button>
+                    }
+                    @if (codeBarres.produit?.id) {
+                      <a
+                        class="adm-button adm-button--ghost"
+                        [routerLink]="['/produit', codeBarres.produit!.id, 'view']"
+                        jhiTranslate="catalogueIdentification.actions.view"
+                        >View</a
+                      >
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </article>
+
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.search.relatedScansTitle">Scans associated with this code</h2>
+              <p jhiTranslate="catalogueIdentification.search.relatedScansDescription">
+                Useful reports when the scan is not yet correctly linked to the catalogue.
+              </p>
+            </div>
+          </div>
+
+          @if (scansCorrespondants().length === 0) {
+            <div class="adm-empty-inline" jhiTranslate="catalogueIdentification.search.noUnknownScan">
+              No unknown scan matches this entry.
+            </div>
+          } @else {
+            <div class="adm-mini-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th jhiTranslate="catalogueIdentification.fields.date">Date</th>
+                    <th jhiTranslate="catalogueIdentification.fields.shop">Shop</th>
+                    <th jhiTranslate="catalogueIdentification.fields.status">Status</th>
+                    <th jhiTranslate="catalogueIdentification.fields.assignedProduct">Assigned product</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (scan of scansCorrespondants(); track scan.id) {
+                    <tr>
+                      <td>{{ scan.dateScan | formatMediumDatetime }}</td>
+                      <td>{{ scan.boutique?.nom ?? '--' }}</td>
+                      <td>
+                        {{
+                          (scan.resolu ? 'catalogueIdentification.status.resolved' : 'catalogueIdentification.status.toProcess') | translate
+                        }}
+                      </td>
+                      <td>{{ scan.produitAffecte?.designation ?? '--' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </article>
+      </section>
+    }
+
+    @if (onglet() === 'codes') {
+      <section class="adm-two-columns">
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.barcodes.title">Active and historical barcodes</h2>
+              <p jhiTranslate="catalogueIdentification.barcodes.description">Central view of product identifiers by shop and type.</p>
+            </div>
+          </div>
+
+          <div class="adm-toolbar adm-toolbar--embedded">
+            <label class="adm-field">
+              <span jhiTranslate="catalogueIdentification.fields.type">Type</span>
+              <select class="adm-select" [ngModel]="filtreTypeCode()" (ngModelChange)="filtreTypeCode.set($event)">
+                <option value="ALL" jhiTranslate="catalogueIdentification.common.all">All</option>
+                @for (typeCode of typesCodeBarres; track typeCode) {
+                  <option [value]="typeCode">{{ 'admSupervisionVentesApp.TypeCodeBarres.' + typeCode | translate }}</option>
+                }
+              </select>
+            </label>
+          </div>
+
+          <div class="adm-mini-table">
+            <table>
+              <thead>
+                <tr>
+                  <th jhiTranslate="catalogueIdentification.fields.code">Code</th>
+                  <th jhiTranslate="catalogueIdentification.fields.product">Product</th>
+                  <th jhiTranslate="catalogueIdentification.fields.shop">Shop</th>
+                  <th jhiTranslate="catalogueIdentification.fields.type">Type</th>
+                  <th jhiTranslate="catalogueIdentification.fields.status">Status</th>
+                  <th jhiTranslate="catalogueIdentification.fields.primary">Primary</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (codeBarres of codesBarresFiltres(); track codeBarres.id) {
+                  <tr>
+                    <td class="adm-code">{{ codeBarres.code ?? '--' }}</td>
+                    <td>{{ codeBarres.produit?.designation ?? '--' }}</td>
+                    <td>{{ produitParId(codeBarres.produit?.id)?.boutique?.nom ?? '--' }}</td>
+                    <td>{{ codeBarres.type ? ('admSupervisionVentesApp.TypeCodeBarres.' + codeBarres.type | translate) : '--' }}</td>
+                    <td>
+                      {{
+                        (codeBarres.actif ? 'catalogueIdentification.status.active' : 'catalogueIdentification.status.inactive') | translate
+                      }}
+                    </td>
+                    <td>
+                      {{ (codeBarres.principal ? 'catalogueIdentification.common.yes' : 'catalogueIdentification.common.no') | translate }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.barcodes.newTitle">New barcode</h2>
+              <p jhiTranslate="catalogueIdentification.barcodes.newDescription">Quickly assign a code to a catalogue product.</p>
+            </div>
+          </div>
+
+          <div class="adm-form-grid">
+            <label class="adm-field adm-field--full">
+              <span jhiTranslate="catalogueIdentification.fields.product">Product</span>
+              <select class="adm-select" [(ngModel)]="formulaireCodeBarres.produitId">
+                <option [ngValue]="null" jhiTranslate="catalogueIdentification.common.selectProduct">Select a product</option>
+                @for (produit of produitsTries(); track produit.id) {
+                  <option [ngValue]="produit.id">
+                    {{ produit.designation }} - {{ produit.codeInterne || ('catalogueIdentification.common.noCode' | translate) }}
+                  </option>
+                }
+              </select>
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="catalogueIdentification.fields.type">Type</span>
+              <select class="adm-select" [(ngModel)]="formulaireCodeBarres.type">
+                @for (typeCode of typesCodeBarres; track typeCode) {
+                  <option [ngValue]="typeCode">{{ 'admSupervisionVentesApp.TypeCodeBarres.' + typeCode | translate }}</option>
+                }
+              </select>
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="catalogueIdentification.fields.barcode">Barcode</span>
+              <input
+                class="adm-input"
+                [(ngModel)]="formulaireCodeBarres.code"
+                [placeholder]="'catalogueIdentification.placeholders.enterOrGenerateCode' | translate"
+              />
+            </label>
+          </div>
+
+          <div class="adm-form-grid adm-form-grid--checks">
+            <label class="adm-check">
+              <input type="checkbox" [(ngModel)]="formulaireCodeBarres.principal" />
+              <span jhiTranslate="catalogueIdentification.fields.primary">Primary</span>
+            </label>
+            <label class="adm-check">
+              <input type="checkbox" [(ngModel)]="formulaireCodeBarres.actif" />
+              <span jhiTranslate="catalogueIdentification.status.active">Active</span>
+            </label>
+            <label class="adm-check">
+              <input type="checkbox" [(ngModel)]="formulaireCodeBarres.genereParSysteme" />
+              <span jhiTranslate="catalogueIdentification.fields.systemGenerated">Generated by the system</span>
+            </label>
+          </div>
+
+          @if (permissionsUi.peutGererArticlesBoutique()) {
+            <div class="adm-page-header__actions">
+              <button
+                type="button"
+                class="adm-button adm-button--ghost"
+                (click)="genererCodeAutomatique()"
+                jhiTranslate="catalogueIdentification.actions.generateAutomatically"
+              >
+                Generate automatically
+              </button>
+              <button type="button" class="adm-button adm-button--primary" (click)="enregistrerCodeBarres()" [disabled]="enregistrement()">
+                {{
+                  (enregistrement() ? 'catalogueIdentification.actions.saving' : 'catalogueIdentification.actions.addBarcode') | translate
+                }}
+              </button>
+            </div>
+          }
+        </article>
+      </section>
+    }
+
+    @if (onglet() === 'scans') {
+      <section class="adm-two-columns">
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.unknownScans.title">Unknown scans to resolve</h2>
+              <p jhiTranslate="catalogueIdentification.unknownScans.description">
+                Process codes not recognized at checkout or in stock workflows.
+              </p>
+            </div>
+          </div>
+
+          <div class="adm-mini-table">
+            <table>
+              <thead>
+                <tr>
+                  <th jhiTranslate="catalogueIdentification.fields.code">Code</th>
+                  <th jhiTranslate="catalogueIdentification.fields.shop">Shop</th>
+                  <th jhiTranslate="catalogueIdentification.fields.screen">Screen</th>
+                  <th jhiTranslate="catalogueIdentification.fields.date">Date</th>
+                  <th jhiTranslate="catalogueIdentification.fields.status">Status</th>
+                  <th jhiTranslate="catalogueIdentification.fields.resolution">Resolution</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (scan of scansFiltres(); track scan.id) {
+                  <tr>
+                    <td class="adm-code">{{ scan.codeScanne ?? '--' }}</td>
+                    <td>{{ scan.boutique?.nom ?? '--' }}</td>
+                    <td>{{ scan.ecranOrigine ?? '--' }}</td>
+                    <td>{{ scan.dateScan | formatMediumDatetime }}</td>
+                    <td>
+                      {{
+                        (scan.resolu ? 'catalogueIdentification.status.resolved' : 'catalogueIdentification.status.toProcess') | translate
+                      }}
+                    </td>
+                    <td>
+                      @if (scan.resolu) {
+                        <span class="adm-pill adm-pill--success">{{
+                          scan.produitAffecte?.designation || ('catalogueIdentification.status.resolved' | translate)
+                        }}</span>
+                      } @else if (permissionsUi.peutGererArticlesBoutique()) {
+                        <div class="adm-inline-form">
+                          <select class="adm-select" [(ngModel)]="resolutionProduitParScan[scan.id]">
+                            <option [ngValue]="null" jhiTranslate="catalogueIdentification.common.chooseProduct">Choose a product</option>
+                            @for (produit of produitsTries(); track produit.id) {
+                              @if (!scan.boutique?.id || produit.boutique?.id === scan.boutique?.id) {
+                                <option [ngValue]="produit.id">{{ produit.designation }}</option>
+                              }
+                            }
+                          </select>
+                          <button
+                            type="button"
+                            class="adm-button adm-button--ghost"
+                            (click)="resoudreScan(scan)"
+                            [disabled]="enregistrement()"
+                          >
+                            <span jhiTranslate="catalogueIdentification.actions.resolve">Resolve</span>
+                          </button>
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.control.title">Control view</h2>
+              <p jhiTranslate="catalogueIdentification.control.description">Direct access to detailed tracking and configuration pages.</p>
+            </div>
+          </div>
+
+          <div class="adm-list-panel">
+            <div class="adm-list-panel__row">
+              <div>
+                <strong>{{ 'catalogueIdentification.control.openScans' | translate: { count: totalScansOuverts() } }}</strong>
+                <small jhiTranslate="catalogueIdentification.control.priorityDescription"
+                  >Prioritize shops with active checkout or stock flows.</small
+                >
+              </div>
+              <a class="adm-button adm-button--ghost" routerLink="/scan-inconnu" jhiTranslate="catalogueIdentification.actions.fullView"
+                >Full view</a
+              >
+            </div>
+            @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+              <div class="adm-list-panel__row">
+                <div>
+                  <strong jhiTranslate="catalogueIdentification.control.barcodeSettings">Barcode settings</strong>
+                  <small jhiTranslate="catalogueIdentification.control.barcodeSettingsDescription"
+                    >Generation formats, prefixes and lengths.</small
+                  >
+                </div>
+                <a class="adm-button adm-button--ghost" routerLink="/settings-center" jhiTranslate="catalogueIdentification.actions.open"
+                  >Open</a
+                >
+              </div>
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (onglet() === 'etiquettes') {
+      <section class="adm-two-columns">
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.labels.title">Label batches</h2>
+              <p jhiTranslate="catalogueIdentification.labels.description">Prepare, track and validate product printing.</p>
+            </div>
+          </div>
+
+          <div class="adm-mini-table">
+            <table>
+              <thead>
+                <tr>
+                  <th jhiTranslate="catalogueIdentification.fields.batchReference">Batch reference</th>
+                  <th jhiTranslate="catalogueIdentification.fields.product">Product</th>
+                  <th jhiTranslate="catalogueIdentification.fields.format">Format</th>
+                  <th jhiTranslate="catalogueIdentification.fields.quantity">Quantity</th>
+                  <th jhiTranslate="catalogueIdentification.fields.status">Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (lotSynthese of lotsSynthese(); track lotSynthese.lot.id) {
+                  <tr>
+                    <td>{{ lotSynthese.lot.reference ?? '--' }}</td>
+                    <td>{{ lotSynthese.produitPrincipal || ('catalogueIdentification.common.productNotProvided' | translate) }}</td>
+                    <td>{{ lotSynthese.lot.formatImpression ?? '--' }}</td>
+                    <td>{{ lotSynthese.quantiteTotale }}</td>
+                    <td>
+                      @if (lotSynthese.imprime) {
+                        <span class="adm-pill adm-pill--success" jhiTranslate="catalogueIdentification.status.printed">Printed</span>
+                      } @else {
+                        <span class="adm-pill adm-pill--warning" jhiTranslate="catalogueIdentification.status.pending">Pending</span>
+                      }
+                    </td>
+                    <td>
+                      <div class="adm-inline-actions">
+                        <a
+                          class="adm-button adm-button--ghost"
+                          [routerLink]="['/lot-etiquettes', lotSynthese.lot.id, 'view']"
+                          jhiTranslate="catalogueIdentification.actions.view"
+                          >View</a
+                        >
+                        @if (!lotSynthese.imprime && permissionsUi.peutGererArticlesBoutique()) {
+                          <button
+                            type="button"
+                            class="adm-button adm-button--ghost"
+                            (click)="marquerLotImprime(lotSynthese)"
+                            [disabled]="enregistrement()"
+                          >
+                            <span jhiTranslate="catalogueIdentification.actions.markPrinted">Mark as printed</span>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="adm-card adm-card--spaced">
+          <div class="adm-section-heading">
+            <div>
+              <h2 jhiTranslate="catalogueIdentification.labels.prepareTitle">Prepare a batch</h2>
+              <p jhiTranslate="catalogueIdentification.labels.prepareDescription">
+                Create a label batch linked to a product and print quantity.
+              </p>
+            </div>
+          </div>
+
+          <div class="adm-form-grid">
+            <label class="adm-field adm-field--full">
+              <span jhiTranslate="catalogueIdentification.fields.product">Product</span>
+              <select class="adm-select" [(ngModel)]="formulaireEtiquettes.produitId">
+                <option [ngValue]="null" jhiTranslate="catalogueIdentification.common.selectProduct">Select a product</option>
+                @for (produit of produitsTries(); track produit.id) {
+                  <option [ngValue]="produit.id">
+                    {{ produit.designation }} - {{ produit.codeInterne || ('catalogueIdentification.common.noCode' | translate) }}
+                  </option>
+                }
+              </select>
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="catalogueIdentification.fields.batchReference">Batch reference</span>
+              <input
+                class="adm-input"
+                [(ngModel)]="formulaireEtiquettes.reference"
+                [placeholder]="'catalogueIdentification.placeholders.generatedIfEmpty' | translate"
+              />
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="catalogueIdentification.fields.printFormat">Print format</span>
+              <input
+                class="adm-input"
+                [(ngModel)]="formulaireEtiquettes.formatImpression"
+                [placeholder]="'catalogueIdentification.placeholders.printFormat' | translate"
+              />
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="catalogueIdentification.fields.quantity">Quantity</span>
+              <input class="adm-input" type="number" min="1" [(ngModel)]="formulaireEtiquettes.quantite" />
+            </label>
+          </div>
+
+          @if (permissionsUi.peutGererArticlesBoutique()) {
+            <button type="button" class="adm-button adm-button--primary" (click)="creerLotEtiquettes()" [disabled]="enregistrement()">
+              {{
+                (enregistrement() ? 'catalogueIdentification.actions.preparing' : 'catalogueIdentification.actions.createLabelBatch')
+                  | translate
+              }}
+            </button>
+          }
+        </article>
+      </section>
+    }
+
+    @if (onglet() === 'historique') {
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="catalogueIdentification.history.title">Code change history</h2>
+            <p jhiTranslate="catalogueIdentification.history.description">
+              Trace replacements and corrections related to product identification.
+            </p>
+          </div>
+        </div>
+
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="catalogueIdentification.fields.date">Date</th>
+                <th jhiTranslate="catalogueIdentification.fields.product">Product</th>
+                <th jhiTranslate="catalogueIdentification.fields.oldCode">Old code</th>
+                <th jhiTranslate="catalogueIdentification.fields.newCode">New code</th>
+                <th jhiTranslate="catalogueIdentification.fields.reason">Reason</th>
+                <th jhiTranslate="catalogueIdentification.fields.user">User</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (historique of historiquesFiltres(); track historique.id) {
+                <tr>
+                  <td>{{ historique.dateChangement | formatMediumDatetime }}</td>
+                  <td>{{ historique.produit?.designation ?? '--' }}</td>
+                  <td class="adm-code">{{ historique.ancienCode ?? '--' }}</td>
+                  <td class="adm-code">{{ historique.nouveauCode ?? '--' }}</td>
+                  <td>{{ historique.motif ?? '--' }}</td>
+                  <td>{{ historique.utilisateur?.login ?? '--' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    }
+  }
+</section>

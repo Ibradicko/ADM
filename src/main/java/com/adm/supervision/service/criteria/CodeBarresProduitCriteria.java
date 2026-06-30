@@ -1,0 +1,295 @@
+package com.adm.supervision.service.criteria;
+
+import com.adm.supervision.domain.enumeration.TypeCodeBarres;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.Optional;
+import org.springdoc.core.annotations.ParameterObject;
+import tech.jhipster.service.Criteria;
+import tech.jhipster.service.filter.*;
+
+/**
+ * Criteria class for the {@link com.adm.supervision.domain.CodeBarresProduit} entity. This class is used
+ * in {@link com.adm.supervision.web.rest.CodeBarresProduitResource} to receive all the possible filtering options from
+ * the Http GET request parameters.
+ * For example the following could be a valid request:
+ * {@code /code-barres-produits?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
+ * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
+ * fix type specific filters.
+ */
+@ParameterObject
+@SuppressWarnings("common-java:DuplicatedBlocks")
+public class CodeBarresProduitCriteria implements Serializable, Criteria {
+
+    /**
+     * Class for filtering TypeCodeBarres
+     */
+    public static class TypeCodeBarresFilter extends Filter<TypeCodeBarres> {
+
+        public TypeCodeBarresFilter() {}
+
+        public TypeCodeBarresFilter(TypeCodeBarresFilter filter) {
+            super(filter);
+        }
+
+        @Override
+        public TypeCodeBarresFilter copy() {
+            return new TypeCodeBarresFilter(this);
+        }
+    }
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private LongFilter id;
+
+    private StringFilter code;
+
+    private TypeCodeBarresFilter type;
+
+    private BooleanFilter principal;
+
+    private BooleanFilter genereParSysteme;
+
+    private BooleanFilter actif;
+
+    private InstantFilter dateAffectation;
+
+    private LongFilter produitId;
+
+    private Boolean distinct;
+
+    public CodeBarresProduitCriteria() {}
+
+    public CodeBarresProduitCriteria(CodeBarresProduitCriteria other) {
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.type = other.optionalType().map(TypeCodeBarresFilter::copy).orElse(null);
+        this.principal = other.optionalPrincipal().map(BooleanFilter::copy).orElse(null);
+        this.genereParSysteme = other.optionalGenereParSysteme().map(BooleanFilter::copy).orElse(null);
+        this.actif = other.optionalActif().map(BooleanFilter::copy).orElse(null);
+        this.dateAffectation = other.optionalDateAffectation().map(InstantFilter::copy).orElse(null);
+        this.produitId = other.optionalProduitId().map(LongFilter::copy).orElse(null);
+        this.distinct = other.distinct;
+    }
+
+    @Override
+    public CodeBarresProduitCriteria copy() {
+        return new CodeBarresProduitCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public TypeCodeBarresFilter getType() {
+        return type;
+    }
+
+    public Optional<TypeCodeBarresFilter> optionalType() {
+        return Optional.ofNullable(type);
+    }
+
+    public TypeCodeBarresFilter type() {
+        if (type == null) {
+            setType(new TypeCodeBarresFilter());
+        }
+        return type;
+    }
+
+    public void setType(TypeCodeBarresFilter type) {
+        this.type = type;
+    }
+
+    public BooleanFilter getPrincipal() {
+        return principal;
+    }
+
+    public Optional<BooleanFilter> optionalPrincipal() {
+        return Optional.ofNullable(principal);
+    }
+
+    public BooleanFilter principal() {
+        if (principal == null) {
+            setPrincipal(new BooleanFilter());
+        }
+        return principal;
+    }
+
+    public void setPrincipal(BooleanFilter principal) {
+        this.principal = principal;
+    }
+
+    public BooleanFilter getGenereParSysteme() {
+        return genereParSysteme;
+    }
+
+    public Optional<BooleanFilter> optionalGenereParSysteme() {
+        return Optional.ofNullable(genereParSysteme);
+    }
+
+    public BooleanFilter genereParSysteme() {
+        if (genereParSysteme == null) {
+            setGenereParSysteme(new BooleanFilter());
+        }
+        return genereParSysteme;
+    }
+
+    public void setGenereParSysteme(BooleanFilter genereParSysteme) {
+        this.genereParSysteme = genereParSysteme;
+    }
+
+    public BooleanFilter getActif() {
+        return actif;
+    }
+
+    public Optional<BooleanFilter> optionalActif() {
+        return Optional.ofNullable(actif);
+    }
+
+    public BooleanFilter actif() {
+        if (actif == null) {
+            setActif(new BooleanFilter());
+        }
+        return actif;
+    }
+
+    public void setActif(BooleanFilter actif) {
+        this.actif = actif;
+    }
+
+    public InstantFilter getDateAffectation() {
+        return dateAffectation;
+    }
+
+    public Optional<InstantFilter> optionalDateAffectation() {
+        return Optional.ofNullable(dateAffectation);
+    }
+
+    public InstantFilter dateAffectation() {
+        if (dateAffectation == null) {
+            setDateAffectation(new InstantFilter());
+        }
+        return dateAffectation;
+    }
+
+    public void setDateAffectation(InstantFilter dateAffectation) {
+        this.dateAffectation = dateAffectation;
+    }
+
+    public LongFilter getProduitId() {
+        return produitId;
+    }
+
+    public Optional<LongFilter> optionalProduitId() {
+        return Optional.ofNullable(produitId);
+    }
+
+    public LongFilter produitId() {
+        if (produitId == null) {
+            setProduitId(new LongFilter());
+        }
+        return produitId;
+    }
+
+    public void setProduitId(LongFilter produitId) {
+        this.produitId = produitId;
+    }
+
+    public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
+        return distinct;
+    }
+
+    public void setDistinct(Boolean distinct) {
+        this.distinct = distinct;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final CodeBarresProduitCriteria that = (CodeBarresProduitCriteria) o;
+        return (
+            Objects.equals(id, that.id) &&
+            Objects.equals(code, that.code) &&
+            Objects.equals(type, that.type) &&
+            Objects.equals(principal, that.principal) &&
+            Objects.equals(genereParSysteme, that.genereParSysteme) &&
+            Objects.equals(actif, that.actif) &&
+            Objects.equals(dateAffectation, that.dateAffectation) &&
+            Objects.equals(produitId, that.produitId) &&
+            Objects.equals(distinct, that.distinct)
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, code, type, principal, genereParSysteme, actif, dateAffectation, produitId, distinct);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "CodeBarresProduitCriteria{" +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalType().map(f -> "type=" + f + ", ").orElse("") +
+            optionalPrincipal().map(f -> "principal=" + f + ", ").orElse("") +
+            optionalGenereParSysteme().map(f -> "genereParSysteme=" + f + ", ").orElse("") +
+            optionalActif().map(f -> "actif=" + f + ", ").orElse("") +
+            optionalDateAffectation().map(f -> "dateAffectation=" + f + ", ").orElse("") +
+            optionalProduitId().map(f -> "produitId=" + f + ", ").orElse("") +
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
+    }
+}

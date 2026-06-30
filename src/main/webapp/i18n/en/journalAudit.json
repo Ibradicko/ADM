@@ -1,0 +1,31 @@
+{
+  "admSupervisionVentesApp": {
+    "journalAudit": {
+      "home": {
+        "title": "Journal Audits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Journal Audit",
+        "createOrEditLabel": "Create or edit a Journal Audit",
+        "notFound": "No Journal Audits found"
+      },
+      "created": "A new Journal Audit is created with identifier {{ param }}",
+      "updated": "A Journal Audit is updated with identifier {{ param }}",
+      "deleted": "A Journal Audit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Journal Audit {{ id }}?"
+      },
+      "detail": {
+        "title": "Journal Audit"
+      },
+      "id": "ID",
+      "typeAction": "Type Action",
+      "entiteConcernee": "Entite Concernee",
+      "identifiantEntite": "Identifiant Entite",
+      "description": "Description",
+      "adresseIp": "Adresse Ip",
+      "dateAction": "Date Action",
+      "boutique": "Boutique",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

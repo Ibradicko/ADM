@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity LigneInventaireStock.
+    -->
+    <changeSet id="20260505101146-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="inventaire_id"
+                                 baseTableName="ligne_inventaire_stock"
+                                 constraintName="fk_ligne_inventaire_stock__inventaire_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="inventaire_stock"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="produit_id"
+                                 baseTableName="ligne_inventaire_stock"
+                                 constraintName="fk_ligne_inventaire_stock__produit_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="produit"
+                                 />
+    </changeSet>
+</databaseChangeLog>

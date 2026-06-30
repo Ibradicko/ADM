@@ -3,6 +3,7 @@ package com.adm.supervision.service;
 import com.adm.supervision.config.Constants;
 import com.adm.supervision.domain.Authority;
 import com.adm.supervision.domain.User;
+import com.adm.supervision.domain.enumeration.TypeActionAudit;
 import com.adm.supervision.repository.AuthorityRepository;
 import com.adm.supervision.repository.UserRepository;
 import com.adm.supervision.security.AuthoritiesConstants;
@@ -10,6 +11,7 @@ import com.adm.supervision.security.SecurityUtils;
 import com.adm.supervision.service.dto.AdminUserDTO;
 import com.adm.supervision.service.dto.UserDTO;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,16 +43,20 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final JournalAuditService journalAuditService;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        JournalAuditService journalAuditService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.journalAuditService = journalAuditService;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -62,6 +68,7 @@ public class UserService {
                 user.setActivated(true);
                 user.setActivationKey(null);
                 this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.MODIFICATION, user.getLogin(), "Activation du compte utilisateur", user);
                 LOG.debug("Activated user: {}", user);
                 return user;
             });
@@ -76,7 +83,9 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
                 user.setResetDate(null);
+                user.setMustChangePassword(false);
                 this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.MODIFICATION, user.getLogin(), "Reinitialisation du mot de passe", user);
                 return user;
             });
     }
@@ -89,6 +98,7 @@ public class UserService {
                 user.setResetKey(RandomUtil.generateResetKey());
                 user.setResetDate(Instant.now());
                 this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.MODIFICATION, user.getLogin(), "Demande de reinitialisation du mot de passe", user);
                 return user;
             });
     }
@@ -131,6 +141,7 @@ public class UserService {
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
         this.clearUserCaches(newUser);
+        auditUserAction(TypeActionAudit.CREATION, newUser.getLogin(), "Creation interne d'un compte avec activation differee", newUser);
         LOG.debug("Created Information for User: {}", newUser);
         return newUser;
     }
@@ -146,6 +157,14 @@ public class UserService {
     }
 
     public User createUser(AdminUserDTO userDTO) {
+        return createUser(userDTO, null, false);
+    }
+
+    public User createUserWithInitialPassword(AdminUserDTO userDTO, String clearTextPassword, boolean mustChangePassword) {
+        return createUser(userDTO, clearTextPassword, mustChangePassword);
+    }
+
+    private User createUser(AdminUserDTO userDTO, String clearTextPassword, boolean mustChangePassword) {
         User user = new User();
         user.setLogin(userDTO.getLogin().toLowerCase());
         user.setFirstName(userDTO.getFirstName());
@@ -159,10 +178,11 @@ public class UserService {
         } else {
             user.setLangKey(userDTO.getLangKey());
         }
-        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
+        String encryptedPassword = passwordEncoder.encode(clearTextPassword == null ? RandomUtil.generatePassword() : clearTextPassword);
         user.setPassword(encryptedPassword);
         user.setResetKey(RandomUtil.generateResetKey());
         user.setResetDate(Instant.now());
+        user.setMustChangePassword(mustChangePassword);
         user.setActivated(true);
         if (userDTO.getAuthorities() != null) {
             Set<Authority> authorities = userDTO
@@ -176,6 +196,7 @@ public class UserService {
         }
         userRepository.save(user);
         this.clearUserCaches(user);
+        auditUserAction(TypeActionAudit.CREATION, user.getLogin(), "Creation d'un utilisateur par l'administration", user);
         LOG.debug("Created Information for User: {}", user);
         return user;
     }
@@ -212,6 +233,7 @@ public class UserService {
                     .forEach(managedAuthorities::add);
                 userRepository.save(user);
                 this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.MODIFICATION, user.getLogin(), "Mise a jour de l'utilisateur", user);
                 LOG.debug("Changed Information for User: {}", user);
                 return user;
             })
@@ -225,6 +247,39 @@ public class UserService {
                 userRepository.delete(user);
                 this.clearUserCaches(user);
                 LOG.debug("Deleted User: {}", user);
+            });
+    }
+
+    public void deactivateUser(String login) {
+        userRepository
+            .findOneByLogin(login)
+            .ifPresent(user -> {
+                SecurityUtils.getCurrentUserLogin()
+                    .filter(currentLogin -> currentLogin.equalsIgnoreCase(user.getLogin()))
+                    .ifPresent(currentLogin -> {
+                        throw new BusinessValidationException(
+                            "userManagement",
+                            "selfDeactivate",
+                            "Vous ne pouvez pas vous desactiver vous-meme"
+                        );
+                    });
+
+                if ("admin".equalsIgnoreCase(user.getLogin())) {
+                    throw new BusinessValidationException(
+                        "userManagement",
+                        "protectedUser",
+                        "Le compte administrateur principal ne peut pas etre desactive"
+                    );
+                }
+
+                user.setActivated(false);
+                user.setActivationKey(null);
+                user.setResetKey(RandomUtil.generateResetKey());
+                user.setResetDate(Instant.now());
+                userRepository.save(user);
+                this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.DESACTIVATION, user.getLogin(), "Desactivation d'un utilisateur", user);
+                LOG.debug("Deactivated User: {}", user);
             });
     }
 
@@ -250,6 +305,7 @@ public class UserService {
                 user.setImageUrl(imageUrl);
                 userRepository.save(user);
                 this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.MODIFICATION, user.getLogin(), "Mise a jour du compte courant", user);
                 LOG.debug("Changed Information for User: {}", user);
             });
     }
@@ -265,7 +321,9 @@ public class UserService {
                 }
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
+                user.setMustChangePassword(false);
                 this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.MODIFICATION, user.getLogin(), "Changement du mot de passe", user);
                 LOG.debug("Changed password for User: {}", user);
             });
     }
@@ -273,6 +331,14 @@ public class UserService {
     @Transactional(readOnly = true)
     public Page<AdminUserDTO> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAll(pageable).map(AdminUserDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AdminUserDTO> getManagedUsersByBoutiques(Collection<Long> boutiqueIds, Pageable pageable) {
+        if (boutiqueIds == null || boutiqueIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return userRepository.findAllManagedByBoutiqueIds(boutiqueIds, LocalDate.now(), pageable).map(AdminUserDTO::new);
     }
 
     @Transactional(readOnly = true)
@@ -307,6 +373,29 @@ public class UserService {
     }
 
     /**
+     * Réinitialise le mot de passe d'un utilisateur à la valeur fournie
+     * et force le changement à la prochaine connexion.
+     * Utilisé par l'admin pour réinitialiser le compte d'un locataire.
+     */
+    public void reinitialiserMotDePasseParAdmin(String login, String clearTextPassword) {
+        userRepository
+            .findOneByLogin(login)
+            .ifPresent(user -> {
+                user.setPassword(passwordEncoder.encode(clearTextPassword));
+                user.setMustChangePassword(true);
+                userRepository.save(user);
+                clearUserCaches(user);
+                auditUserAction(
+                    TypeActionAudit.MODIFICATION,
+                    user.getLogin(),
+                    "Reinitialisation du mot de passe par l'administration",
+                    user
+                );
+                LOG.debug("Password reset by admin for User: {}", user);
+            });
+    }
+
+    /**
      * Gets a list of all the authorities.
      * @return a list of all the authorities.
      */
@@ -320,5 +409,9 @@ public class UserService {
         if (user.getEmail() != null) {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evictIfPresent(user.getEmail());
         }
+    }
+
+    private void auditUserAction(TypeActionAudit typeAction, String targetLogin, String description, User fallbackUser) {
+        journalAuditService.logAction(typeAction, "User", targetLogin, description, null, null);
     }
 }

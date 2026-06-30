@@ -1,0 +1,184 @@
+@if (produit(); as produitRef) {
+  <section class="adm-page">
+    <div class="adm-page-header">
+      <div>
+        <h1>{{ formatValeur(produitRef.designation) }}</h1>
+        <p jhiTranslate="productCustom.detail.subtitle">Detailed product view, commercial classification and relationships.</p>
+      </div>
+
+      <div class="adm-page-header__actions">
+        <button type="button" class="adm-button adm-button--ghost" (click)="previousState()">
+          <fa-icon icon="arrow-left" />
+          <span jhiTranslate="productCustom.actions.back">Back</span>
+        </button>
+
+        <a class="adm-button adm-button--ghost" [routerLink]="['/produit']">
+          <fa-icon icon="list" />
+          <span jhiTranslate="productCustom.actions.catalogue">Catalogue</span>
+        </a>
+
+        <a class="adm-button adm-button--primary" [routerLink]="['/produit', produitRef.id, 'edit']">
+          <fa-icon icon="pencil-alt" />
+          <span jhiTranslate="productCustom.actions.edit">Edit</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="adm-stats-grid adm-stats-grid--compact">
+      <article class="adm-stat-card">
+        <span jhiTranslate="admSupervisionVentesApp.produit.prixVente">Sale price</span>
+        <strong>{{ formatMontant(produitRef.prixVente) }}</strong>
+      </article>
+      <article class="adm-stat-card">
+        <span jhiTranslate="admSupervisionVentesApp.produit.typePrix">Price type</span>
+        <strong>{{ 'admSupervisionVentesApp.TypePrix.' + produitRef.typePrix | translate }}</strong>
+      </article>
+      <article class="adm-stat-card">
+        <span jhiTranslate="productCustom.fields.royalty">Royalty</span>
+        <strong>{{ formatTaux(produitRef.tauxRedevanceApplicable) }}</strong>
+      </article>
+      <article class="adm-stat-card">
+        <span jhiTranslate="admSupervisionVentesApp.produit.statut">Status</span>
+        <strong>{{ 'admSupervisionVentesApp.StatutGeneral.' + produitRef.statut | translate }}</strong>
+      </article>
+    </div>
+
+    <div class="adm-detail-layout">
+      <article class="adm-card">
+        <div class="adm-card__header">
+          <div>
+            <h2 jhiTranslate="productCustom.detail.identificationTitle">Product identification</h2>
+            <p jhiTranslate="productCustom.detail.identificationDescription">
+              Information visible to catalogue, sales and reporting teams.
+            </p>
+          </div>
+          <span
+            class="adm-pill"
+            [class.adm-pill--success]="produitRef.statut === 'ACTIF'"
+            [class.adm-pill--warning]="produitRef.statut === 'INACTIF'"
+            [class.adm-pill--danger]="produitRef.statut === 'SUSPENDU'"
+          >
+            {{ 'admSupervisionVentesApp.StatutGeneral.' + produitRef.statut | translate }}
+          </span>
+        </div>
+
+        <div class="adm-detail-grid">
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.codeInterne">Internal code</span>
+            <strong class="adm-code">{{ formatValeur(produitRef.codeInterne) }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.boutique">Shop</span>
+            <strong>{{ formatValeur(produitRef.boutique?.nom) }}</strong>
+          </div>
+          <div class="adm-detail-block adm-detail-block--full">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.description">Description</span>
+            <strong>{{ formatValeur(produitRef.description) }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.dateCreation">Creation date</span>
+            <strong>{{ produitRef.dateCreation | formatMediumDatetime }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.uniteMesure">Unit of measure</span>
+            <strong>{{ formatValeur(produitRef.uniteMesure?.code) }}</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="adm-card">
+        <div class="adm-card__header">
+          <div>
+            <h2 jhiTranslate="productCustom.detail.commercialTitle">Commercial and financial</h2>
+            <p jhiTranslate="productCustom.detail.commercialDescription">Data used at checkout, for royalties and price comparisons.</p>
+          </div>
+        </div>
+
+        <div class="adm-detail-grid">
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.typePrix">Price type</span>
+            <strong>{{ 'admSupervisionVentesApp.TypePrix.' + produitRef.typePrix | translate }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.prixVente">Sale price</span>
+            <strong>{{ formatMontant(produitRef.prixVente) }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.tauxRedevanceApplicable">Royalty rate</span>
+            <strong>{{ formatTaux(produitRef.tauxRedevanceApplicable) }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="productCustom.fields.technicalId">Technical identifier</span>
+            <strong>#{{ produitRef.id }}</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="adm-card">
+        <div class="adm-card__header">
+          <div>
+            <h2 jhiTranslate="productCustom.fields.classification">Classification</h2>
+            <p jhiTranslate="productCustom.detail.classificationDescription">
+              Commercial catalogue organization used for filtering and analysis.
+            </p>
+          </div>
+        </div>
+
+        <div class="adm-detail-grid">
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.groupeArticle">Product group</span>
+            <strong>{{ formatValeur(produitRef.groupeArticle?.libelle) }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.familleArticle">Product family</span>
+            <strong>{{ formatValeur(produitRef.familleArticle?.libelle) }}</strong>
+          </div>
+          <div class="adm-detail-block adm-detail-block--full">
+            <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.sousFamilleArticle">Subfamily</span>
+            <strong>{{ formatValeur(produitRef.sousFamilleArticle?.libelle) }}</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="adm-card">
+        <div class="adm-card__header">
+          <div>
+            <h2 jhiTranslate="productCustom.detail.quickAccessTitle">Quick access</h2>
+            <p jhiTranslate="productCustom.detail.quickAccessDescription">Useful shortcuts for product identification.</p>
+          </div>
+        </div>
+
+        <div class="adm-action-stack">
+          <a
+            class="adm-button adm-button--ghost"
+            [routerLink]="['/catalogue-identification']"
+            [queryParams]="{ produitId: produitRef.id, onglet: 'codes' }"
+          >
+            <fa-icon icon="barcode" />
+            <span jhiTranslate="productCustom.actions.manageBarcodes">Manage barcodes</span>
+          </a>
+          <a
+            class="adm-button adm-button--ghost"
+            [routerLink]="['/catalogue-identification']"
+            [queryParams]="{ produitId: produitRef.id, onglet: 'historique' }"
+          >
+            <fa-icon icon="road" />
+            <span jhiTranslate="productCustom.actions.viewHistory">View history</span>
+          </a>
+          <a
+            class="adm-button adm-button--ghost"
+            [routerLink]="['/catalogue-identification']"
+            [queryParams]="{ produitId: produitRef.id, onglet: 'etiquettes' }"
+          >
+            <fa-icon icon="tags" />
+            <span jhiTranslate="productCustom.actions.prepareLabels">Prepare labels</span>
+          </a>
+          <a class="adm-button adm-button--ghost" [routerLink]="['/settings-center']" [queryParams]="{ onglet: 'barcode' }">
+            <fa-icon icon="cogs" />
+            <span jhiTranslate="productCustom.actions.barcodeSettings">Barcode settings</span>
+          </a>
+        </div>
+      </article>
+    </div>
+  </section>
+}

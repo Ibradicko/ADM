@@ -1,0 +1,59 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (profilMetier(); as profilMetierRef) {
+      <div>
+        <h2 data-cy="profilMetierDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.profilMetier.detail.title">Profil Metier</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ profilMetierRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.profilMetier.code">Code</span></dt>
+          <dd>
+            <span>{{ profilMetierRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.profilMetier.libelle">Libelle</span></dt>
+          <dd>
+            <span>{{ profilMetierRef.libelle }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.profilMetier.description">Description</span></dt>
+          <dd>
+            <span>{{ profilMetierRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.profilMetier.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutGeneral.' + (profilMetierRef.statut ?? 'null')">{{
+              { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[profilMetierRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.profilMetier.permissions">Permissions</span></dt>
+          <dd>
+            @for (permissions of profilMetierRef.permissionses; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/permission-metier', permissions.id, 'view']">{{ permissions?.code }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/profil-metier', profilMetierRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

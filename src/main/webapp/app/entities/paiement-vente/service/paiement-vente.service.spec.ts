@@ -1,0 +1,199 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { IPaiementVente } from '../paiement-vente.model';
+import { sampleWithFullData, sampleWithNewData, sampleWithPartialData, sampleWithRequiredData } from '../paiement-vente.test-samples';
+
+import { PaiementVenteService, RestPaiementVente } from './paiement-vente.service';
+
+const requireRestSample: RestPaiementVente = {
+  ...sampleWithRequiredData,
+  datePaiement: sampleWithRequiredData.datePaiement?.toJSON(),
+};
+
+describe('PaiementVente Service', () => {
+  let service: PaiementVenteService;
+  let httpMock: HttpTestingController;
+  let expectedResult: IPaiementVente | IPaiementVente[] | boolean | null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClientTesting()],
+    });
+    expectedResult = null;
+    service = TestBed.inject(PaiementVenteService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  describe('Service methods', () => {
+    it('should find an element', () => {
+      const returnedFromService = { ...requireRestSample };
+      const expected = { ...sampleWithRequiredData };
+
+      service.find(123).subscribe(resp => (expectedResult = resp));
+
+      const req = httpMock.expectOne({ method: 'GET' });
+      req.flush(returnedFromService);
+      expect(expectedResult).toMatchObject(expected);
+    });
+
+    it('should create a PaiementVente', () => {
+      const paiementVente = { ...sampleWithNewData };
+      const returnedFromService = { ...requireRestSample };
+      const expected = { ...sampleWithRequiredData };
+
+      service.create(paiementVente).subscribe(resp => (expectedResult = resp));
+
+      const req = httpMock.expectOne({ method: 'POST' });
+      req.flush(returnedFromService);
+      expect(expectedResult).toMatchObject(expected);
+    });
+
+    it('should update a PaiementVente', () => {
+      const paiementVente = { ...sampleWithRequiredData };
+      const returnedFromService = { ...requireRestSample };
+      const expected = { ...sampleWithRequiredData };
+
+      service.update(paiementVente).subscribe(resp => (expectedResult = resp));
+
+      const req = httpMock.expectOne({ method: 'PUT' });
+      req.flush(returnedFromService);
+      expect(expectedResult).toMatchObject(expected);
+    });
+
+    it('should partial update a PaiementVente', () => {
+      const patchObject = { ...sampleWithPartialData };
+      const returnedFromService = { ...requireRestSample };
+      const expected = { ...sampleWithRequiredData };
+
+      service.partialUpdate(patchObject).subscribe(resp => (expectedResult = resp));
+
+      const req = httpMock.expectOne({ method: 'PATCH' });
+      req.flush(returnedFromService);
+      expect(expectedResult).toMatchObject(expected);
+    });
+
+    it('should return a list of PaiementVente', () => {
+      const returnedFromService = { ...requireRestSample };
+
+      const expected = { ...sampleWithRequiredData };
+
+      service.query().subscribe(resp => (expectedResult = resp.body));
+
+      const req = httpMock.expectOne({ method: 'GET' });
+      req.flush([returnedFromService]);
+      httpMock.verify();
+      expect(expectedResult).toMatchObject([expected]);
+    });
+
+    it('should delete a PaiementVente', () => {
+      service.delete(123).subscribe();
+
+      const requests = httpMock.match({ method: 'DELETE' });
+      expect(requests.length).toBe(1);
+    });
+
+    describe('addPaiementVenteToCollectionIfMissing', () => {
+      it('should add a PaiementVente to an empty array', () => {
+        const paiementVente: IPaiementVente = sampleWithRequiredData;
+        expectedResult = service.addPaiementVenteToCollectionIfMissing([], paiementVente);
+        expect(expectedResult).toEqual([paiementVente]);
+      });
+
+      it('should not add a PaiementVente to an array that contains it', () => {
+        const paiementVente: IPaiementVente = sampleWithRequiredData;
+        const paiementVenteCollection: IPaiementVente[] = [
+          {
+            ...paiementVente,
+          },
+          sampleWithPartialData,
+        ];
+        expectedResult = service.addPaiementVenteToCollectionIfMissing(paiementVenteCollection, paiementVente);
+        expect(expectedResult).toHaveLength(2);
+      });
+
+      it("should add a PaiementVente to an array that doesn't contain it", () => {
+        const paiementVente: IPaiementVente = sampleWithRequiredData;
+        const paiementVenteCollection: IPaiementVente[] = [sampleWithPartialData];
+        expectedResult = service.addPaiementVenteToCollectionIfMissing(paiementVenteCollection, paiementVente);
+        expect(expectedResult).toHaveLength(2);
+        expect(expectedResult).toContain(paiementVente);
+      });
+
+      it('should add only unique PaiementVente to an array', () => {
+        const paiementVenteArray: IPaiementVente[] = [sampleWithRequiredData, sampleWithPartialData, sampleWithFullData];
+        const paiementVenteCollection: IPaiementVente[] = [sampleWithRequiredData];
+        expectedResult = service.addPaiementVenteToCollectionIfMissing(paiementVenteCollection, ...paiementVenteArray);
+        expect(expectedResult).toHaveLength(3);
+      });
+
+      it('should accept varargs', () => {
+        const paiementVente: IPaiementVente = sampleWithRequiredData;
+        const paiementVente2: IPaiementVente = sampleWithPartialData;
+        expectedResult = service.addPaiementVenteToCollectionIfMissing([], paiementVente, paiementVente2);
+        expect(expectedResult).toEqual([paiementVente, paiementVente2]);
+      });
+
+      it('should accept null and undefined values', () => {
+        const paiementVente: IPaiementVente = sampleWithRequiredData;
+        expectedResult = service.addPaiementVenteToCollectionIfMissing([], null, paiementVente, undefined);
+        expect(expectedResult).toEqual([paiementVente]);
+      });
+
+      it('should return initial array if no PaiementVente is added', () => {
+        const paiementVenteCollection: IPaiementVente[] = [sampleWithRequiredData];
+        expectedResult = service.addPaiementVenteToCollectionIfMissing(paiementVenteCollection, undefined, null);
+        expect(expectedResult).toEqual(paiementVenteCollection);
+      });
+    });
+
+    describe('comparePaiementVente', () => {
+      it('should return true if both entities are null', () => {
+        const entity1 = null;
+        const entity2 = null;
+
+        const compareResult = service.comparePaiementVente(entity1, entity2);
+
+        expect(compareResult).toEqual(true);
+      });
+
+      it('should return false if one entity is null', () => {
+        const entity1 = { id: 30087 };
+        const entity2 = null;
+
+        const compareResult1 = service.comparePaiementVente(entity1, entity2);
+        const compareResult2 = service.comparePaiementVente(entity2, entity1);
+
+        expect(compareResult1).toEqual(false);
+        expect(compareResult2).toEqual(false);
+      });
+
+      it('should return false if primaryKey differs', () => {
+        const entity1 = { id: 30087 };
+        const entity2 = { id: 20053 };
+
+        const compareResult1 = service.comparePaiementVente(entity1, entity2);
+        const compareResult2 = service.comparePaiementVente(entity2, entity1);
+
+        expect(compareResult1).toEqual(false);
+        expect(compareResult2).toEqual(false);
+      });
+
+      it('should return false if primaryKey matches', () => {
+        const entity1 = { id: 30087 };
+        const entity2 = { id: 30087 };
+
+        const compareResult1 = service.comparePaiementVente(entity1, entity2);
+        const compareResult2 = service.comparePaiementVente(entity2, entity1);
+
+        expect(compareResult1).toEqual(true);
+        expect(compareResult2).toEqual(true);
+      });
+    });
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+  });
+});

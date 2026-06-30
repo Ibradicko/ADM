@@ -1,0 +1,220 @@
+{
+  "caisse": {
+    "title": "Poste caisse",
+    "subtitle": "Encaissement rapide par scan, ajout au panier, multi-paiement et suivi SAV des tickets.",
+    "common": {
+      "notAvailable": "--"
+    },
+    "accessDenied": {
+      "title": "Acces limite",
+      "text": "Votre profil ne permet pas encore d'utiliser le poste caisse."
+    },
+    "actions": {
+      "rawHistory": "Historique brut",
+      "validateTicket": "Valider le ticket",
+      "validating": "Validation en cours...",
+      "validatingShort": "Validation...",
+      "addByScan": "Ajouter par scan",
+      "assignBarcode": "Affecter le code-barres",
+      "remove": "Retirer",
+      "addPaymentMode": "Ajouter un mode",
+      "reprint": "Reimprimer",
+      "reprinting": "Reimpression...",
+      "reprintTicket": "Reimprimer le ticket",
+      "viewTicketLarge": "Voir le ticket en grand",
+      "registerReturn": "Enregistrer un retour",
+      "processing": "Traitement...",
+      "cancelSale": "Annuler la vente",
+      "cancelling": "Annulation...",
+      "confirmValidation": "Confirmer la validation",
+      "confirm": "Confirmer"
+    },
+    "stats": {
+      "cartItems": "Articles panier",
+      "subtotal": "Sous-total",
+      "enteredPayments": "Paiements saisis",
+      "enteredTotal": "Total saisi",
+      "remaining": "Reste a payer",
+      "remainingShort": "Reste",
+      "discount": "Remise",
+      "netTotal": "Total net"
+    },
+    "saleContext": {
+      "title": "Contexte de vente",
+      "subtitle": "Selection de la boutique, du locataire et des references de voyage.",
+      "moreInfo": "Informations complementaires"
+    },
+    "tabs": {
+      "caisse": "Caisse",
+      "historique": "Historique & SAV"
+    },
+    "categories": {
+      "all": "Toutes les categories"
+    },
+    "fields": {
+      "shop": "Boutique",
+      "shopRequired": "Boutique *",
+      "tenant": "Locataire",
+      "tenantRequired": "Locataire *",
+      "select": "Selectionner",
+      "passengerReference": "Reference passager",
+      "boardingPass": "Carte d'embarquement",
+      "ticketComment": "Commentaire de ticket",
+      "paymentMode": "Mode",
+      "amount": "Montant",
+      "reference": "Reference",
+      "status": "Statut",
+      "netAmount": "Montant net",
+      "seller": "Vendeur",
+      "quantity": "Quantite",
+      "items": "Articles",
+      "product": "Produit",
+      "currentStatus": "Statut actuel",
+      "requiredReason": "Motif obligatoire"
+    },
+    "placeholders": {
+      "passengerReference": "Numero client ou passager",
+      "boardingPass": "Reference d'embarquement",
+      "ticketComment": "Information utile a conserver sur la vente",
+      "scanCode": "Scanner un code-barres ou saisir un code manuel",
+      "searchProduct": "Rechercher un produit par code, designation ou famille",
+      "paymentReference": "Numero, transaction, cheque...",
+      "searchHistory": "Rechercher par ticket, boutique, locataire ou vendeur",
+      "auditReason": "Expliquer le motif pour l'audit"
+    },
+    "scan": {
+      "title": "Scan prioritaire",
+      "subtitle": "Scannez un code ou ajoutez un article via la recherche si besoin.",
+      "mode": "Mode scan",
+      "short": "scan",
+      "noScan": "Sans scan",
+      "unknownComment": "Scan non reconnu depuis le poste caisse"
+    },
+    "empty": {
+      "noProductMatch": "Aucun produit actif ne correspond a la recherche en cours.",
+      "noRecentSale": "Aucune vente recente disponible.",
+      "noGeneratedTicket": "Aucun ticket genere dans cette session pour le moment.",
+      "noReference": "Aucune reference",
+      "noSelectedSaleTitle": "Aucune vente selectionnee",
+      "noSelectedSaleText": "Choisissez un ticket dans l'historique pour afficher son detail et lancer les actions SAV.",
+      "noTicketTitle": "Aucun ticket disponible",
+      "noTicketText": "Lancez une reimpression pour regenerer le ticket de cette vente."
+    },
+    "recentSales": {
+      "title": "Dernieres ventes",
+      "subtitle": "Repere rapide des tickets recents dans l'application."
+    },
+    "currentTicket": {
+      "title": "Ticket courant",
+      "subtitle": "Panier de vente en cours avec quantites et totaux instantanes.",
+      "lineCount": "{{count}} ligne(s)",
+      "emptyTitle": "Le panier est vide",
+      "emptyText": "Scannez un produit ou ajoutez-le depuis la recherche pour commencer la vente."
+    },
+    "payments": {
+      "title": "Paiements",
+      "subtitle": "Ventilez le reglement sur un ou plusieurs modes de paiement."
+    },
+    "generatedTicket": {
+      "title": "Dernier ticket genere",
+      "subtitle": "Apercu texte du ticket de caisse tout juste emis."
+    },
+    "history": {
+      "title": "Historique, retours et annulations",
+      "subtitle": "Selectionnez une vente pour consulter son detail, reimprimer le ticket ou traiter un SAV.",
+      "columns": {
+        "ticket": "Ticket",
+        "date": "Date",
+        "shop": "Boutique",
+        "tenant": "Locataire",
+        "netTotal": "Total net",
+        "status": "Statut",
+        "actions": "Actions"
+      }
+    },
+    "ticketDetail": {
+      "title": "Detail ticket"
+    },
+    "linesPayments": {
+      "title": "Lignes et paiements",
+      "subtitle": "Resume detaille des articles et du reglement."
+    },
+    "corrections": {
+      "title": "Corrections enregistrees",
+      "subtitle": "Historique des retours, annulations et ajustements."
+    },
+    "ticketPreview": {
+      "title": "Apercu ticket",
+      "subtitle": "Version la plus recente de ce ticket.",
+      "modalTitle": "Apercu du ticket"
+    },
+    "validation": {
+      "title": "Validation du ticket",
+      "subtitle": "Controle rapide avant enregistrement definitif de la vente.",
+      "warning": "Cette action cree la vente, ses lignes, les paiements et le ticket. Toute correction devra ensuite passer par une operation tracee."
+    },
+    "operation": {
+      "sensitiveLogged": "operation sensible journalisee.",
+      "warning": "Le statut de la vente et ses paiements seront mis a jour. L'action apparaitra dans l'historique des corrections."
+    },
+    "defaults": {
+      "operatorCancellation": "Annulation operateur",
+      "customerReturn": "Retour client"
+    },
+    "statuses": {
+      "sale": {
+        "TOUS": "Tous",
+        "BROUILLON": "Brouillon",
+        "VALIDEE": "Validee",
+        "ANNULEE": "Annulee",
+        "RETOURNEE": "Retournee",
+        "AJUSTEE": "Ajustee"
+      },
+      "payment": {
+        "PAYE": "Paye",
+        "ANNULE": "Annule",
+        "PARTIEL": "Partiel",
+        "EN_ATTENTE": "En attente",
+        "REMBOURSE": "Rembourse"
+      }
+    },
+    "ticket": {
+      "title": "ADM Manage - Ticket de caisse",
+      "number": "Numero",
+      "date": "Date",
+      "shop": "Boutique",
+      "tenant": "Locataire",
+      "seller": "Vendeur",
+      "items": "Articles",
+      "payments": "Paiements",
+      "netTotal": "Total net",
+      "product": "Produit",
+      "payment": "Paiement"
+    },
+    "messages": {
+      "accountWithoutId": "Le compte connecte n'expose pas d'identifiant utilisateur exploitable. Le ticket ne pourra pas etre valide tant que ce point n'est pas corrige.",
+      "selectShopBeforeScan": "Selectionnez d'abord une boutique avant de lancer un scan.",
+      "productAdded": "{{product}} a ete ajoute au ticket.",
+      "ticketIncomplete": "Le ticket ne peut pas etre valide tant que les informations obligatoires ou le paiement ne sont pas complets.",
+      "saleValidated": "La vente {{ticket}} a ete enregistree et le ticket caisse a ete genere.",
+      "partialSaleError": "La vente {{ticket}} a ete creee partiellement, mais une etape du ticket ou du paiement a echoue. Verifiez les donnees avant de reprendre.",
+      "finalizeError": "La vente n'a pas pu etre finalisee. Verifiez les donnees saisies puis reessayez.",
+      "completeBeforeValidate": "Completez le contexte de vente, le panier et les paiements avant de valider le ticket.",
+      "selectSaleForPreview": "Selectionnez une vente pour afficher le ticket en grand.",
+      "selectSaleBeforeAction": "Selectionnez une vente avant de lancer cette action.",
+      "saleCannotBeCancelled": "Cette vente ne peut plus etre annulee.",
+      "onlyValidatedCanReturn": "Seules les ventes validees peuvent faire l'objet d'un retour.",
+      "reasonRequired": "Le motif est obligatoire pour tracer cette operation.",
+      "selectSaleBeforeReprint": "Selectionnez une vente avant de lancer une reimpression.",
+      "ticketReprinted": "Le ticket a ete regenere et la reimpression a ete enregistree.",
+      "reprintError": "La reimpression du ticket a echoue.",
+      "saleCancelled": "La vente a ete annulee avec succes.",
+      "saleReturned": "Le retour de vente a ete enregistre.",
+      "operationError": "L'operation n'a pas pu etre finalisee.",
+      "multipleBarcodeMatches": "Plusieurs produits correspondent a ce code pour la selection en cours. Choisissez manuellement le bon article.",
+      "multipleProductMatches": "La recherche renvoie plusieurs produits. Selectionnez celui qui doit etre ajoute au panier.",
+      "unknownScanSaved": "Le code {{code}} n'a pas ete reconnu. Un scan inconnu a ete enregistre; contactez un responsable autorise.",
+      "unknownScanAssignable": "Le code {{code}} n'a pas ete reconnu. Vous pouvez maintenant l'affecter a un produit."
+    }
+  }
+}

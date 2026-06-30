@@ -1,0 +1,158 @@
+{
+  "productCustom": {
+    "common": {
+      "all": "Tous",
+      "allFeminine": "Toutes",
+      "batchWithoutReference": "Lot sans référence",
+      "noInternalCode": "Sans code interne",
+      "noneFeminine": "Aucune",
+      "noneMasculine": "Aucun"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "notPrinted": "Non imprimé",
+      "pending": "En attente",
+      "printed": "Imprimé"
+    },
+    "actions": {
+      "back": "Retour",
+      "barcode": "Code-barres",
+      "barcodesAndLabels": "Codes-barres et étiquettes",
+      "barcodeSettings": "Paramètres code-barres",
+      "cancel": "Annuler",
+      "catalogue": "Catalogue",
+      "centre": "Centre",
+      "close": "Fermer",
+      "createLabelBatch": "Créer le lot d'étiquettes",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "labels": "Étiquettes",
+      "loading": "Chargement...",
+      "manageBarcodes": "Gérer les codes-barres",
+      "newProduct": "Nouvel article",
+      "prepareLabels": "Préparer les étiquettes",
+      "preparing": "Préparation...",
+      "price": "Tarif",
+      "refresh": "Actualiser",
+      "reset": "Réinitialiser",
+      "select": "Sélectionner",
+      "saveBarcode": "Enregistrer le code-barres",
+      "generateBarcode": "Generer automatiquement",
+      "savePrice": "Enregistrer le tarif",
+      "saving": "Enregistrement...",
+      "view": "Voir",
+      "viewHistory": "Voir l'historique"
+    },
+    "kpis": {
+      "activeProducts": "Articles actifs",
+      "contractPrices": "Prix contractuels",
+      "promotionalPrices": "Prix promotionnels",
+      "totalProducts": "Total articles"
+    },
+    "fields": {
+      "actions": "Actions",
+      "activePrice": "Tarif actif",
+      "amount": "Montant",
+      "barcode": "Code-barres",
+      "batchReference": "Référence du lot",
+      "classification": "Classification",
+      "code": "Code",
+      "endDate": "Date de fin",
+      "format": "Format",
+      "labelCount": "Nombre d'étiquettes",
+      "primary": "Principal",
+      "primaryCode": "Code principal",
+      "price": "Prix",
+      "product": "Article",
+      "quickActions": "Actions rapides",
+      "royalty": "Redevance",
+      "startDate": "Date de début",
+      "systemGenerated": "Généré par le système",
+      "technicalId": "Identifiant technique",
+      "type": "Type"
+    },
+    "placeholders": {
+      "autoReference": "Laisser vide pour une génération automatique",
+      "internalCode": "Ex. : PARF-T1-001",
+      "labelFormat": "A6, planche, rouleau...",
+      "productDescription": "Résumé article, arguments de vente, contexte d'usage",
+      "productName": "Nom commercial de l'article",
+      "searchProduct": "Rechercher un article, un code, une famille..."
+    },
+    "list": {
+      "title": "Catalogue articles",
+      "subtitle": "Supervision du référentiel article, des prix et des supports de vente",
+      "tableTitle": "Liste des articles",
+      "tableSubtitle": "Vue opérationnelle des références vendables et de leurs actions rapides",
+      "displayed": "{{ count }} affichés",
+      "emptyTitle": "Aucun article ne correspond aux critères sélectionnés",
+      "emptyDescription": "Élargissez les filtres ou créez une nouvelle référence pour enrichir le catalogue."
+    },
+    "detail": {
+      "subtitle": "Vue détaillée de l'article, de sa classification commerciale et de ses rattachements.",
+      "identificationTitle": "Identification article",
+      "identificationDescription": "Informations visibles par les équipes catalogue, vente et reporting.",
+      "commercialTitle": "Commercial et financier",
+      "commercialDescription": "Éléments utilisés en caisse, redevance et comparaison tarifaire.",
+      "classificationDescription": "Organisation commerciale du catalogue pour les filtres et analyses.",
+      "quickAccessTitle": "Accès rapides",
+      "quickAccessDescription": "Raccourcis utiles autour de l'identification article."
+    },
+    "update": {
+      "editTitle": "Modifier un article",
+      "createTitle": "Nouvel article",
+      "editSubtitle": "Ajustez les informations commerciales, financières et de classification de l'article.",
+      "createSubtitle": "Créez une nouvelle référence vendable en renseignant son rattachement et sa tarification.",
+      "identificationTitle": "Identification",
+      "identificationDescription": "Champs de base utilisés dans le catalogue, la caisse et les exports.",
+      "priceTitle": "Prix et redevance",
+      "priceDescription": "Définissez la valeur de vente et son comportement financier.",
+      "summaryTitle": "Résumé",
+      "summaryDescription": "Contrôle rapide avant enregistrement."
+    },
+    "barcodeModal": {
+      "title": "Ajouter un code-barres",
+      "help": "Utilisez cette action rapide pour préparer un article à la vente et au scan sans quitter le catalogue.",
+      "history": "Codes-barres existants",
+      "empty": "Aucun code-barres chargé pour cet article."
+    },
+    "labelModal": {
+      "title": "Préparer un lot d'étiquettes",
+      "help": "Cette préparation crée un lot d'étiquettes lié à l'article pour l'impression et le suivi.",
+      "history": "Historique des lots liés",
+      "empty": "Aucun lot d'étiquettes chargé pour cet article.",
+      "labelCount": "{{ count }} étiquettes"
+    },
+    "priceModal": {
+      "title": "Ajouter un tarif",
+      "help": "Ajoutez rapidement un prix standard, promotionnel ou contractuel sans quitter la liste article.",
+      "history": "Historique des tarifs",
+      "empty": "Aucun tarif chargé pour cet article.",
+      "period": "du {{ start }} au {{ end }}"
+    },
+    "messages": {
+      "loadBarcodesFailed": "Impossible de charger les codes-barres existants.",
+      "barcodeRequired": "Le code-barres est obligatoire.",
+      "barcodeCreationFailed": "La création du code-barres a échoué. Vérifiez son unicité et les champs saisis.",
+      "barcodeGenerationFailed": "La generation automatique a echoue. Verifiez qu'aucun code principal actif n'existe deja.",
+      "loadLabelsFailed": "Impossible de charger l'historique des étiquettes.",
+      "labelQuantityPositive": "La quantité d'étiquettes doit être supérieure à zéro.",
+      "labelBatchFailed": "La préparation du lot d'étiquettes a échoué.",
+      "loadPricesFailed": "Impossible de charger les tarifs existants.",
+      "priceAndStartDateRequired": "Le montant et la date de début sont obligatoires.",
+      "priceCreationFailed": "La création du tarif a échoué. Vérifiez les dates et les droits d'accès."
+    },
+    "validation": {
+      "internalCodeRequired": "Le code interne est obligatoire.",
+      "designationRequired": "La désignation est obligatoire.",
+      "creationDateRequired": "La date de création est obligatoire.",
+      "statusRequired": "Le statut est obligatoire.",
+      "priceTypeRequired": "Le type de prix est obligatoire.",
+      "salePriceRequired": "Le prix de vente est obligatoire.",
+      "shopRequired": "La boutique est obligatoire.",
+      "groupRequired": "Le groupe article est obligatoire.",
+      "unitRequired": "L'unité de mesure est obligatoire."
+    }
+  }
+}

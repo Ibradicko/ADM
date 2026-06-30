@@ -1,0 +1,134 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="JournalAuditHeading">
+    <div>
+      <h1>Journal d'audit</h1>
+      <p>Traçabilité complète des actions utilisateurs — lecture seule</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <section class="adm-toolbar" aria-label="Filtres audit">
+    <jhi-filter [filters]="filters" />
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Entrées d'audit</h2>
+        <p>Chronologie des actions enregistrées dans le système</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ totalItems() }} entrée(s)</span>
+    </div>
+
+    @if (journalAudits().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucune entrée d'audit trouvée</strong>
+        <p>Affinez les filtres pour rechercher des événements spécifiques.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="dateAction">Date / Heure <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="typeAction">Type d'action <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="utilisateur.login">Utilisateur <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="entiteConcernee">Entité <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="identifiantEntite">Identifiant <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="description">Description <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (journalAudit of journalAudits(); track trackId(journalAudit); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>{{ journalAudit.dateAction | formatMediumDatetime }}</td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="['CONNEXION', 'CREATION', 'VENTE_VALIDEE'].includes(journalAudit.typeAction ?? '')"
+                    [class.adm-pill--info]="
+                      [
+                        'MODIFICATION',
+                        'CHANGEMENT_PRIX',
+                        'CHANGEMENT_TAUX_REDEVANCE',
+                        'CHANGEMENT_CODE_BARRES',
+                        'MOUVEMENT_STOCK',
+                        'INVENTAIRE',
+                        'PARAMETRAGE',
+                        'EXPORT',
+                      ].includes(journalAudit.typeAction ?? '')
+                    "
+                    [class.adm-pill--danger]="['DESACTIVATION', 'VENTE_ANNULEE'].includes(journalAudit.typeAction ?? '')"
+                    [class.adm-pill--warning]="['DECONNEXION', 'RETOUR_VENTE'].includes(journalAudit.typeAction ?? '')"
+                  >
+                    {{ actionTypeLabels[journalAudit.typeAction ?? ''] ?? journalAudit.typeAction }}
+                  </span>
+                </td>
+                <td>
+                  @if (journalAudit.boutique) {
+                    <a [routerLink]="['/boutique', journalAudit.boutique.id, 'view']" class="adm-link">
+                      {{ journalAudit.boutique.nom }}
+                    </a>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>{{ journalAudit.utilisateur?.login ?? '—' }}</td>
+                <td>
+                  <span class="adm-code">{{ journalAudit.entiteConcernee ?? '—' }}</span>
+                </td>
+                <td>{{ journalAudit.identifiantEntite ?? '—' }}</td>
+                <td>
+                  <span title="{{ journalAudit.description ?? '' }}">
+                    {{
+                      (journalAudit.description?.length ?? 0) > 60
+                        ? journalAudit.description!.substring(0, 60) + '…'
+                        : (journalAudit.description ?? '—')
+                    }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/journal-audit', journalAudit.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir le détail"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (journalAudits().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

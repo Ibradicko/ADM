@@ -1,0 +1,11 @@
+{
+  "admSupervisionVentesApp": {
+    "StatutPaiement": {
+      "null": "",
+      "EN_ATTENTE": "En attente",
+      "PARTIEL": "Partiel",
+      "PAYE": "Paye",
+      "ANNULE": "Annule"
+    }
+  }
+}

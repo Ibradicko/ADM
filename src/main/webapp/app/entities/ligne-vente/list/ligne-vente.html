@@ -1,0 +1,142 @@
+<div>
+  <h2 id="page-heading" data-cy="LigneVenteHeading">
+    <span jhiTranslate="admSupervisionVentesApp.ligneVente.home.title">Ligne Ventes</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneVente.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-ligne-vente"
+        [routerLink]="['/ligne-vente/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneVente.home.createLabel">Create a new Ligne Vente</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (ligneVentes().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <span jhiTranslate="admSupervisionVentesApp.ligneVente.home.notFound">No Ligne Ventes found</span>
+    </div>
+  } @else {
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="quantite">
+              <span jhiTranslate="admSupervisionVentesApp.ligneVente.quantite">Quantite</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="prixUnitaire">
+              <span jhiTranslate="admSupervisionVentesApp.ligneVente.prixUnitaire">Prix Unitaire</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="remise">
+              <span jhiTranslate="admSupervisionVentesApp.ligneVente.remise">Remise</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="montantLigne">
+              <span jhiTranslate="admSupervisionVentesApp.ligneVente.montantLigne">Montant Ligne</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="codeBarresScanne">
+              <span jhiTranslate="admSupervisionVentesApp.ligneVente.codeBarresScanne">Code Barres Scanne</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="vente.numeroTicket">
+              <span jhiTranslate="admSupervisionVentesApp.ligneVente.vente">Vente</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="produit.designation">
+              <span jhiTranslate="admSupervisionVentesApp.ligneVente.produit">Produit</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ligneVente of ligneVentes(); track trackId(ligneVente); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+              <td>
+                <a [routerLink]="['/ligne-vente', ligneVente.id, 'view']">{{ ligneVente.id }}</a>
+              </td>
+              <td>{{ ligneVente.quantite }}</td>
+              <td>{{ ligneVente.prixUnitaire }}</td>
+              <td>{{ ligneVente.remise }}</td>
+              <td>{{ ligneVente.montantLigne }}</td>
+              <td>{{ ligneVente.codeBarresScanne }}</td>
+              <td>
+                @if (ligneVente.vente) {
+                  <div>
+                    <a [routerLink]="['/vente', ligneVente.vente.id, 'view']">{{ ligneVente.vente.numeroTicket }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (ligneVente.produit) {
+                  <div>
+                    <a [routerLink]="['/produit', ligneVente.produit.id, 'view']">{{ ligneVente.produit.designation }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/ligne-vente', ligneVente.id, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
+                    <fa-icon icon="eye" />
+                  </a>
+                  <a
+                    [routerLink]="['/ligne-vente', ligneVente.id, 'edit']"
+                    class="adm-icon-button"
+                    data-cy="entityEditButton"
+                    title="Modifier"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                  </a>
+                  <button
+                    type="button"
+                    (click)="delete(ligneVente)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    title="Supprimer"
+                  >
+                    <fa-icon icon="times" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (ligneVentes().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

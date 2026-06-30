@@ -1,0 +1,220 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="LocataireHeading">
+    <div>
+      <h1 jhiTranslate="admSupervisionVentesApp.locataire.list.title">Gestion des locataires</h1>
+      <p jhiTranslate="admSupervisionVentesApp.locataire.list.subtitle">Suivi des enseignes, proprietaires et partenaires commerciaux</p>
+    </div>
+
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.locataire.list.refresh">Actualiser</span>
+      </button>
+
+      @if (permissionsUi.peutModifierFeature('locataires')) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/locataire/new']">
+          <fa-icon icon="plus" />
+          <span jhiTranslate="admSupervisionVentesApp.locataire.list.createNew">Nouveau locataire</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="adm-stats-grid adm-stats-grid--compact">
+    <article class="adm-stat-card">
+      <span jhiTranslate="admSupervisionVentesApp.locataire.list.statsTotal">Total locataires</span>
+      <strong>{{ totalItems() || locataires().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span jhiTranslate="admSupervisionVentesApp.locataire.list.statsActive">Locataires actifs</span>
+      <strong>{{ activeCount() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span jhiTranslate="admSupervisionVentesApp.locataire.list.statsPhysical">Personnes physiques</span>
+      <strong>{{ physicalCount() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span jhiTranslate="admSupervisionVentesApp.locataire.list.statsCorporate">Personnes morales</span>
+      <strong>{{ corporateCount() }}</strong>
+    </article>
+  </div>
+
+  <section class="adm-toolbar" aria-label="Filtres locataires">
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        [placeholder]="'admSupervisionVentesApp.locataire.list.searchPlaceholder' | translate"
+      />
+    </label>
+
+    <div class="adm-toolbar__filters">
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.locataire.list.filterType">Type</span>
+        <select class="adm-select" [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)">
+          <option value="ALL">{{ 'admSupervisionVentesApp.locataire.list.filterTypeAll' | translate }}</option>
+          <option value="PERSONNE_PHYSIQUE">{{ 'admSupervisionVentesApp.TypeLocataire.PERSONNE_PHYSIQUE' | translate }}</option>
+          <option value="PERSONNE_MORALE">{{ 'admSupervisionVentesApp.TypeLocataire.PERSONNE_MORALE' | translate }}</option>
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.locataire.list.filterStatus">Statut</span>
+        <select class="adm-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+          <option value="ALL">{{ 'admSupervisionVentesApp.locataire.list.filterStatusAll' | translate }}</option>
+          <option value="ACTIF">{{ 'admSupervisionVentesApp.StatutGeneral.ACTIF' | translate }}</option>
+          <option value="INACTIF">{{ 'admSupervisionVentesApp.StatutGeneral.INACTIF' | translate }}</option>
+          <option value="SUSPENDU">{{ 'admSupervisionVentesApp.StatutGeneral.SUSPENDU' | translate }}</option>
+        </select>
+      </label>
+
+      <button type="button" class="adm-button adm-button--ghost" (click)="clearFilters()">
+        {{ 'admSupervisionVentesApp.locataire.list.clearFilters' | translate }}
+      </button>
+    </div>
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2 jhiTranslate="admSupervisionVentesApp.locataire.list.tableTitle">Liste des locataires</h2>
+        <p jhiTranslate="admSupervisionVentesApp.locataire.list.tableSubtitle">
+          Vue operationnelle pour l'administration et le suivi des partenaires
+        </p>
+      </div>
+      <span class="adm-pill adm-pill--primary"
+        >{{ filteredLocataires().length }} {{ 'admSupervisionVentesApp.locataire.list.displayedCount' | translate }}</span
+      >
+    </div>
+
+    @if (filteredLocataires().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong jhiTranslate="admSupervisionVentesApp.locataire.list.emptyTitle">Aucun locataire ne correspond aux criteres actuels</strong>
+        <p jhiTranslate="admSupervisionVentesApp.locataire.list.emptyHint">
+          Elargissez les filtres ou creez un nouveau locataire pour demarrer le suivi.
+        </p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">
+                {{ 'admSupervisionVentesApp.locataire.list.columnCode' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="nom">
+                {{ 'admSupervisionVentesApp.locataire.list.columnName' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="typeLocataire">
+                {{ 'admSupervisionVentesApp.locataire.list.columnType' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="numeroIdentification">
+                {{ 'admSupervisionVentesApp.locataire.list.columnIdNumber' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="telephone">
+                {{ 'admSupervisionVentesApp.locataire.list.columnContact' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="adresse">
+                {{ 'admSupervisionVentesApp.locataire.list.columnAddress' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="statut">
+                {{ 'admSupervisionVentesApp.locataire.list.columnStatus' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="dateCreation">
+                {{ 'admSupervisionVentesApp.locataire.list.columnCreatedDate' | translate }} <fa-icon icon="sort" />
+              </th>
+              <th scope="col" class="text-end">{{ 'admSupervisionVentesApp.locataire.list.columnActions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (locataire of filteredLocataires(); track trackId(locataire)) {
+              <tr data-cy="entityTable">
+                <td>
+                  <span class="adm-code">{{ formatValue(locataire.code) }}</span>
+                </td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValue(locataire.nom) }}</strong>
+                    <small>{{ formatValue(locataire.email) }}</small>
+                  </div>
+                </td>
+                <td>{{ 'admSupervisionVentesApp.TypeLocataire.' + (locataire.typeLocataire ?? 'null') | translate }}</td>
+                <td>{{ formatValue(locataire.numeroIdentification) }}</td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValue(locataire.telephone) }}</strong>
+                    <small>{{ formatValue(locataire.email) }}</small>
+                  </div>
+                </td>
+                <td>{{ formatValue(locataire.adresse) }}</td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="locataire.statut === 'ACTIF'"
+                    [class.adm-pill--warning]="locataire.statut === 'INACTIF'"
+                    [class.adm-pill--danger]="locataire.statut === 'SUSPENDU'"
+                  >
+                    {{ 'admSupervisionVentesApp.StatutGeneral.' + (locataire.statut ?? 'null') | translate }}
+                  </span>
+                </td>
+                <td>{{ locataire.dateCreation | formatMediumDatetime }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/locataire', locataire.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      [title]="'admSupervisionVentesApp.locataire.list.actionView' | translate"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutModifierFeature('locataires')) {
+                      <a
+                        [routerLink]="['/locataire', locataire.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        [title]="'admSupervisionVentesApp.locataire.list.actionEdit' | translate"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(locataire)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        [title]="'admSupervisionVentesApp.locataire.list.actionDelete' | translate"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (locataires().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

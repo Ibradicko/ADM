@@ -1,0 +1,94 @@
+{
+  "auditSupervision": {
+    "eyebrow": "Contrôle et traçabilité",
+    "title": "Audit et supervision",
+    "subtitle": "Journal des actions sensibles, alertes d’exploitation et signaux de contrôle.",
+    "actions": {
+      "reporting": "Centre de reporting",
+      "refresh": "Actualiser",
+      "refreshing": "Actualisation...",
+      "openModule": "Ouvrir le module",
+      "viewStock": "Voir le stock"
+    },
+    "restricted": {
+      "title": "Accès limité",
+      "description": "Votre profil ne permet pas la consultation des données de supervision."
+    },
+    "kpis": {
+      "filteredEvents": "Événements filtrés",
+      "sensitiveEvents": "Événements sensibles",
+      "unknownScans": "Scans inconnus ouverts",
+      "stockAlerts": "Alertes stock",
+      "recentExports": "Exports récents",
+      "impactedShops": "Boutiques impactées"
+    },
+    "fields": {
+      "shop": "Boutique",
+      "action": "Action",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "search": "Recherche",
+      "date": "Date",
+      "entity": "Entité",
+      "user": "Utilisateur",
+      "identifier": "Identifiant",
+      "ipAddress": "Adresse IP",
+      "description": "Description",
+      "scannedCode": "Code scanné",
+      "sourceScreen": "Écran d’origine",
+      "product": "Produit",
+      "quantity": "Quantité",
+      "threshold": "Seuil",
+      "reference": "Référence",
+      "type": "Type",
+      "format": "Format"
+    },
+    "filters": {
+      "allShops": "Toutes les boutiques",
+      "allActions": "Toutes les actions",
+      "searchPlaceholder": "Action, entité, utilisateur, boutique..."
+    },
+    "sections": {
+      "auditLog": "Journal d’audit",
+      "eventDetail": "Détail de l’événement",
+      "unknownScans": "Scans inconnus à traiter",
+      "stockAndExports": "Alertes stock et exports récents"
+    },
+    "count": {
+      "events": "{{count}} événement(s) après filtrage.",
+      "unresolvedScans": "{{count}} scan(s) non résolu(s)."
+    },
+    "hints": {
+      "eventDetail": "Lecture rapide d’une action pour audit ou contrôle.",
+      "selectEvent": "Sélectionnez une ligne du journal pour afficher son détail.",
+      "crossFunctionalView": "Vue de supervision transversale."
+    },
+    "empty": {
+      "noEvent": "Aucun événement pour les filtres courants.",
+      "noDescription": "Aucune description détaillée.",
+      "noSelectedEvent": "Aucun événement sélectionné",
+      "noUnknownScan": "Aucun scan inconnu en attente.",
+      "noStockAlert": "Aucune alerte stock pour la sélection.",
+      "noRecentExport": "Aucun export récent."
+    },
+    "messages": {
+      "loadFailed": "Le chargement du module audit et supervision a échoué."
+    },
+    "actionTypes": {
+      "CONNEXION": "Connexion",
+      "CREATION": "Création",
+      "MODIFICATION": "Modification",
+      "DESACTIVATION": "Désactivation",
+      "CHANGEMENT_PRIX": "Changement de prix",
+      "CHANGEMENT_TAUX_REDEVANCE": "Changement du taux de redevance",
+      "CHANGEMENT_CODE_BARRES": "Changement de code-barres",
+      "VENTE_VALIDEE": "Vente validée",
+      "VENTE_ANNULEE": "Vente annulée",
+      "RETOUR_VENTE": "Retour de vente",
+      "MOUVEMENT_STOCK": "Mouvement de stock",
+      "INVENTAIRE": "Inventaire",
+      "PARAMETRAGE": "Paramétrage",
+      "EXPORT": "Export"
+    }
+  }
+}

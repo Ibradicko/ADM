@@ -1,6 +1,14 @@
 {
   "login": {
     "title": "Sign in",
+    "description": "Access your secure workspace.",
+    "hero": {
+      "subtitle": "Centralized airport supervision",
+      "eyebrow": "Secure portal",
+      "title": "ADM shop, sales, stock and royalty management.",
+      "description": "A clear control space to monitor commercial operations and keep control of business flows.",
+      "modules": "Main modules"
+    },
     "form": {
       "password": "Password",
       "password.placeholder": "Your password",
@@ -14,6 +22,9 @@
     },
     "password": {
       "forgot": "Did you forget your password?"
+    },
+    "account": {
+      "notice": "Accounts are created by the administration."
     }
   }
 }

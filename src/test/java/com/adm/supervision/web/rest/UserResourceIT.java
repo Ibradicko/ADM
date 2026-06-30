@@ -6,14 +6,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.adm.supervision.IntegrationTest;
+import com.adm.supervision.domain.AffectationUtilisateur;
+import com.adm.supervision.domain.Boutique;
+import com.adm.supervision.domain.JournalAudit;
+import com.adm.supervision.domain.PermissionMetier;
+import com.adm.supervision.domain.ProfilMetier;
 import com.adm.supervision.domain.User;
+import com.adm.supervision.domain.enumeration.StatutGeneral;
+import com.adm.supervision.domain.enumeration.TypeActionAudit;
+import com.adm.supervision.repository.JournalAuditRepository;
 import com.adm.supervision.repository.UserRepository;
 import com.adm.supervision.security.AuthoritiesConstants;
+import com.adm.supervision.security.BusinessPermissions;
 import com.adm.supervision.service.UserService;
 import com.adm.supervision.service.dto.AdminUserDTO;
 import com.adm.supervision.service.mapper.UserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -65,6 +75,9 @@ class UserResourceIT {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JournalAuditRepository journalAuditRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -481,8 +494,185 @@ class UserResourceIT {
 
         assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin(), User.class)).isNull();
 
-        // Validate the database is empty
-        assertPersistedUsers(users -> assertThat(users).hasSize(databaseSizeBeforeDelete - 1));
+        assertPersistedUsers(users -> {
+            assertThat(users).hasSize(databaseSizeBeforeDelete);
+            User deactivatedUser = userRepository.findOneByLogin(user.getLogin()).orElseThrow();
+            assertThat(deactivatedUser.isActivated()).isFalse();
+        });
+
+        assertThat(journalAuditRepository.findAll())
+            .extracting(JournalAudit::getTypeAction, JournalAudit::getIdentifiantEntite)
+            .contains(new org.assertj.core.groups.Tuple(TypeActionAudit.DESACTIVATION, user.getLogin()));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "manager-boutique-it")
+    void boutiqueManagerCreatesUserAssignedToManagedBoutique() throws Exception {
+        User manager = createEntity();
+        manager.setLogin("manager-boutique-it");
+        manager.setEmail("manager-boutique-it@example.com");
+        userRepository.saveAndFlush(manager);
+
+        Boutique boutique = BoutiqueResourceIT.createEntity();
+        boutique.setCode("BTQ-MGR-03");
+        boutique.setNom("Boutique Manager 3");
+        em.persist(boutique);
+
+        PermissionMetier createPermission = findOrCreatePermission(BusinessPermissions.USER_CREATE, "Creation utilisateurs");
+        PermissionMetier readPermission = findOrCreatePermission(BusinessPermissions.USER_READ, "Lecture utilisateurs");
+
+        ProfilMetier managerProfil = findOrCreateProfile("MANAGER_BOUTIQUE", "Manager boutique");
+        managerProfil.addPermissions(createPermission);
+        managerProfil.addPermissions(readPermission);
+
+        ProfilMetier sellerProfil = findOrCreateProfile("VENDEUR", "Vendeur");
+
+        AffectationUtilisateur managerAssignment = new AffectationUtilisateur()
+            .user(manager)
+            .boutique(boutique)
+            .profil(managerProfil)
+            .actif(true)
+            .dateDebut(LocalDate.now().minusDays(1));
+        em.persist(managerAssignment);
+        em.flush();
+
+        AdminUserDTO userDTO = new AdminUserDTO();
+        userDTO.setLogin("seller-created");
+        userDTO.setFirstName("Seller");
+        userDTO.setLastName("Created");
+        userDTO.setEmail("seller-created@example.com");
+        userDTO.setActivated(true);
+        userDTO.setLangKey(DEFAULT_LANGKEY);
+        userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+
+        try {
+            restUserMockMvc
+                .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.login").value("seller-created"));
+
+            List<AffectationUtilisateur> affectations = em
+                .createQuery(
+                    "select a from AffectationUtilisateur a join fetch a.boutique join fetch a.profil where a.user.login = :login",
+                    AffectationUtilisateur.class
+                )
+                .setParameter("login", "seller-created")
+                .getResultList();
+
+            assertThat(affectations).hasSize(1);
+            assertThat(affectations.get(0).getBoutique().getId()).isEqualTo(boutique.getId());
+            assertThat(affectations.get(0).getProfil().getCode()).isEqualTo("VENDEUR");
+            assertThat(affectations.get(0).getActif()).isTrue();
+
+            restUserMockMvc.perform(get("/api/admin/users/{login}", "seller-created")).andExpect(status().isOk());
+        } finally {
+            cleanupManagedUserSecurityFixtures();
+        }
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "manager-read-it")
+    void managerWithActiveAssignmentCanReadUserInManagedBoutique() throws Exception {
+        User manager = createEntity();
+        manager.setLogin("manager-read-it");
+        manager.setEmail("manager-read-it@example.com");
+        userRepository.saveAndFlush(manager);
+
+        User managedUser = createEntity();
+        managedUser.setLogin("seller-managed");
+        managedUser.setEmail("seller-managed@example.com");
+        userRepository.saveAndFlush(managedUser);
+
+        Boutique boutique = BoutiqueResourceIT.createEntity();
+        boutique.setCode("BTQ-MGR-01");
+        boutique.setNom("Boutique Manager");
+        em.persist(boutique);
+
+        PermissionMetier permission = findOrCreatePermission(BusinessPermissions.USER_READ, "Lecture utilisateurs");
+
+        ProfilMetier profil = findOrCreateProfile("MANAGER_BOUTIQUE", "Manager boutique");
+        profil.addPermissions(permission);
+
+        AffectationUtilisateur managerAssignment = new AffectationUtilisateur()
+            .user(manager)
+            .boutique(boutique)
+            .profil(profil)
+            .actif(true)
+            .dateDebut(LocalDate.now().minusDays(1));
+        em.persist(managerAssignment);
+
+        AffectationUtilisateur managedUserAssignment = new AffectationUtilisateur()
+            .user(managedUser)
+            .boutique(boutique)
+            .profil(profil)
+            .actif(true)
+            .dateDebut(LocalDate.now().minusDays(1));
+        em.persist(managedUserAssignment);
+        em.flush();
+
+        try {
+            restUserMockMvc
+                .perform(get("/api/admin/users/{login}", managedUser.getLogin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.login").value(managedUser.getLogin()));
+        } finally {
+            cleanupManagedUserSecurityFixtures();
+        }
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "manager-outside-it")
+    void managerCannotReadUserOutsideManagedBoutique() throws Exception {
+        User manager = createEntity();
+        manager.setLogin("manager-outside-it");
+        manager.setEmail("manager-outside-it@example.com");
+        userRepository.saveAndFlush(manager);
+
+        User managedUser = createEntity();
+        managedUser.setLogin("seller-outside");
+        managedUser.setEmail("seller-outside@example.com");
+        userRepository.saveAndFlush(managedUser);
+
+        Boutique managerBoutique = BoutiqueResourceIT.createEntity();
+        managerBoutique.setCode("BTQ-MGR-02");
+        managerBoutique.setNom("Boutique Manager 2");
+        em.persist(managerBoutique);
+
+        Boutique otherBoutique = BoutiqueResourceIT.createEntity();
+        otherBoutique.setCode("BTQ-OTH-01");
+        otherBoutique.setNom("Boutique Outside");
+        em.persist(otherBoutique);
+
+        PermissionMetier permission = findOrCreatePermission(BusinessPermissions.USER_READ, "Lecture utilisateurs");
+
+        ProfilMetier profil = findOrCreateProfile("MANAGER_BOUTIQUE", "Manager boutique");
+        profil.addPermissions(permission);
+
+        AffectationUtilisateur managerAssignment = new AffectationUtilisateur()
+            .user(manager)
+            .boutique(managerBoutique)
+            .profil(profil)
+            .actif(true)
+            .dateDebut(LocalDate.now().minusDays(1));
+        em.persist(managerAssignment);
+
+        AffectationUtilisateur managedUserAssignment = new AffectationUtilisateur()
+            .user(managedUser)
+            .boutique(otherBoutique)
+            .profil(profil)
+            .actif(true)
+            .dateDebut(LocalDate.now().minusDays(1));
+        em.persist(managedUserAssignment);
+        em.flush();
+
+        try {
+            restUserMockMvc.perform(get("/api/admin/users/{login}", managedUser.getLogin())).andExpect(status().isForbidden());
+        } finally {
+            cleanupManagedUserSecurityFixtures();
+        }
     }
 
     @Test
@@ -501,5 +691,60 @@ class UserResourceIT {
 
     private void assertPersistedUsers(Consumer<List<User>> userAssertion) {
         userAssertion.accept(userRepository.findAll());
+    }
+
+    private void cleanupManagedUserSecurityFixtures() {
+        em
+            .createQuery("delete from AffectationUtilisateur a where a.user.login in :logins")
+            .setParameter(
+                "logins",
+                List.of(
+                    "manager-boutique-it",
+                    "manager-read-it",
+                    "manager-outside-it",
+                    "seller-managed",
+                    "seller-outside",
+                    "seller-created"
+                )
+            )
+            .executeUpdate();
+        em
+            .createQuery("delete from Boutique b where b.code in :codes")
+            .setParameter("codes", List.of("BTQ-MGR-01", "BTQ-MGR-02", "BTQ-MGR-03", "BTQ-OTH-01"))
+            .executeUpdate();
+        em.flush();
+        em.clear();
+        userService.deleteUser("manager-boutique-it");
+        userService.deleteUser("manager-read-it");
+        userService.deleteUser("manager-outside-it");
+        userService.deleteUser("seller-managed");
+        userService.deleteUser("seller-outside");
+        userService.deleteUser("seller-created");
+    }
+
+    private PermissionMetier findOrCreatePermission(String code, String libelle) {
+        return em
+            .createQuery("select p from PermissionMetier p where p.code = :code", PermissionMetier.class)
+            .setParameter("code", code)
+            .getResultStream()
+            .findFirst()
+            .orElseGet(() -> {
+                PermissionMetier permission = new PermissionMetier().code(code).libelle(libelle).module("SECURITY");
+                em.persist(permission);
+                return permission;
+            });
+    }
+
+    private ProfilMetier findOrCreateProfile(String code, String libelle) {
+        return em
+            .createQuery("select p from ProfilMetier p where p.code = :code", ProfilMetier.class)
+            .setParameter("code", code)
+            .getResultStream()
+            .findFirst()
+            .orElseGet(() -> {
+                ProfilMetier profil = new ProfilMetier().code(code).libelle(libelle).statut(StatutGeneral.ACTIF);
+                em.persist(profil);
+                return profil;
+            });
     }
 }

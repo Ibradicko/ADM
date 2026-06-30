@@ -1,0 +1,109 @@
+{
+  "reporting": {
+    "title": "Centre de reporting",
+    "subtitle": "Generation d'exports, apercus rapides et pilotage des rapports reels du backend.",
+    "actions": {
+      "technicalArchives": "Archives techniques",
+      "generate": "Generer un rapport",
+      "generating": "Generation en cours...",
+      "preview": "Apercu",
+      "download": "Telecharger",
+      "downloading": "Telechargement...",
+      "downloadThisReport": "Telecharger ce rapport",
+      "openLarge": "Ouvrir en grand"
+    },
+    "accessDenied": {
+      "title": "Acces limite",
+      "text": "Votre profil ne permet pas encore de consulter le centre de reporting."
+    },
+    "filters": {
+      "title": "Filtres de generation",
+      "subtitle": "Choisissez le type de rapport et le perimetre de l'export."
+    },
+    "fields": {
+      "reportType": "Type de rapport",
+      "format": "Format",
+      "startDate": "Periode debut",
+      "endDate": "Periode fin",
+      "period": "Periode",
+      "shop": "Boutique",
+      "allShops": "Toutes les boutiques",
+      "tenant": "Locataire",
+      "allTenants": "Tous les locataires",
+      "depot": "Depot",
+      "allDepots": "Tous les depots",
+      "product": "Produit",
+      "allProducts": "Tous les produits",
+      "saleStatus": "Statut vente",
+      "minNetAmount": "Montant net minimum",
+      "noThreshold": "Aucun seuil"
+    },
+    "types": {
+      "salesByDay": {
+        "label": "Ventes par jour",
+        "description": "Synthese quotidienne des ventes validees ou brouillons."
+      },
+      "stockAlerts": {
+        "label": "Alertes stock",
+        "description": "Produits sous le seuil d'alerte par depot et boutique."
+      },
+      "royalties": {
+        "label": "Redevances",
+        "description": "Montants dus, payes et restants par calcul de redevance."
+      },
+      "unknownScans": {
+        "label": "Scans inconnus",
+        "description": "Codes non resolus a traiter par les equipes catalogue."
+      }
+    },
+    "statuses": {
+      "VALIDEE": "Validee",
+      "BROUILLON": "Brouillon",
+      "ANNULEE": "Annulee",
+      "RETOURNEE": "Retournee"
+    },
+    "recentExports": {
+      "title": "Exports recents",
+      "subtitle": "Historique des rapports generes cote backend.",
+      "emptyTitle": "Aucun export genere",
+      "emptyText": "Generez un premier rapport pour alimenter cette section.",
+      "columns": {
+        "reference": "Reference",
+        "type": "Type",
+        "scope": "Portee",
+        "format": "Format",
+        "generatedAt": "Genere le",
+        "actions": "Actions"
+      }
+    },
+    "currentPreview": {
+      "title": "Apercu courant",
+      "subtitle": "Lecture rapide du dernier export genere ou recharge.",
+      "emptyTitle": "Aucun apercu disponible",
+      "emptyText": "Generez un rapport ou ouvrez un export recent pour afficher son contenu ici."
+    },
+    "stockAlerts": {
+      "title": "Alertes stock live",
+      "subtitle": "Extrait temps reel du backend pour les produits sous seuil.",
+      "count": "{{count}} alerte(s)",
+      "empty": "Aucune alerte stock visible avec les filtres courants.",
+      "threshold": "Seuil"
+    },
+    "modal": {
+      "title": "Apercu du rapport"
+    },
+    "scope": {
+      "global": "Global"
+    },
+    "messages": {
+      "generated": "Le rapport {{type}} a ete genere et l'apercu est disponible.",
+      "generateError": "La generation du rapport a echoue. Verifiez les filtres puis reessayez.",
+      "previewLoaded": "Apercu charge depuis l'export existant.",
+      "previewError": "Impossible de charger l'apercu demande.",
+      "previewRequired": "Generez ou chargez un export avant d'ouvrir l'apercu.",
+      "noExportFile": "Aucun fichier export n'est disponible pour cet apercu.",
+      "downloaded": "Le fichier a ete telecharge avec succes.",
+      "downloadError": "Le telechargement du rapport a echoue."
+    }
+  }
+}

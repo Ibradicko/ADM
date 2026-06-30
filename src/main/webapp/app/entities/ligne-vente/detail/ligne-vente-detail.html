@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ligneVente(); as ligneVenteRef) {
+      <div>
+        <h2 data-cy="ligneVenteDetailsHeading"><span jhiTranslate="admSupervisionVentesApp.ligneVente.detail.title">Ligne Vente</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ligneVenteRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.quantite">Quantite</span></dt>
+          <dd>
+            <span>{{ ligneVenteRef.quantite }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.prixUnitaire">Prix Unitaire</span></dt>
+          <dd>
+            <span>{{ ligneVenteRef.prixUnitaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.remise">Remise</span></dt>
+          <dd>
+            <span>{{ ligneVenteRef.remise }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.montantLigne">Montant Ligne</span></dt>
+          <dd>
+            <span>{{ ligneVenteRef.montantLigne }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.codeBarresScanne">Code Barres Scanne</span></dt>
+          <dd>
+            <span>{{ ligneVenteRef.codeBarresScanne }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.vente">Vente</span></dt>
+          <dd>
+            @if (ligneVente()!.vente) {
+              <div>
+                <a [routerLink]="['/vente', ligneVente()!.vente?.id, 'view']">{{ ligneVenteRef.vente?.numeroTicket }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.produit">Produit</span></dt>
+          <dd>
+            @if (ligneVente()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', ligneVente()!.produit?.id, 'view']">{{ ligneVenteRef.produit?.designation }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ligne-vente', ligneVenteRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

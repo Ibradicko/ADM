@@ -151,3 +151,26 @@ Desktop.ini
 ######################
 coverage/
 .nyc_output/
+
+######################
+# Local documentation and non-runtime files
+######################
+/docs/
+*.md
+/adm-supervision.jdl
+/scripts/*
+!/scripts/docker-cli.mjs
+/.docker-codex/
+/.vscode/
+
+######################
+# JHipster generation metadata
+# Not required to start the compiled application.
+######################
+/.jhipster/
+
+######################
+# Windows reserved-name artifacts
+######################
+/NUL
+/NUL.*

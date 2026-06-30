@@ -1,5 +1,5 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, LOCALE_ID, importProvidersFrom, inject } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, importProvidersFrom, inject, provideZonelessChangeDetection } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import {
   NavigationError,
@@ -10,6 +10,7 @@ import {
   withComponentInputBinding,
   withDebugTracing,
   withNavigationErrorHandler,
+  withRouterConfig,
 } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -20,6 +21,8 @@ import { authExpiredInterceptor } from 'app/core/interceptor/auth-expired.interc
 import { authInterceptor } from 'app/core/interceptor/auth.interceptor';
 import { errorHandlerInterceptor } from 'app/core/interceptor/error-handler.interceptor';
 import { notificationInterceptor } from 'app/core/interceptor/notification.interceptor';
+import { AccountService } from 'app/core/auth/account.service';
+import { UiPermissionService } from 'app/core/services/ui-permission.service';
 
 import './config/dayjs';
 import { TranslationModule } from 'app/shared/language/translation.module';
@@ -30,10 +33,13 @@ import { NgbDateDayjsAdapter } from './config/datepicker-adapter';
 
 const routerFeatures: RouterFeatures[] = [
   withComponentInputBinding(),
+  withRouterConfig({ onSameUrlNavigation: 'reload' }),
   withNavigationErrorHandler((e: NavigationError) => {
     const router = inject(Router);
     if (e.error.status === 403) {
-      router.navigate(['/accessdenied']);
+      const accountService = inject(AccountService);
+      const permissionsUi = inject(UiPermissionService);
+      router.navigate([accountService.account() ? permissionsUi.routeAccueilAutorisee() : '/login']);
     } else if (e.error.status === 404) {
       router.navigate(['/404']);
     } else if (e.error.status === 401) {
@@ -49,6 +55,7 @@ if (environment.DEBUG_INFO_ENABLED) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZonelessChangeDetection(),
     provideRouter(routes, ...routerFeatures),
     // Set this to true to enable service worker (PWA)
     importProvidersFrom(ServiceWorkerModule.register('ngsw-worker.js', { enabled: false })),

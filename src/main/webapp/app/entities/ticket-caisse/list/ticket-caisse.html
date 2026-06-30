@@ -1,0 +1,79 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="TicketCaisseHeading">
+    <div>
+      <h1>Tickets de caisse</h1>
+      <p>Reçus générés lors de la validation des ventes</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des tickets de caisse</h2>
+        <p>Historique des reçus émis — lecture et réimpression</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ ticketCaisses().length }} ticket(s)</span>
+    </div>
+
+    @if (ticketCaisses().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun ticket de caisse trouvé</strong>
+        <p>Les tickets sont générés automatiquement lors des ventes validées.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="numero">N° Ticket <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="vente.numeroTicket">Vente associée <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateEmission">Date émission <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="nombreImpressions">Impressions <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tc of ticketCaisses(); track trackId(tc); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <a [routerLink]="['/ticket-caisse', tc.id, 'view']" class="adm-link">
+                    <span class="adm-code">{{ tc.numero ?? '#' + tc.id }}</span>
+                  </a>
+                </td>
+                <td>
+                  @if (tc.vente) {
+                    <a [routerLink]="['/vente', tc.vente.id, 'view']" class="adm-link">
+                      {{ tc.vente.numeroTicket ?? '#' + tc.vente.id }}
+                    </a>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>{{ tc.dateEmission | formatMediumDatetime }}</td>
+                <td>
+                  <span class="adm-pill adm-pill--info">{{ tc.nombreImpressions ?? 0 }}×</span>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/ticket-caisse', tc.id, 'view']" class="adm-icon-button" data-cy="entityDetailsButton" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

@@ -1,0 +1,108 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="ParametreGlobalHeading">
+    <div>
+      <h1>Paramètres globaux</h1>
+      <p>Configuration système — clés et valeurs applicatives</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+        <a
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="adm-button adm-button--primary"
+          [routerLink]="['/parametre-global/new']"
+        >
+          <fa-icon icon="plus" />
+          <span>Nouveau paramètre</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des paramètres globaux</h2>
+        <p>Paramètres applicatifs de niveau système</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ parametreGlobals().length }} paramètre(s)</span>
+    </div>
+
+    @if (parametreGlobals().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun paramètre global configuré</strong>
+        <p>Ajoutez les paramètres nécessaires au fonctionnement du système.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="valeur">Valeur <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="description">Description <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="actif">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pg of parametreGlobals(); track trackId(pg); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ pg.code ?? '—' }}</span>
+                </td>
+                <td>
+                  <strong>{{ pg.valeur ?? '—' }}</strong>
+                </td>
+                <td>{{ pg.description ?? '—' }}</td>
+                <td>
+                  <span class="adm-pill" [class.adm-pill--success]="pg.actif" [class.adm-pill--danger]="!pg.actif">
+                    {{ pg.actif ? 'Actif' : 'Inactif' }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/parametre-global', pg.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+                      <a
+                        [routerLink]="['/parametre-global', pg.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(pg)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

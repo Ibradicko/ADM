@@ -3,6 +3,11 @@ import { Routes } from '@angular/router';
 
 const routes: Routes = [
   {
+    path: 'user-management',
+    loadChildren: () => import('../entities/admin/user-management/user-management.routes'),
+    title: 'userManagement.home.title',
+  },
+  {
     path: 'docs',
     loadComponent: () => import('./docs/docs'),
     title: 'global.menu.admin.apidocs',

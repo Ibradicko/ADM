@@ -1,0 +1,35 @@
+{
+  "admSupervisionVentesApp": {
+    "vente": {
+      "home": {
+        "title": "Ventes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Vente",
+        "createOrEditLabel": "Create or edit a Vente",
+        "notFound": "No Ventes found"
+      },
+      "created": "A new Vente is created with identifier {{ param }}",
+      "updated": "A Vente is updated with identifier {{ param }}",
+      "deleted": "A Vente is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Vente {{ id }}?"
+      },
+      "detail": {
+        "title": "Vente"
+      },
+      "id": "ID",
+      "numeroTicket": "Numero Ticket",
+      "dateHeure": "Date Heure",
+      "statut": "Statut",
+      "referencePassager": "Reference Passager",
+      "referenceCarteEmbarquement": "Reference Carte Embarquement",
+      "montantBrut": "Montant Brut",
+      "montantRemise": "Montant Remise",
+      "montantNet": "Montant Net",
+      "commentaire": "Commentaire",
+      "boutique": "Boutique",
+      "locataire": "Locataire",
+      "vendeur": "Vendeur"
+    }
+  }
+}

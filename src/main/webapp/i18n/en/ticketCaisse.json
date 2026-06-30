@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "ticketCaisse": {
+      "home": {
+        "title": "Ticket Caisses",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ticket Caisse",
+        "createOrEditLabel": "Create or edit a Ticket Caisse",
+        "notFound": "No Ticket Caisses found"
+      },
+      "created": "A new Ticket Caisse is created with identifier {{ param }}",
+      "updated": "A Ticket Caisse is updated with identifier {{ param }}",
+      "deleted": "A Ticket Caisse is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ticket Caisse {{ id }}?"
+      },
+      "detail": {
+        "title": "Ticket Caisse"
+      },
+      "id": "ID",
+      "numero": "Numero",
+      "dateEmission": "Date Emission",
+      "nombreImpressions": "Nombre Impressions",
+      "contenu": "Contenu",
+      "vente": "Vente"
+    }
+  }
+}

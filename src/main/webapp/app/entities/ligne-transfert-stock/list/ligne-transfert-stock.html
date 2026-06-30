@@ -1,0 +1,111 @@
+<div>
+  <h2 id="page-heading" data-cy="LigneTransfertStockHeading">
+    <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.home.title">Ligne Transfert Stocks</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-ligne-transfert-stock"
+        [routerLink]="['/ligne-transfert-stock/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.home.createLabel">Create a new Ligne Transfert Stock</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (ligneTransfertStocks().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.home.notFound">No Ligne Transfert Stocks found</span>
+    </div>
+  } @else {
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="quantite">
+              <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.quantite">Quantite</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="commentaire">
+              <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.commentaire">Commentaire</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="transfert.reference">
+              <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.transfert">Transfert</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="produit.designation">
+              <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.produit">Produit</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ligneTransfertStock of ligneTransfertStocks(); track trackId(ligneTransfertStock); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+              <td>
+                <a [routerLink]="['/ligne-transfert-stock', ligneTransfertStock.id, 'view']">{{ ligneTransfertStock.id }}</a>
+              </td>
+              <td>{{ ligneTransfertStock.quantite }}</td>
+              <td>{{ ligneTransfertStock.commentaire }}</td>
+              <td>
+                @if (ligneTransfertStock.transfert) {
+                  <div>
+                    <a [routerLink]="['/transfert-stock', ligneTransfertStock.transfert.id, 'view']">{{
+                      ligneTransfertStock.transfert.reference
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (ligneTransfertStock.produit) {
+                  <div>
+                    <a [routerLink]="['/produit', ligneTransfertStock.produit.id, 'view']">{{ ligneTransfertStock.produit.designation }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/ligne-transfert-stock', ligneTransfertStock.id, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
+                    <fa-icon icon="eye" />
+                  </a>
+                  <a
+                    [routerLink]="['/ligne-transfert-stock', ligneTransfertStock.id, 'edit']"
+                    class="adm-icon-button"
+                    data-cy="entityEditButton"
+                    title="Modifier"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                  </a>
+                  <button
+                    type="button"
+                    (click)="delete(ligneTransfertStock)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    title="Supprimer"
+                  >
+                    <fa-icon icon="times" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

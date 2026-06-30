@@ -1,0 +1,33 @@
+{
+  "admSupervisionVentesApp": {
+    "rapportExport": {
+      "home": {
+        "title": "Rapport Exports",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Rapport Export",
+        "createOrEditLabel": "Create or edit a Rapport Export",
+        "notFound": "No Rapport Exports found"
+      },
+      "created": "A new Rapport Export is created with identifier {{ param }}",
+      "updated": "A Rapport Export is updated with identifier {{ param }}",
+      "deleted": "A Rapport Export is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Rapport Export {{ id }}?"
+      },
+      "detail": {
+        "title": "Rapport Export"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "typeRapport": "Type Rapport",
+      "format": "Format",
+      "periodeDebut": "Periode Debut",
+      "periodeFin": "Periode Fin",
+      "cheminFichier": "Chemin Fichier",
+      "dateGeneration": "Date Generation",
+      "boutique": "Boutique",
+      "locataire": "Locataire",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

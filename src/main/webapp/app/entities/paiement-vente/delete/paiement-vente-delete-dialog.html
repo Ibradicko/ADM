@@ -1,0 +1,28 @@
+@if (paiementVente) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(paiementVente.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="paiementVenteDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p
+        id="jhi-delete-paiementVente-heading"
+        jhiTranslate="admSupervisionVentesApp.paiementVente.delete.question"
+        [translateValues]="{ id: paiementVente.id }"
+      >
+        Are you sure you want to delete Paiement Vente {{ paiementVente.id }}?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+
+      <button id="jhi-confirm-delete-paiementVente" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span jhiTranslate="entity.action.delete">Delete</span>
+      </button>
+    </div>
+  </form>
+}

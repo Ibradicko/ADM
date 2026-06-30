@@ -1,0 +1,302 @@
+<section class="adm-page">
+  <header class="adm-page__header">
+    <div>
+      <p class="adm-page__eyebrow" jhiTranslate="auditSupervision.eyebrow">Control and traceability</p>
+      <h1 jhiTranslate="auditSupervision.title">Audit and supervision</h1>
+      <p jhiTranslate="auditSupervision.subtitle">Sensitive action log, operational alerts and control signals.</p>
+    </div>
+    <div class="adm-page__actions">
+      <a routerLink="/reporting" class="adm-button adm-button--ghost" jhiTranslate="auditSupervision.actions.reporting">Reporting center</a>
+      <button type="button" class="adm-button" (click)="recharger()" [disabled]="chargement()">
+        {{ (chargement() ? 'auditSupervision.actions.refreshing' : 'auditSupervision.actions.refresh') | translate }}
+      </button>
+    </div>
+  </header>
+
+  @if (!permissionsUi.peutVoirEcran('audit')) {
+    <article class="adm-card">
+      <div class="adm-empty-state">
+        <h2 jhiTranslate="auditSupervision.restricted.title">Limited access</h2>
+        <p jhiTranslate="auditSupervision.restricted.description">Your profile cannot view supervision data.</p>
+      </div>
+    </article>
+  } @else {
+    @if (message(); as feedback) {
+      <div
+        class="alert"
+        [class.alert-success]="feedback.type === 'success'"
+        [class.alert-danger]="feedback.type === 'danger'"
+        [class.alert-info]="feedback.type === 'info'"
+      >
+        {{ feedback.key | translate }}
+      </div>
+    }
+
+    <section class="adm-kpi-grid">
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="auditSupervision.kpis.filteredEvents">Filtered events</span>
+        <strong>{{ resume().totalEvenements }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="auditSupervision.kpis.sensitiveEvents">Sensitive events</span>
+        <strong>{{ resume().totalSensibles }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="auditSupervision.kpis.unknownScans">Open unknown scans</span>
+        <strong>{{ resume().scansNonResolus }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="auditSupervision.kpis.stockAlerts">Stock alerts</span>
+        <strong>{{ resume().alertesStock }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="auditSupervision.kpis.recentExports">Recent exports</span>
+        <strong>{{ resume().exportsRecents }}</strong>
+      </article>
+      <article class="adm-kpi-card">
+        <span class="adm-kpi-card__label" jhiTranslate="auditSupervision.kpis.impactedShops">Impacted shops</span>
+        <strong>{{ resume().boutiquesImpactees }}</strong>
+      </article>
+    </section>
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-toolbar">
+        <label class="adm-field">
+          <span jhiTranslate="auditSupervision.fields.shop">Shop</span>
+          <select [ngModel]="boutiqueId()" (ngModelChange)="boutiqueId.set($event ? +$event : null)">
+            <option [ngValue]="null" jhiTranslate="auditSupervision.filters.allShops">All shops</option>
+            @for (boutique of boutiques(); track boutique.id) {
+              <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
+            }
+          </select>
+        </label>
+        <label class="adm-field">
+          <span jhiTranslate="auditSupervision.fields.action">Action</span>
+          <select [ngModel]="typeAction()" (ngModelChange)="typeAction.set($event)">
+            <option value="" jhiTranslate="auditSupervision.filters.allActions">All actions</option>
+            @for (action of typesActions; track action) {
+              <option [value]="action">{{ 'auditSupervision.actionTypes.' + action | translate }}</option>
+            }
+          </select>
+        </label>
+        <label class="adm-field">
+          <span jhiTranslate="auditSupervision.fields.startDate">Start date</span>
+          <input type="date" [ngModel]="dateDebut()" (ngModelChange)="dateDebut.set($event)" />
+        </label>
+        <label class="adm-field">
+          <span jhiTranslate="auditSupervision.fields.endDate">End date</span>
+          <input type="date" [ngModel]="dateFin()" (ngModelChange)="dateFin.set($event)" />
+        </label>
+        <label class="adm-field adm-field--grow">
+          <span jhiTranslate="auditSupervision.fields.search">Search</span>
+          <input
+            type="search"
+            [placeholder]="'auditSupervision.filters.searchPlaceholder' | translate"
+            [ngModel]="recherche()"
+            (ngModelChange)="recherche.set($event)"
+          />
+        </label>
+      </div>
+    </article>
+
+    <section class="adm-two-columns">
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="auditSupervision.sections.auditLog">Audit log</h2>
+            <p>{{ 'auditSupervision.count.events' | translate: { count: journauxFiltres().length } }}</p>
+          </div>
+        </div>
+
+        <div class="adm-data-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="auditSupervision.fields.date">Date</th>
+                <th jhiTranslate="auditSupervision.fields.action">Action</th>
+                <th jhiTranslate="auditSupervision.fields.entity">Entity</th>
+                <th jhiTranslate="auditSupervision.fields.user">User</th>
+                <th jhiTranslate="auditSupervision.fields.shop">Shop</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (evenement of journauxFiltres(); track evenement.id) {
+                <tr
+                  (click)="selectionnerAudit(evenement.id)"
+                  [class.adm-data-table__row--selected]="auditSelectionne().id === evenement.id"
+                >
+                  <td>{{ formatDate(evenement.dateAction) }}</td>
+                  <td>{{ evenement.typeAction ? ('auditSupervision.actionTypes.' + evenement.typeAction | translate) : '--' }}</td>
+                  <td>{{ evenement.entiteConcernee ?? '--' }}</td>
+                  <td>{{ evenement.utilisateur?.login ?? '--' }}</td>
+                  <td>{{ evenement.boutique?.nom ?? '--' }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5">
+                    <div class="adm-empty-inline" jhiTranslate="auditSupervision.empty.noEvent">No event for the current filters.</div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="auditSupervision.sections.eventDetail">Event details</h2>
+            <p jhiTranslate="auditSupervision.hints.eventDetail">Quick view of an action for audit or control.</p>
+          </div>
+        </div>
+
+        @if (auditSelectionne(); as evenement) {
+          <div class="adm-detail-grid">
+            <div>
+              <span class="adm-detail-grid__label" jhiTranslate="auditSupervision.fields.date">Date</span>
+              <strong>{{ formatDate(evenement.dateAction) }}</strong>
+            </div>
+            <div>
+              <span class="adm-detail-grid__label" jhiTranslate="auditSupervision.fields.action">Action</span>
+              <strong>{{ evenement.typeAction ? ('auditSupervision.actionTypes.' + evenement.typeAction | translate) : '--' }}</strong>
+            </div>
+            <div>
+              <span class="adm-detail-grid__label" jhiTranslate="auditSupervision.fields.entity">Entity</span>
+              <strong>{{ evenement.entiteConcernee ?? '--' }}</strong>
+            </div>
+            <div>
+              <span class="adm-detail-grid__label" jhiTranslate="auditSupervision.fields.identifier">Identifier</span>
+              <strong>{{ evenement.identifiantEntite ?? '--' }}</strong>
+            </div>
+            <div>
+              <span class="adm-detail-grid__label" jhiTranslate="auditSupervision.fields.user">User</span>
+              <strong>{{ evenement.utilisateur?.login ?? '--' }}</strong>
+            </div>
+            <div>
+              <span class="adm-detail-grid__label" jhiTranslate="auditSupervision.fields.ipAddress">IP address</span>
+              <strong>{{ evenement.adresseIp ?? '--' }}</strong>
+            </div>
+          </div>
+
+          <section class="adm-subsection">
+            <h3 jhiTranslate="auditSupervision.fields.description">Description</h3>
+            <p>{{ evenement.description ?? ('auditSupervision.empty.noDescription' | translate) }}</p>
+          </section>
+        } @else {
+          <div class="adm-empty-state">
+            <h3 jhiTranslate="auditSupervision.empty.noSelectedEvent">No event selected</h3>
+            <p jhiTranslate="auditSupervision.hints.selectEvent">Select a log row to display its details.</p>
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="adm-two-columns">
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="auditSupervision.sections.unknownScans">Unknown scans to process</h2>
+            <p>{{ 'auditSupervision.count.unresolvedScans' | translate: { count: scansNonResolus().length } }}</p>
+          </div>
+          <a routerLink="/scan-inconnu" class="adm-button adm-button--ghost" jhiTranslate="auditSupervision.actions.openModule"
+            >Open module</a
+          >
+        </div>
+
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="auditSupervision.fields.date">Date</th>
+                <th jhiTranslate="auditSupervision.fields.scannedCode">Scanned code</th>
+                <th jhiTranslate="auditSupervision.fields.shop">Shop</th>
+                <th jhiTranslate="auditSupervision.fields.sourceScreen">Source screen</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (scan of scansNonResolus().slice(0, 10); track scan.id) {
+                <tr>
+                  <td>{{ formatDate(scan.dateScan) }}</td>
+                  <td>{{ scan.codeScanne ?? '--' }}</td>
+                  <td>{{ scan.boutique?.nom ?? '--' }}</td>
+                  <td>{{ scan.ecranOrigine ?? '--' }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" jhiTranslate="auditSupervision.empty.noUnknownScan">No unknown scan awaiting processing.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2 jhiTranslate="auditSupervision.sections.stockAndExports">Stock alerts and recent exports</h2>
+            <p jhiTranslate="auditSupervision.hints.crossFunctionalView">Cross-functional supervision view.</p>
+          </div>
+          <a routerLink="/stock-operations" class="adm-button adm-button--ghost" jhiTranslate="auditSupervision.actions.viewStock"
+            >View stock</a
+          >
+        </div>
+
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="auditSupervision.fields.shop">Shop</th>
+                <th jhiTranslate="auditSupervision.fields.product">Product</th>
+                <th jhiTranslate="auditSupervision.fields.quantity">Quantity</th>
+                <th jhiTranslate="auditSupervision.fields.threshold">Threshold</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (alerte of alertesStock().slice(0, 8); track $index) {
+                <tr>
+                  <td>{{ alerte.boutiqueNom }}</td>
+                  <td>{{ alerte.produitDesignation }}</td>
+                  <td>{{ alerte.quantiteTheorique }}</td>
+                  <td>{{ alerte.stockAlerte }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" jhiTranslate="auditSupervision.empty.noStockAlert">No stock alert for the selection.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="auditSupervision.fields.reference">Reference</th>
+                <th jhiTranslate="auditSupervision.fields.type">Type</th>
+                <th jhiTranslate="auditSupervision.fields.format">Format</th>
+                <th jhiTranslate="auditSupervision.fields.date">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rapport of exportsRecents().slice(0, 8); track rapport.id) {
+                <tr>
+                  <td>{{ rapport.reference ?? '--' }}</td>
+                  <td>{{ rapport.typeRapport ?? '--' }}</td>
+                  <td>{{ rapport.format ?? '--' }}</td>
+                  <td>{{ formatDate(rapport.dateGeneration) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" jhiTranslate="auditSupervision.empty.noRecentExport">No recent export.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  }
+</section>

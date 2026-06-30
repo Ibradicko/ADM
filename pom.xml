@@ -855,7 +855,7 @@
             <properties>
                 <!-- default Spring profiles -->
                 <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/admSupervisionVentes</liquibase-plugin.url>
+                <liquibase-plugin.url>jdbc:postgresql://localhost:5433/admSupervisionVentes</liquibase-plugin.url>
                 <liquibase-plugin.username>admSupervisionVentes</liquibase-plugin.username>
                 <profile.test>test,testdev</profile.test>
                 <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
@@ -969,7 +969,7 @@
             <properties>
                 <!-- default Spring profiles -->
                 <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/admSupervisionVentes</liquibase-plugin.url>
+                <liquibase-plugin.url>jdbc:postgresql://localhost:5433/admSupervisionVentes</liquibase-plugin.url>
                 <liquibase-plugin.username>admSupervisionVentes</liquibase-plugin.username>
                 <profile.test>test,testprod</profile.test>
                 <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>

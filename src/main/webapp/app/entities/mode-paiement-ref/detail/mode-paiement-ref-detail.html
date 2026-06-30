@@ -1,0 +1,44 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (modePaiementRef(); as modePaiementRefRef) {
+      <div>
+        <h2 data-cy="modePaiementRefDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.modePaiementRef.detail.title">Mode Paiement Ref</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ modePaiementRefRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.modePaiementRef.code">Code</span></dt>
+          <dd>
+            <span>{{ modePaiementRefRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.modePaiementRef.libelle">Libelle</span></dt>
+          <dd>
+            <span>{{ modePaiementRefRef.libelle }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.modePaiementRef.actif">Actif</span></dt>
+          <dd>
+            <span>{{ modePaiementRefRef.actif }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/mode-paiement-ref', modePaiementRefRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

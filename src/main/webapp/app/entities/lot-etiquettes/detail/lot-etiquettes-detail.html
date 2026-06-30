@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (lotEtiquettes(); as lotEtiquettesRef) {
+      <div>
+        <h2 data-cy="lotEtiquettesDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.detail.title">Lot Etiquettes</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ lotEtiquettesRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.reference">Reference</span></dt>
+          <dd>
+            <span>{{ lotEtiquettesRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.dateGeneration">Date Generation</span></dt>
+          <dd>
+            <span>{{ lotEtiquettesRef.dateGeneration | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.formatImpression">Format Impression</span></dt>
+          <dd>
+            <span>{{ lotEtiquettesRef.formatImpression }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.nombreEtiquettes">Nombre Etiquettes</span></dt>
+          <dd>
+            <span>{{ lotEtiquettesRef.nombreEtiquettes }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/lot-etiquettes', lotEtiquettesRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

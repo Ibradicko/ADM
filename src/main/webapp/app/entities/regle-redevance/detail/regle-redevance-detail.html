@@ -1,0 +1,98 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (regleRedevance(); as regleRedevanceRef) {
+      <div>
+        <h2 data-cy="regleRedevanceDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.regleRedevance.detail.title">Regle Redevance</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ regleRedevanceRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.code">Code</span></dt>
+          <dd>
+            <span>{{ regleRedevanceRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.typeRegle">Type Regle</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypeRegleRedevance.' + (regleRedevanceRef.typeRegle ?? 'null')">{{
+              { null: '', BOUTIQUE: 'BOUTIQUE', LOCATAIRE: 'LOCATAIRE', GROUPE_ARTICLE: 'GROUPE_ARTICLE', PRODUIT: 'PRODUIT' }[
+                regleRedevanceRef.typeRegle ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.taux">Taux</span></dt>
+          <dd>
+            <span>{{ regleRedevanceRef.taux }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.dateDebut">Date Debut</span></dt>
+          <dd>
+            <span>{{ regleRedevanceRef.dateDebut | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.dateFin">Date Fin</span></dt>
+          <dd>
+            <span>{{ regleRedevanceRef.dateFin | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.priorite">Priorite</span></dt>
+          <dd>
+            <span>{{ regleRedevanceRef.priorite }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.actif">Actif</span></dt>
+          <dd>
+            <span>{{ regleRedevanceRef.actif }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.boutique">Boutique</span></dt>
+          <dd>
+            @if (regleRedevance()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', regleRedevance()!.boutique?.id, 'view']">{{ regleRedevanceRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.locataire">Locataire</span></dt>
+          <dd>
+            @if (regleRedevance()!.locataire) {
+              <div>
+                <a [routerLink]="['/locataire', regleRedevance()!.locataire?.id, 'view']">{{ regleRedevanceRef.locataire?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.groupeArticle">Groupe Article</span></dt>
+          <dd>
+            @if (regleRedevance()!.groupeArticle) {
+              <div>
+                <a [routerLink]="['/groupe-article', regleRedevance()!.groupeArticle?.id, 'view']">{{
+                  regleRedevanceRef.groupeArticle?.libelle
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.produit">Produit</span></dt>
+          <dd>
+            @if (regleRedevance()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', regleRedevance()!.produit?.id, 'view']">{{ regleRedevanceRef.produit?.designation }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/regle-redevance', regleRedevanceRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

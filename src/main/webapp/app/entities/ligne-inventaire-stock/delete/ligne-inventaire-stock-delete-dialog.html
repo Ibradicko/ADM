@@ -1,0 +1,30 @@
+@if (ligneInventaireStock) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(ligneInventaireStock.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="ligneInventaireStockDeleteDialogHeading" jhiTranslate="entity.delete.title">
+        Confirm delete operation
+      </h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p
+        id="jhi-delete-ligneInventaireStock-heading"
+        jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.delete.question"
+        [translateValues]="{ id: ligneInventaireStock.id }"
+      >
+        Are you sure you want to delete Ligne Inventaire Stock {{ ligneInventaireStock.id }}?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+
+      <button id="jhi-confirm-delete-ligneInventaireStock" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span jhiTranslate="entity.action.delete">Delete</span>
+      </button>
+    </div>
+  </form>
+}

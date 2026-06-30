@@ -1,0 +1,296 @@
+{
+  "admSupervisionVentesApp": {
+    "regleRedevance": {
+      "home": {
+        "title": "Règles de redevance",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une règle de redevance",
+        "createOrEditLabel": "Créer ou modifier une règle de redevance",
+        "notFound": "Aucune règle de redevance trouvée"
+      },
+      "created": "Une règle de redevance a été créée avec l’identifiant {{ param }}",
+      "updated": "La règle de redevance {{ param }} a été mise à jour",
+      "deleted": "La règle de redevance {{ param }} a été supprimée",
+      "delete": { "question": "Voulez-vous vraiment supprimer la règle de redevance {{ id }} ?" },
+      "detail": { "title": "Règle de redevance" },
+      "id": "ID",
+      "code": "Code",
+      "typeRegle": "Type de règle",
+      "taux": "Taux",
+      "dateDebut": "Date de début",
+      "dateFin": "Date de fin",
+      "priorite": "Priorité",
+      "actif": "Actif",
+      "boutique": "Boutique",
+      "locataire": "Locataire",
+      "groupeArticle": "Groupe d’articles",
+      "produit": "Produit"
+    },
+    "calculRedevance": {
+      "home": {
+        "title": "Calculs de redevance",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un calcul de redevance",
+        "createOrEditLabel": "Créer ou modifier un calcul de redevance",
+        "notFound": "Aucun calcul de redevance trouvé"
+      },
+      "created": "Un calcul de redevance a été créé avec l’identifiant {{ param }}",
+      "updated": "Le calcul de redevance {{ param }} a été mis à jour",
+      "deleted": "Le calcul de redevance {{ param }} a été supprimé",
+      "delete": { "question": "Voulez-vous vraiment supprimer le calcul de redevance {{ id }} ?" },
+      "detail": { "title": "Calcul de redevance" },
+      "id": "ID",
+      "reference": "Référence",
+      "periodeDebut": "Début de période",
+      "periodeFin": "Fin de période",
+      "chiffreAffaires": "Chiffre d’affaires",
+      "montantRedevance": "Montant de redevance",
+      "statut": "Statut",
+      "dateCalcul": "Date de calcul",
+      "boutique": "Boutique",
+      "locataire": "Locataire"
+    },
+    "ligneCalculRedevance": {
+      "home": {
+        "title": "Lignes de calcul de redevance",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une ligne de calcul",
+        "createOrEditLabel": "Créer ou modifier une ligne de calcul",
+        "notFound": "Aucune ligne de calcul trouvée"
+      },
+      "created": "Une ligne de calcul a été créée avec l’identifiant {{ param }}",
+      "updated": "La ligne de calcul {{ param }} a été mise à jour",
+      "deleted": "La ligne de calcul {{ param }} a été supprimée",
+      "delete": { "question": "Voulez-vous vraiment supprimer la ligne de calcul {{ id }} ?" },
+      "detail": { "title": "Ligne de calcul de redevance" },
+      "id": "ID",
+      "baseCalcul": "Base de calcul",
+      "tauxApplique": "Taux appliqué",
+      "montantRedevance": "Montant de redevance",
+      "calcul": "Calcul",
+      "vente": "Vente"
+    },
+    "paiementRedevance": {
+      "home": {
+        "title": "Paiements de redevance",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un paiement de redevance",
+        "createOrEditLabel": "Créer ou modifier un paiement",
+        "notFound": "Aucun paiement de redevance trouvé"
+      },
+      "created": "Un paiement de redevance a été créé avec l’identifiant {{ param }}",
+      "updated": "Le paiement {{ param }} a été mis à jour",
+      "deleted": "Le paiement {{ param }} a été supprimé",
+      "delete": { "question": "Voulez-vous vraiment supprimer le paiement {{ id }} ?" },
+      "detail": { "title": "Paiement de redevance" },
+      "id": "ID",
+      "reference": "Référence",
+      "montant": "Montant",
+      "datePaiement": "Date de paiement",
+      "modePaiement": "Mode de paiement",
+      "commentaire": "Commentaire",
+      "calcul": "Calcul"
+    },
+    "regularisationRedevance": {
+      "home": {
+        "title": "Régularisations de redevance",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une régularisation",
+        "createOrEditLabel": "Créer ou modifier une régularisation",
+        "notFound": "Aucune régularisation trouvée"
+      },
+      "created": "Une régularisation a été créée avec l’identifiant {{ param }}",
+      "updated": "La régularisation {{ param }} a été mise à jour",
+      "deleted": "La régularisation {{ param }} a été supprimée",
+      "delete": { "question": "Voulez-vous vraiment supprimer la régularisation {{ id }} ?" },
+      "detail": { "title": "Régularisation de redevance" },
+      "id": "ID",
+      "reference": "Référence",
+      "montant": "Montant",
+      "motif": "Motif",
+      "dateRegularisation": "Date de régularisation",
+      "calcul": "Calcul"
+    },
+    "journalAudit": {
+      "home": {
+        "title": "Journal d’audit",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une entrée d’audit",
+        "createOrEditLabel": "Créer ou modifier une entrée d’audit",
+        "notFound": "Aucune entrée d’audit trouvée"
+      },
+      "created": "Une entrée d’audit a été créée avec l’identifiant {{ param }}",
+      "updated": "L’entrée d’audit {{ param }} a été mise à jour",
+      "deleted": "L’entrée d’audit {{ param }} a été supprimée",
+      "delete": { "question": "Voulez-vous vraiment supprimer l’entrée d’audit {{ id }} ?" },
+      "detail": { "title": "Entrée du journal d’audit" },
+      "id": "ID",
+      "typeAction": "Type d’action",
+      "entiteConcernee": "Entité concernée",
+      "identifiantEntite": "Identifiant de l’entité",
+      "description": "Description",
+      "adresseIp": "Adresse IP",
+      "dateAction": "Date de l’action",
+      "boutique": "Boutique",
+      "utilisateur": "Utilisateur"
+    },
+    "rapportExport": {
+      "home": {
+        "title": "Rapports exportés",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un rapport exporté",
+        "createOrEditLabel": "Créer ou modifier un rapport exporté",
+        "notFound": "Aucun rapport exporté trouvé"
+      },
+      "created": "Un rapport exporté a été créé avec l’identifiant {{ param }}",
+      "updated": "Le rapport exporté {{ param }} a été mis à jour",
+      "deleted": "Le rapport exporté {{ param }} a été supprimé",
+      "delete": { "question": "Voulez-vous vraiment supprimer le rapport exporté {{ id }} ?" },
+      "detail": { "title": "Rapport exporté" },
+      "id": "ID",
+      "reference": "Référence",
+      "typeRapport": "Type de rapport",
+      "format": "Format",
+      "periodeDebut": "Début de période",
+      "periodeFin": "Fin de période",
+      "cheminFichier": "Chemin du fichier",
+      "dateGeneration": "Date de génération",
+      "boutique": "Boutique",
+      "locataire": "Locataire",
+      "utilisateur": "Utilisateur"
+    },
+    "parametreGlobal": {
+      "home": {
+        "title": "Paramètres globaux",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un paramètre global",
+        "createOrEditLabel": "Créer ou modifier un paramètre global",
+        "notFound": "Aucun paramètre global trouvé"
+      },
+      "created": "Un paramètre global a été créé avec l’identifiant {{ param }}",
+      "updated": "Le paramètre global {{ param }} a été mis à jour",
+      "deleted": "Le paramètre global {{ param }} a été supprimé",
+      "delete": { "question": "Voulez-vous vraiment supprimer le paramètre global {{ id }} ?" },
+      "detail": { "title": "Paramètre global" },
+      "id": "ID",
+      "code": "Code",
+      "valeur": "Valeur",
+      "description": "Description",
+      "actif": "Actif"
+    },
+    "modePaiementRef": {
+      "home": {
+        "title": "Modes de paiement",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un mode de paiement",
+        "createOrEditLabel": "Créer ou modifier un mode de paiement",
+        "notFound": "Aucun mode de paiement trouvé"
+      },
+      "created": "Un mode de paiement a été créé avec l’identifiant {{ param }}",
+      "updated": "Le mode de paiement {{ param }} a été mis à jour",
+      "deleted": "Le mode de paiement {{ param }} a été supprimé",
+      "delete": { "question": "Voulez-vous vraiment supprimer le mode de paiement {{ id }} ?" },
+      "detail": { "title": "Mode de paiement" },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libellé",
+      "actif": "Actif"
+    },
+    "profilMetier": {
+      "home": {
+        "title": "Profils métier",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un profil métier",
+        "createOrEditLabel": "Créer ou modifier un profil métier",
+        "notFound": "Aucun profil métier trouvé"
+      },
+      "created": "Un profil métier a été créé avec l’identifiant {{ param }}",
+      "updated": "Le profil métier {{ param }} a été mis à jour",
+      "deleted": "Le profil métier {{ param }} a été supprimé",
+      "delete": { "question": "Voulez-vous vraiment supprimer le profil métier {{ id }} ?" },
+      "detail": { "title": "Profil métier" },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libellé",
+      "description": "Description",
+      "statut": "Statut",
+      "permissions": "Permissions"
+    },
+    "permissionMetier": {
+      "home": {
+        "title": "Permissions métier",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une permission métier",
+        "createOrEditLabel": "Créer ou modifier une permission métier",
+        "notFound": "Aucune permission métier trouvée"
+      },
+      "created": "Une permission métier a été créée avec l’identifiant {{ param }}",
+      "updated": "La permission métier {{ param }} a été mise à jour",
+      "deleted": "La permission métier {{ param }} a été supprimée",
+      "delete": { "question": "Voulez-vous vraiment supprimer la permission métier {{ id }} ?" },
+      "detail": { "title": "Permission métier" },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libellé",
+      "module": "Module",
+      "description": "Description",
+      "profils": "Profils"
+    },
+    "affectationUtilisateur": {
+      "home": {
+        "title": "Affectations utilisateur",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une affectation utilisateur",
+        "createOrEditLabel": "Créer ou modifier une affectation",
+        "notFound": "Aucune affectation trouvée"
+      },
+      "created": "Une affectation a été créée avec l’identifiant {{ param }}",
+      "updated": "L’affectation {{ param }} a été mise à jour",
+      "deleted": "L’affectation {{ param }} a été supprimée",
+      "delete": { "question": "Voulez-vous vraiment supprimer l’affectation {{ id }} ?" },
+      "detail": { "title": "Affectation utilisateur" },
+      "id": "ID",
+      "dateDebut": "Date de début",
+      "dateFin": "Date de fin",
+      "actif": "Actif",
+      "user": "Utilisateur",
+      "boutique": "Boutique",
+      "profil": "Profil"
+    },
+    "StatutRedevance": {
+      "null": "",
+      "CALCULEE": "Calculée",
+      "VALIDEE": "Validée",
+      "REGULARISEE": "Régularisée",
+      "PARTIELLEMENT_PAYEE": "Partiellement payée",
+      "PAYEE": "Payée",
+      "ANNULEE": "Annulée"
+    },
+    "TypeRegleRedevance": {
+      "null": "",
+      "BOUTIQUE": "Boutique",
+      "LOCATAIRE": "Locataire",
+      "GROUPE_ARTICLE": "Groupe d’articles",
+      "PRODUIT": "Produit"
+    },
+    "TypeActionAudit": {
+      "null": "",
+      "CONNEXION": "Connexion",
+      "DECONNEXION": "Déconnexion",
+      "CREATION": "Création",
+      "MODIFICATION": "Modification",
+      "DESACTIVATION": "Désactivation",
+      "CHANGEMENT_PRIX": "Changement de prix",
+      "CHANGEMENT_TAUX_REDEVANCE": "Changement du taux de redevance",
+      "CHANGEMENT_CODE_BARRES": "Changement de code-barres",
+      "VENTE_VALIDEE": "Vente validée",
+      "VENTE_ANNULEE": "Vente annulée",
+      "RETOUR_VENTE": "Retour de vente",
+      "MOUVEMENT_STOCK": "Mouvement de stock",
+      "INVENTAIRE": "Inventaire",
+      "PARAMETRAGE": "Paramétrage",
+      "EXPORT": "Export"
+    },
+    "FormatExport": { "null": "", "PDF": "PDF", "EXCEL": "Excel" }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "admSupervisionVentesApp": {
+    "ligneVente": {
+      "home": {
+        "title": "Ligne Ventes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ligne Vente",
+        "createOrEditLabel": "Create or edit a Ligne Vente",
+        "notFound": "No Ligne Ventes found"
+      },
+      "created": "A new Ligne Vente is created with identifier {{ param }}",
+      "updated": "A Ligne Vente is updated with identifier {{ param }}",
+      "deleted": "A Ligne Vente is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ligne Vente {{ id }}?"
+      },
+      "detail": {
+        "title": "Ligne Vente"
+      },
+      "id": "ID",
+      "quantite": "Quantite",
+      "prixUnitaire": "Prix Unitaire",
+      "remise": "Remise",
+      "montantLigne": "Montant Ligne",
+      "codeBarresScanne": "Code Barres Scanne",
+      "vente": "Vente",
+      "produit": "Produit"
+    }
+  }
+}

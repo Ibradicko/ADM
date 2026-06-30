@@ -1,0 +1,11 @@
+export enum StatutVente {
+  BROUILLON = 'BROUILLON',
+
+  VALIDEE = 'VALIDEE',
+
+  ANNULEE = 'ANNULEE',
+
+  RETOURNEE = 'RETOURNEE',
+
+  AJUSTEE = 'AJUSTEE',
+}

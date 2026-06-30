@@ -1,0 +1,29 @@
+{
+  "admSupervisionVentesApp": {
+    "affectationUtilisateur": {
+      "home": {
+        "title": "Affectation Utilisateurs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Affectation Utilisateur",
+        "createOrEditLabel": "Create or edit a Affectation Utilisateur",
+        "notFound": "No Affectation Utilisateurs found"
+      },
+      "created": "A new Affectation Utilisateur is created with identifier {{ param }}",
+      "updated": "A Affectation Utilisateur is updated with identifier {{ param }}",
+      "deleted": "A Affectation Utilisateur is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Affectation Utilisateur {{ id }}?"
+      },
+      "detail": {
+        "title": "Affectation Utilisateur"
+      },
+      "id": "ID",
+      "dateDebut": "Date Debut",
+      "dateFin": "Date Fin",
+      "actif": "Actif",
+      "user": "User",
+      "boutique": "Boutique",
+      "profil": "Profil"
+    }
+  }
+}

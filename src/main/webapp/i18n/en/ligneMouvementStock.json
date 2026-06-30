@@ -1,0 +1,30 @@
+{
+  "admSupervisionVentesApp": {
+    "ligneMouvementStock": {
+      "home": {
+        "title": "Ligne Mouvement Stocks",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ligne Mouvement Stock",
+        "createOrEditLabel": "Create or edit a Ligne Mouvement Stock",
+        "notFound": "No Ligne Mouvement Stocks found"
+      },
+      "created": "A new Ligne Mouvement Stock is created with identifier {{ param }}",
+      "updated": "A Ligne Mouvement Stock is updated with identifier {{ param }}",
+      "deleted": "A Ligne Mouvement Stock is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ligne Mouvement Stock {{ id }}?"
+      },
+      "detail": {
+        "title": "Ligne Mouvement Stock"
+      },
+      "id": "ID",
+      "quantite": "Quantite",
+      "stockAvant": "Stock Avant",
+      "stockApres": "Stock Apres",
+      "commentaire": "Commentaire",
+      "mouvement": "Mouvement",
+      "produit": "Produit",
+      "depot": "Depot"
+    }
+  }
+}

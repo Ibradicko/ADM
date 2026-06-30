@@ -1,0 +1,104 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="DepotStockHeading">
+    <div>
+      <h1>Dépôts de stock</h1>
+      <p>Emplacements physiques de stockage par boutique</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutGererStock()) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/depot-stock/new']">
+          <fa-icon icon="plus" />
+          <span>Nouveau dépôt</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des dépôts de stock</h2>
+        <p>Zones de stockage configurées par boutique</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ depotStocks().length }} dépôt(s)</span>
+    </div>
+
+    @if (depotStocks().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun dépôt de stock configuré</strong>
+        <p>Créez un dépôt pour organiser le stockage des marchandises.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="libelle">Libellé <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="emplacement">Emplacement <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="actif">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ds of depotStocks(); track trackId(ds); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ ds.code ?? '—' }}</span>
+                </td>
+                <td>
+                  <strong>{{ ds.libelle ?? '—' }}</strong>
+                </td>
+                <td>
+                  @if (ds.boutique) {
+                    <div class="adm-table-title">
+                      <strong>{{ ds.boutique.nom }}</strong>
+                      <small>{{ ds.boutique.code }}</small>
+                    </div>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>{{ ds.emplacement ?? '—' }}</td>
+                <td>
+                  <span class="adm-pill" [class.adm-pill--success]="ds.actif" [class.adm-pill--danger]="!ds.actif">
+                    {{ ds.actif ? 'Actif' : 'Inactif' }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/depot-stock', ds.id, 'view']" class="adm-icon-button" data-cy="entityDetailsButton" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutGererStock()) {
+                      <a [routerLink]="['/depot-stock', ds.id, 'edit']" class="adm-icon-button" data-cy="entityEditButton" title="Modifier">
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(ds)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

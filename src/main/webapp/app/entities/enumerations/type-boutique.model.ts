@@ -1,0 +1,11 @@
+export enum TypeBoutique {
+  DUTY_FREE = 'DUTY_FREE',
+
+  RESTAURATION = 'RESTAURATION',
+
+  COMMERCE = 'COMMERCE',
+
+  SERVICE = 'SERVICE',
+
+  AUTRE = 'AUTRE',
+}

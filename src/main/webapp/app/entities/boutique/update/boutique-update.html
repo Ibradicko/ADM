@@ -1,0 +1,72 @@
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
+      <div>
+        <p class="adm-page__eyebrow">Structure commerciale</p>
+        <h2>{{ editForm.controls.id.value === null ? 'Nouvelle boutique' : 'Modifier la boutique' }}</h2>
+        <p>Le code est genere automatiquement a partir du nom de la boutique.</p>
+      </div>
+    </div>
+
+    <jhi-alert-error />
+
+    @if (messageMetier(); as message) {
+      <div class="adm-inline-alert adm-inline-alert--danger">{{ message }}</div>
+    }
+
+    <div class="adm-form-grid">
+      <label class="adm-field adm-field--full">
+        <span>Nom boutique</span>
+        <input type="text" formControlName="nom" />
+        @if (champInvalide('nom')) {
+          <small class="text-danger">Le nom de la boutique est obligatoire.</small>
+        } @else {
+          <small>Utilisez le nom commercial visible dans les rapports et les ventes.</small>
+        }
+      </label>
+
+      <label class="adm-field">
+        <span>Type</span>
+        <select formControlName="type">
+          @for (typeBoutique of typeBoutiqueValues; track $index) {
+            <option [value]="typeBoutique">{{ typeBoutique }}</option>
+          }
+        </select>
+        <small>Classez la boutique pour faciliter le reporting.</small>
+      </label>
+
+      <label class="adm-field">
+        <span>Statut</span>
+        <select formControlName="statut">
+          @for (statutGeneral of statutGeneralValues; track $index) {
+            <option [value]="statutGeneral">{{ statutGeneral }}</option>
+          }
+        </select>
+        <small>Seules les boutiques actives sont utilisees dans les operations courantes.</small>
+      </label>
+
+      <label class="adm-field adm-field--full">
+        <span>Emplacement</span>
+        <input type="text" formControlName="emplacement" />
+        <small>Indiquez une zone claire : terminal, hall, porte ou niveau.</small>
+      </label>
+
+      <label class="adm-field">
+        <span>Telephone</span>
+        <input type="tel" inputmode="numeric" maxlength="8" pattern="[0-9]*" formControlName="telephone" />
+        @if (champInvalide('telephone')) {
+          <small class="text-danger">Le numero au Mali doit contenir exactement 8 chiffres.</small>
+        } @else {
+          <small>Facultatif. Format attendu : 8 chiffres, sans espace ni indicatif pays.</small>
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="previousState()">Annuler</button>
+      <button type="submit" class="adm-button adm-button--primary" [disabled]="editForm.invalid || isSaving()">
+        {{ isSaving() ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+  </form>
+</section>

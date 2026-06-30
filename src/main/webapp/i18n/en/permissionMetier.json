@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "permissionMetier": {
+      "home": {
+        "title": "Permission Metiers",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Permission Metier",
+        "createOrEditLabel": "Create or edit a Permission Metier",
+        "notFound": "No Permission Metiers found"
+      },
+      "created": "A new Permission Metier is created with identifier {{ param }}",
+      "updated": "A Permission Metier is updated with identifier {{ param }}",
+      "deleted": "A Permission Metier is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Permission Metier {{ id }}?"
+      },
+      "detail": {
+        "title": "Permission Metier"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libelle",
+      "module": "Module",
+      "description": "Description",
+      "profils": "Profils"
+    }
+  }
+}

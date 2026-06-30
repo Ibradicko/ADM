@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ligneMouvementStock(); as ligneMouvementStockRef) {
+      <div>
+        <h2 data-cy="ligneMouvementStockDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.detail.title">Ligne Mouvement Stock</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ligneMouvementStockRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.quantite">Quantite</span></dt>
+          <dd>
+            <span>{{ ligneMouvementStockRef.quantite }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.stockAvant">Stock Avant</span></dt>
+          <dd>
+            <span>{{ ligneMouvementStockRef.stockAvant }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.stockApres">Stock Apres</span></dt>
+          <dd>
+            <span>{{ ligneMouvementStockRef.stockApres }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.commentaire">Commentaire</span></dt>
+          <dd>
+            <span>{{ ligneMouvementStockRef.commentaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.mouvement">Mouvement</span></dt>
+          <dd>
+            @if (ligneMouvementStock()!.mouvement) {
+              <div>
+                <a [routerLink]="['/mouvement-stock', ligneMouvementStock()!.mouvement?.id, 'view']">{{
+                  ligneMouvementStockRef.mouvement?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.produit">Produit</span></dt>
+          <dd>
+            @if (ligneMouvementStock()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', ligneMouvementStock()!.produit?.id, 'view']">{{
+                  ligneMouvementStockRef.produit?.designation
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.depot">Depot</span></dt>
+          <dd>
+            @if (ligneMouvementStock()!.depot) {
+              <div>
+                <a [routerLink]="['/depot-stock', ligneMouvementStock()!.depot?.id, 'view']">{{ ligneMouvementStockRef.depot?.code }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ligne-mouvement-stock', ligneMouvementStockRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

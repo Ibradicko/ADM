@@ -1,0 +1,104 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="GroupeArticleHeading">
+    <div>
+      <h1>Groupes d'articles</h1>
+      <p>Catégories globales ADM — définissent les taux de redevance applicables</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+        <a class="adm-button adm-button--primary" [routerLink]="['/groupe-article/new']" id="jh-create-entity" data-cy="entityCreateButton">
+          <fa-icon icon="plus" />
+          <span>Nouveau groupe</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  @if (groupeArticles().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <strong>Aucun groupe d'articles trouvé</strong>
+      <p>Créez un premier groupe pour commencer à définir des taux de redevance.</p>
+    </div>
+  } @else {
+    <article class="adm-card adm-card--table">
+      <div class="adm-card__header">
+        <div>
+          <h2>Liste des groupes d'articles</h2>
+          <p>Ces groupes sont globaux — ils s'appliquent à toutes les boutiques.</p>
+        </div>
+        <span class="adm-pill adm-pill--primary">{{ groupeArticles().length }} groupes</span>
+      </div>
+
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="libelle">Libellé <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (groupeArticle of groupeArticles(); track trackId(groupeArticle); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ groupeArticle.code ?? '—' }}</span>
+                </td>
+                <td>{{ groupeArticle.libelle ?? '—' }}</td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="groupeArticle.statut === 'ACTIF'"
+                    [class.adm-pill--warning]="groupeArticle.statut === 'INACTIF'"
+                    [class.adm-pill--danger]="groupeArticle.statut === 'SUSPENDU'"
+                  >
+                    {{ groupeArticle.statut ?? '—' }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/groupe-article', groupeArticle.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+                      <a
+                        [routerLink]="['/groupe-article', groupeArticle.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(groupeArticle)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+</section>

@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (tarifProduit(); as tarifProduitRef) {
+      <div>
+        <h2 data-cy="tarifProduitDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.tarifProduit.detail.title">Tarif Produit</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ tarifProduitRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.tarifProduit.montant">Montant</span></dt>
+          <dd>
+            <span>{{ tarifProduitRef.montant }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.tarifProduit.typePrix">Type Prix</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypePrix.' + (tarifProduitRef.typePrix ?? 'null')">{{
+              { null: '', STANDARD: 'STANDARD', PROMOTION: 'PROMOTION', CONTRACTUEL: 'CONTRACTUEL' }[tarifProduitRef.typePrix ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.tarifProduit.dateDebut">Date Debut</span></dt>
+          <dd>
+            <span>{{ tarifProduitRef.dateDebut | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.tarifProduit.dateFin">Date Fin</span></dt>
+          <dd>
+            <span>{{ tarifProduitRef.dateFin | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.tarifProduit.actif">Actif</span></dt>
+          <dd>
+            <span>{{ tarifProduitRef.actif }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.tarifProduit.produit">Produit</span></dt>
+          <dd>
+            @if (tarifProduit()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', tarifProduit()!.produit?.id, 'view']">{{ tarifProduitRef.produit?.designation }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/tarif-produit', tarifProduitRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

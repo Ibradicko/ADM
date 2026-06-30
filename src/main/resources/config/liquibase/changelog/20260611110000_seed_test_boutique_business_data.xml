@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <changeSet id="20260611110000-1" author="codex">
+        <comment>Seed separated Alpha/Beta business data to validate boutique scoping.</comment>
+        <sql>
+            INSERT INTO locataire (id, code, nom, type_locataire, numero_identification, telephone, email, adresse, statut, date_creation) VALUES
+              (903101, 'LOC-ALPHA', 'Locataire Alpha Test', 'PERSONNE_MORALE', 'NINEA-ALPHA-TEST', '+221770001101', 'locataire.alpha@test.adm', 'Terminal A - Zone publique', 'ACTIF', current_timestamp),
+              (903102, 'LOC-BETA', 'Locataire Beta Test', 'PERSONNE_MORALE', 'NINEA-BETA-TEST', '+221770001102', 'locataire.beta@test.adm', 'Terminal B - Zone embarquement', 'ACTIF', current_timestamp)
+            ON CONFLICT (code) DO UPDATE SET
+              nom = EXCLUDED.nom,
+              type_locataire = EXCLUDED.type_locataire,
+              numero_identification = EXCLUDED.numero_identification,
+              telephone = EXCLUDED.telephone,
+              email = EXCLUDED.email,
+              adresse = EXCLUDED.adresse,
+              statut = EXCLUDED.statut;
+
+            INSERT INTO exploitation_boutique (id, numero_contrat, date_debut, date_fin, taux_redevance_defaut, statut, commentaire, boutique_id, locataire_id) VALUES
+              (903201, 'CTR-ALPHA-2026', DATE '2026-01-01', null, 12.00, 'ACTIF', 'Contrat de recette test Alpha', 901101, 903101),
+              (903202, 'CTR-BETA-2026', DATE '2026-01-01', null, 10.00, 'ACTIF', 'Contrat de recette test Beta', 901102, 903102)
+            ON CONFLICT (id) DO UPDATE SET
+              numero_contrat = EXCLUDED.numero_contrat,
+              date_debut = EXCLUDED.date_debut,
+              date_fin = EXCLUDED.date_fin,
+              taux_redevance_defaut = EXCLUDED.taux_redevance_defaut,
+              statut = EXCLUDED.statut,
+              commentaire = EXCLUDED.commentaire,
+              boutique_id = EXCLUDED.boutique_id,
+              locataire_id = EXCLUDED.locataire_id;
+
+            INSERT INTO unite_mesure (id, code, libelle, symbole) VALUES
+              (903301, 'PCS', 'Piece', 'pcs')
+            ON CONFLICT (code) DO UPDATE SET
+              libelle = EXCLUDED.libelle,
+              symbole = EXCLUDED.symbole;
+
+            INSERT INTO groupe_article (id, code, libelle, statut) VALUES
+              (903401, 'GRP-ALPHA', 'Groupe Alpha Test', 'ACTIF'),
+              (903402, 'GRP-BETA', 'Groupe Beta Test', 'ACTIF')
+            ON CONFLICT (id) DO UPDATE SET
+              code = EXCLUDED.code,
+              libelle = EXCLUDED.libelle,
+              statut = EXCLUDED.statut;
+
+            INSERT INTO famille_article (id, code, libelle, statut, groupe_article_id) VALUES
+              (903411, 'FAM-ALPHA', 'Famille Alpha Test', 'ACTIF', 903401),
+              (903412, 'FAM-BETA', 'Famille Beta Test', 'ACTIF', 903402)
+            ON CONFLICT (id) DO UPDATE SET
+              code = EXCLUDED.code,
+              libelle = EXCLUDED.libelle,
+              statut = EXCLUDED.statut,
+              groupe_article_id = EXCLUDED.groupe_article_id;
+
+            INSERT INTO sous_famille_article (id, code, libelle, statut, famille_article_id) VALUES
+              (903421, 'SF-ALPHA', 'Sous famille Alpha Test', 'ACTIF', 903411),
+              (903422, 'SF-BETA', 'Sous famille Beta Test', 'ACTIF', 903412)
+            ON CONFLICT (id) DO UPDATE SET
+              code = EXCLUDED.code,
+              libelle = EXCLUDED.libelle,
+              statut = EXCLUDED.statut,
+              famille_article_id = EXCLUDED.famille_article_id;
+
+            INSERT INTO produit (
+              id, code_interne, designation, description, type_prix, prix_vente, taux_redevance_applicable, statut, date_creation,
+              boutique_id, groupe_article_id, famille_article_id, sous_famille_article_id, unite_mesure_id
+            ) VALUES
+              (903501, 'ALPHA-CAF-001', 'Cafe Alpha Test', 'Produit uniquement visible sur la boutique Alpha', 'STANDARD', 3000.00, 12.00, 'ACTIF', current_timestamp, 901101, 903401, 903411, 903421, 903301),
+              (903502, 'ALPHA-EAU-001', 'Eau Alpha Test', 'Produit uniquement visible sur la boutique Alpha', 'STANDARD', 8000.00, 12.00, 'ACTIF', current_timestamp, 901101, 903401, 903411, 903421, 903301),
+              (903503, 'BETA-PARF-001', 'Parfum Beta Test', 'Produit uniquement visible sur la boutique Beta', 'STANDARD', 10000.00, 10.00, 'ACTIF', current_timestamp, 901102, 903402, 903412, 903422, 903301),
+              (903504, 'BETA-SOUV-001', 'Souvenir Beta Test', 'Produit uniquement visible sur la boutique Beta', 'STANDARD', 2500.00, 10.00, 'ACTIF', current_timestamp, 901102, 903402, 903412, 903422, 903301)
+            ON CONFLICT (id) DO UPDATE SET
+              code_interne = EXCLUDED.code_interne,
+              designation = EXCLUDED.designation,
+              description = EXCLUDED.description,
+              type_prix = EXCLUDED.type_prix,
+              prix_vente = EXCLUDED.prix_vente,
+              taux_redevance_applicable = EXCLUDED.taux_redevance_applicable,
+              statut = EXCLUDED.statut,
+              boutique_id = EXCLUDED.boutique_id,
+              groupe_article_id = EXCLUDED.groupe_article_id,
+              famille_article_id = EXCLUDED.famille_article_id,
+              sous_famille_article_id = EXCLUDED.sous_famille_article_id,
+              unite_mesure_id = EXCLUDED.unite_mesure_id;
+
+            INSERT INTO tarif_produit (id, montant, type_prix, date_debut, date_fin, actif, produit_id) VALUES
+              (903601, 3000.00, 'STANDARD', DATE '2026-01-01', null, true, 903501),
+              (903602, 8000.00, 'STANDARD', DATE '2026-01-01', null, true, 903502),
+              (903603, 10000.00, 'STANDARD', DATE '2026-01-01', null, true, 903503),
+              (903604, 2500.00, 'STANDARD', DATE '2026-01-01', null, true, 903504)
+            ON CONFLICT (id) DO UPDATE SET
+              montant = EXCLUDED.montant,
+              type_prix = EXCLUDED.type_prix,
+              date_debut = EXCLUDED.date_debut,
+              date_fin = EXCLUDED.date_fin,
+              actif = EXCLUDED.actif,
+              produit_id = EXCLUDED.produit_id;
+
+            INSERT INTO code_barres_produit (id, code, type, principal, genere_par_systeme, actif, date_affectation, produit_id) VALUES
+              (903701, 'ALPHA-CAF-001-CB', 'CODE128', true, false, true, current_timestamp, 903501),
+              (903702, 'ALPHA-EAU-001-CB', 'CODE128', true, false, true, current_timestamp, 903502),
+              (903703, 'BETA-PARF-001-CB', 'CODE128', true, false, true, current_timestamp, 903503),
+              (903704, 'BETA-SOUV-001-CB', 'CODE128', true, false, true, current_timestamp, 903504)
+            ON CONFLICT (id) DO UPDATE SET
+              code = EXCLUDED.code,
+              type = EXCLUDED.type,
+              principal = EXCLUDED.principal,
+              genere_par_systeme = EXCLUDED.genere_par_systeme,
+              actif = EXCLUDED.actif,
+              date_affectation = EXCLUDED.date_affectation,
+              produit_id = EXCLUDED.produit_id;
+
+            INSERT INTO depot_stock (id, code, libelle, emplacement, actif, boutique_id) VALUES
+              (903801, 'DEP-ALPHA-PRINC', 'Depot principal Alpha', 'Reserve Alpha', true, 901101),
+              (903802, 'DEP-BETA-PRINC', 'Depot principal Beta', 'Reserve Beta', true, 901102)
+            ON CONFLICT (id) DO UPDATE SET
+              code = EXCLUDED.code,
+              libelle = EXCLUDED.libelle,
+              emplacement = EXCLUDED.emplacement,
+              actif = EXCLUDED.actif,
+              boutique_id = EXCLUDED.boutique_id;
+
+            INSERT INTO stock_produit (id, quantite_theorique, stock_alerte, date_dernier_mouvement, produit_id, depot_id) VALUES
+              (903901, 48.00, 5.00, current_timestamp, 903501, 903801),
+              (903902, 30.00, 5.00, current_timestamp, 903502, 903801),
+              (903903, 20.00, 3.00, current_timestamp, 903503, 903802),
+              (903904, 90.00, 10.00, current_timestamp, 903504, 903802)
+            ON CONFLICT (produit_id, depot_id) DO UPDATE SET
+              quantite_theorique = EXCLUDED.quantite_theorique,
+              stock_alerte = EXCLUDED.stock_alerte,
+              date_dernier_mouvement = EXCLUDED.date_dernier_mouvement;
+
+            INSERT INTO vente (
+              id, numero_ticket, date_heure, statut, reference_passager, reference_carte_embarquement,
+              montant_brut, montant_remise, montant_net, commentaire, boutique_id, locataire_id, vendeur_id
+            ) VALUES
+              (904001, 'TCK-ALPHA-2026-001', current_timestamp, 'VALIDEE', 'PAX-ALPHA-001', 'BP-ALPHA-001', 14000.00, 0.00, 14000.00, 'Vente test Alpha', 901101, 903101, 901202),
+              (904002, 'TCK-BETA-2026-001', current_timestamp, 'VALIDEE', 'PAX-BETA-001', 'BP-BETA-001', 17500.00, 0.00, 17500.00, 'Vente test Beta', 901102, 903102, 901203)
+            ON CONFLICT (numero_ticket) DO UPDATE SET
+              date_heure = EXCLUDED.date_heure,
+              statut = EXCLUDED.statut,
+              reference_passager = EXCLUDED.reference_passager,
+              reference_carte_embarquement = EXCLUDED.reference_carte_embarquement,
+              montant_brut = EXCLUDED.montant_brut,
+              montant_remise = EXCLUDED.montant_remise,
+              montant_net = EXCLUDED.montant_net,
+              commentaire = EXCLUDED.commentaire,
+              boutique_id = EXCLUDED.boutique_id,
+              locataire_id = EXCLUDED.locataire_id,
+              vendeur_id = EXCLUDED.vendeur_id;
+
+            INSERT INTO ligne_vente (id, quantite, prix_unitaire, remise, montant_ligne, code_barres_scanne, vente_id, produit_id) VALUES
+              (904101, 2.00, 3000.00, 0.00, 6000.00, 'ALPHA-CAF-001-CB', 904001, 903501),
+              (904102, 1.00, 8000.00, 0.00, 8000.00, 'ALPHA-EAU-001-CB', 904001, 903502),
+              (904103, 1.00, 10000.00, 0.00, 10000.00, 'BETA-PARF-001-CB', 904002, 903503),
+              (904104, 3.00, 2500.00, 0.00, 7500.00, 'BETA-SOUV-001-CB', 904002, 903504)
+            ON CONFLICT (id) DO UPDATE SET
+              quantite = EXCLUDED.quantite,
+              prix_unitaire = EXCLUDED.prix_unitaire,
+              remise = EXCLUDED.remise,
+              montant_ligne = EXCLUDED.montant_ligne,
+              code_barres_scanne = EXCLUDED.code_barres_scanne,
+              vente_id = EXCLUDED.vente_id,
+              produit_id = EXCLUDED.produit_id;
+
+            INSERT INTO paiement_vente (id, montant, statut, reference_paiement, date_paiement, vente_id, mode_paiement_id) VALUES
+              (904201, 14000.00, 'PAYE', 'PAY-ALPHA-2026-001', current_timestamp, 904001, 900201),
+              (904202, 17500.00, 'PAYE', 'PAY-BETA-2026-001', current_timestamp, 904002, 900202)
+            ON CONFLICT (id) DO UPDATE SET
+              montant = EXCLUDED.montant,
+              statut = EXCLUDED.statut,
+              reference_paiement = EXCLUDED.reference_paiement,
+              date_paiement = EXCLUDED.date_paiement,
+              vente_id = EXCLUDED.vente_id,
+              mode_paiement_id = EXCLUDED.mode_paiement_id;
+
+            INSERT INTO regle_redevance (id, code, type_regle, taux, date_debut, date_fin, priorite, actif, boutique_id, locataire_id, groupe_article_id, produit_id) VALUES
+              (904301, 'RDEV-ALPHA-12', 'BOUTIQUE', 12.00, DATE '2026-01-01', null, 10, true, 901101, null, null, null),
+              (904302, 'RDEV-BETA-10', 'BOUTIQUE', 10.00, DATE '2026-01-01', null, 10, true, 901102, null, null, null)
+            ON CONFLICT (code) DO UPDATE SET
+              type_regle = EXCLUDED.type_regle,
+              taux = EXCLUDED.taux,
+              date_debut = EXCLUDED.date_debut,
+              date_fin = EXCLUDED.date_fin,
+              priorite = EXCLUDED.priorite,
+              actif = EXCLUDED.actif,
+              boutique_id = EXCLUDED.boutique_id,
+              locataire_id = EXCLUDED.locataire_id,
+              groupe_article_id = EXCLUDED.groupe_article_id,
+              produit_id = EXCLUDED.produit_id;
+
+            INSERT INTO calcul_redevance (
+              id, reference, periode_debut, periode_fin, chiffre_affaires, montant_redevance, statut, date_calcul, boutique_id, locataire_id
+            ) VALUES
+              (904401, 'CALC-ALPHA-2026-06', DATE '2026-06-01', DATE '2026-06-30', 14000.00, 1680.00, 'PARTIELLEMENT_PAYEE', current_timestamp, 901101, 903101),
+              (904402, 'CALC-BETA-2026-06', DATE '2026-06-01', DATE '2026-06-30', 17500.00, 1750.00, 'CALCULEE', current_timestamp, 901102, 903102)
+            ON CONFLICT (reference) DO UPDATE SET
+              periode_debut = EXCLUDED.periode_debut,
+              periode_fin = EXCLUDED.periode_fin,
+              chiffre_affaires = EXCLUDED.chiffre_affaires,
+              montant_redevance = EXCLUDED.montant_redevance,
+              statut = EXCLUDED.statut,
+              date_calcul = EXCLUDED.date_calcul,
+              boutique_id = EXCLUDED.boutique_id,
+              locataire_id = EXCLUDED.locataire_id;
+
+            INSERT INTO ligne_calcul_redevance (id, base_calcul, taux_applique, montant_redevance, calcul_id, vente_id) VALUES
+              (904501, 14000.00, 12.00, 1680.00, 904401, 904001),
+              (904502, 17500.00, 10.00, 1750.00, 904402, 904002)
+            ON CONFLICT (id) DO UPDATE SET
+              base_calcul = EXCLUDED.base_calcul,
+              taux_applique = EXCLUDED.taux_applique,
+              montant_redevance = EXCLUDED.montant_redevance,
+              calcul_id = EXCLUDED.calcul_id,
+              vente_id = EXCLUDED.vente_id;
+
+            INSERT INTO paiement_redevance (id, reference, montant, date_paiement, mode_paiement, commentaire, calcul_id) VALUES
+              (904601, 'PR-ALPHA-2026-001', 1000.00, DATE '2026-06-11', 'ESPECES', 'Paiement partiel redevance Alpha', 904401)
+            ON CONFLICT (reference) DO UPDATE SET
+              montant = EXCLUDED.montant,
+              date_paiement = EXCLUDED.date_paiement,
+              mode_paiement = EXCLUDED.mode_paiement,
+              commentaire = EXCLUDED.commentaire,
+              calcul_id = EXCLUDED.calcul_id;
+
+            SELECT setval('sequence_generator', GREATEST((SELECT last_value FROM sequence_generator), 905000), true);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

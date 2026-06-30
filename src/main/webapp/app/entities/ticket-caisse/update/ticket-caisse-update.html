@@ -1,0 +1,146 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-ticket-caisse-heading"
+        data-cy="TicketCaisseCreateUpdateHeading"
+        jhiTranslate="admSupervisionVentesApp.ticketCaisse.home.createOrEditLabel"
+      >
+        Create or edit a Ticket Caisse
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let numeroRef = editForm.get('numero')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_numero" jhiTranslate="admSupervisionVentesApp.ticketCaisse.numero">Numero</label>
+          <input type="text" class="form-control" name="numero" id="field_numero" data-cy="numero" formControlName="numero" />
+          @if (numeroRef.invalid && (numeroRef.dirty || numeroRef.touched)) {
+            <div>
+              @if (editForm.get('numero')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('numero')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+                  >This field cannot be longer than 80 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let dateEmissionRef = editForm.get('dateEmission')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateEmission" jhiTranslate="admSupervisionVentesApp.ticketCaisse.dateEmission"
+            >Date Emission</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_dateEmission"
+              data-cy="dateEmission"
+              type="datetime-local"
+              class="form-control"
+              name="dateEmission"
+              formControlName="dateEmission"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (dateEmissionRef.invalid && (dateEmissionRef.dirty || dateEmissionRef.touched)) {
+            <div>
+              @if (editForm.get('dateEmission')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('dateEmission')?.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let nombreImpressionsRef = editForm.get('nombreImpressions')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nombreImpressions" jhiTranslate="admSupervisionVentesApp.ticketCaisse.nombreImpressions"
+            >Nombre Impressions</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            name="nombreImpressions"
+            id="field_nombreImpressions"
+            data-cy="nombreImpressions"
+            formControlName="nombreImpressions"
+          />
+          @if (nombreImpressionsRef.invalid && (nombreImpressionsRef.dirty || nombreImpressionsRef.touched)) {
+            <div>
+              @if (editForm.get('nombreImpressions')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('nombreImpressions')?.errors?.min) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '1' }"
+                  >This field should be at least 1.</small
+                >
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('nombreImpressions')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_contenu" jhiTranslate="admSupervisionVentesApp.ticketCaisse.contenu">Contenu</label>
+          <textarea class="form-control" name="contenu" id="field_contenu" data-cy="contenu" formControlName="contenu"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_vente" jhiTranslate="admSupervisionVentesApp.ticketCaisse.vente">Vente</label>
+          <select class="form-control" id="field_vente" data-cy="vente" name="vente" formControlName="vente" [compareWith]="compareVente">
+            @if (!editForm.get('vente')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (venteOption of ventesSharedCollection(); track $index) {
+              <option [ngValue]="venteOption">{{ venteOption.numeroTicket }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['vente'])!.invalid && (editForm.get(['vente'])!.dirty || editForm.get(['vente'])!.touched)) {
+          <div>
+            @if (editForm.get(['vente'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

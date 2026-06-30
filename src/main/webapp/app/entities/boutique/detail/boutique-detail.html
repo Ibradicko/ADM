@@ -1,0 +1,104 @@
+@if (boutique(); as boutiqueRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
+      <div>
+        <p class="adm-page__eyebrow">{{ boutiqueRef.code }}</p>
+        <h1 data-cy="boutiqueDetailsHeading">{{ boutiqueRef.nom }}</h1>
+        <p>{{ boutiqueRef.emplacement || 'Emplacement non renseigne' }}</p>
+      </div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+        @if (permissionsUi.peutModifierBoutiques()) {
+          <a [routerLink]="['/boutique', boutiqueRef.id, 'edit']" class="adm-button">
+            <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Modifier</span>
+          </a>
+        }
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <section class="adm-detail-layout">
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2>Informations boutique</h2>
+            <p>Coordonnees et statut d'exploitation.</p>
+          </div>
+          <span class="adm-pill adm-pill--success">{{ boutiqueRef.statut }}</span>
+        </div>
+        <div class="adm-detail-grid">
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label">Type</span>
+            <strong>{{ boutiqueRef.type || '--' }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label">Emplacement</span>
+            <strong>{{ boutiqueRef.emplacement || '--' }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label">Telephone</span>
+            <strong>{{ boutiqueRef.telephone || '--' }}</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2>Proprietaire / locataire</h2>
+            <p>Entite responsable de l'exploitation commerciale.</p>
+          </div>
+        </div>
+        @if (exploitation(); as exploitationRef) {
+          <div class="adm-detail-grid">
+            <div class="adm-detail-block adm-detail-block--full">
+              <span class="adm-detail-block__label">Proprietaire / locataire</span>
+              <strong>{{ exploitationRef.locataire?.nom || '--' }}</strong>
+            </div>
+            <div class="adm-detail-block">
+              <span class="adm-detail-block__label">Contrat</span>
+              <strong>{{ exploitationRef.numeroContrat || '--' }}</strong>
+            </div>
+            <div class="adm-detail-block">
+              <span class="adm-detail-block__label">Taux de redevance</span>
+              <strong>{{ exploitationRef.tauxRedevanceDefaut ?? 0 }} %</strong>
+            </div>
+          </div>
+        } @else {
+          <div class="adm-empty-inline">Aucun contrat actif rattache a cette boutique.</div>
+        }
+      </article>
+
+      <article class="adm-card adm-card--spaced">
+        <div class="adm-section-heading">
+          <div>
+            <h2>Administrateur boutique</h2>
+            <p>Compte locataire responsable de la gestion operationnelle.</p>
+          </div>
+        </div>
+        @if (manager(); as managerRef) {
+          <div class="adm-detail-grid">
+            <div class="adm-detail-block adm-detail-block--full">
+              <span class="adm-detail-block__label">Nom</span>
+              <strong>{{ nomManager() }}</strong>
+            </div>
+            <div class="adm-detail-block">
+              <span class="adm-detail-block__label">Identifiant</span>
+              <strong>{{ managerRef.user?.login || '--' }}</strong>
+            </div>
+            <div class="adm-detail-block">
+              <span class="adm-detail-block__label">Email</span>
+              <strong>{{ managerRef.user?.email || '--' }}</strong>
+            </div>
+          </div>
+        } @else {
+          <div class="adm-empty-inline">Aucun manager actif affecte a cette boutique.</div>
+        }
+      </article>
+    </section>
+  </section>
+}

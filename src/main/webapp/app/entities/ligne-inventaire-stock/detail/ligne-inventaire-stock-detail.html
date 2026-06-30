@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ligneInventaireStock(); as ligneInventaireStockRef) {
+      <div>
+        <h2 data-cy="ligneInventaireStockDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.detail.title">Ligne Inventaire Stock</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ligneInventaireStockRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.quantiteTheorique">Quantite Theorique</span></dt>
+          <dd>
+            <span>{{ ligneInventaireStockRef.quantiteTheorique }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.quantiteComptee">Quantite Comptee</span></dt>
+          <dd>
+            <span>{{ ligneInventaireStockRef.quantiteComptee }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.ecart">Ecart</span></dt>
+          <dd>
+            <span>{{ ligneInventaireStockRef.ecart }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.commentaire">Commentaire</span></dt>
+          <dd>
+            <span>{{ ligneInventaireStockRef.commentaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.inventaire">Inventaire</span></dt>
+          <dd>
+            @if (ligneInventaireStock()!.inventaire) {
+              <div>
+                <a [routerLink]="['/inventaire-stock', ligneInventaireStock()!.inventaire?.id, 'view']">{{
+                  ligneInventaireStockRef.inventaire?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.produit">Produit</span></dt>
+          <dd>
+            @if (ligneInventaireStock()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', ligneInventaireStock()!.produit?.id, 'view']">{{
+                  ligneInventaireStockRef.produit?.designation
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ligne-inventaire-stock', ligneInventaireStockRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

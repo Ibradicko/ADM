@@ -1,0 +1,124 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-permission-metier-heading"
+        data-cy="PermissionMetierCreateUpdateHeading"
+        jhiTranslate="admSupervisionVentesApp.permissionMetier.home.createOrEditLabel"
+      >
+        Create or edit a Permission Metier
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let codeRef = editForm.get('code')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_code" jhiTranslate="admSupervisionVentesApp.permissionMetier.code">Code</label>
+          <input type="text" class="form-control" name="code" id="field_code" data-cy="code" formControlName="code" />
+          @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
+            <div>
+              @if (editForm.get('code')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('code')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+                  >This field cannot be longer than 80 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let libelleRef = editForm.get('libelle')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_libelle" jhiTranslate="admSupervisionVentesApp.permissionMetier.libelle">Libelle</label>
+          <input type="text" class="form-control" name="libelle" id="field_libelle" data-cy="libelle" formControlName="libelle" />
+          @if (libelleRef.invalid && (libelleRef.dirty || libelleRef.touched)) {
+            <div>
+              @if (editForm.get('libelle')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('libelle')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '150' }"
+                  >This field cannot be longer than 150 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let moduleRef = editForm.get('module')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_module" jhiTranslate="admSupervisionVentesApp.permissionMetier.module">Module</label>
+          <input type="text" class="form-control" name="module" id="field_module" data-cy="module" formControlName="module" />
+          @if (moduleRef.invalid && (moduleRef.dirty || moduleRef.touched)) {
+            <div>
+              @if (editForm.get('module')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('module')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+                  >This field cannot be longer than 80 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_description" jhiTranslate="admSupervisionVentesApp.permissionMetier.description"
+            >Description</label
+          >
+          <textarea
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          ></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="field_profilses" jhiTranslate="admSupervisionVentesApp.permissionMetier.profils">Profils</label>
+          <select
+            class="form-control"
+            id="field_profilses"
+            data-cy="profils"
+            multiple
+            name="profilses"
+            formControlName="profilses"
+            [compareWith]="compareProfilMetier"
+          >
+            @for (profilMetierOption of profilMetiersSharedCollection(); track $index) {
+              <option [ngValue]="profilMetierOption">{{ profilMetierOption.code }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+{
+  "admSupervisionVentesApp": {
+    "paiementRedevance": {
+      "home": {
+        "title": "Paiement Redevances",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Paiement Redevance",
+        "createOrEditLabel": "Create or edit a Paiement Redevance",
+        "notFound": "No Paiement Redevances found"
+      },
+      "created": "A new Paiement Redevance is created with identifier {{ param }}",
+      "updated": "A Paiement Redevance is updated with identifier {{ param }}",
+      "deleted": "A Paiement Redevance is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Paiement Redevance {{ id }}?"
+      },
+      "detail": {
+        "title": "Paiement Redevance"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "montant": "Montant",
+      "datePaiement": "Date Paiement",
+      "modePaiement": "Mode Paiement",
+      "commentaire": "Commentaire",
+      "calcul": "Calcul"
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "royalties": {
+    "eyebrow": "Pilotage financier",
+    "title": "Redevances",
+    "subtitle": "Suivi des calculs, paiements et régularisations par boutique et locataire.",
+    "actions": {
+      "exportReport": "Exporter un rapport",
+      "refresh": "Actualiser",
+      "refreshing": "Actualisation...",
+      "saving": "Enregistrement...",
+      "update": "Mettre à jour",
+      "addPayment": "Ajouter un paiement",
+      "addAdjustment": "Ajouter une régularisation",
+      "creating": "Création...",
+      "createCalculation": "Créer le calcul"
+    },
+    "restricted": {
+      "title": "Accès limité",
+      "description": "Votre profil ne permet pas de consulter le module redevances.",
+      "manage": "Votre profil ne permet pas de créer ou modifier les redevances."
+    },
+    "kpis": {
+      "filteredCalculations": "Calculs filtrés",
+      "turnover": "Chiffre d’affaires",
+      "royaltiesDue": "Redevances dues",
+      "paymentsReceived": "Paiements reçus",
+      "adjustments": "Régularisations",
+      "outstandingBalance": "Solde restant"
+    },
+    "fields": {
+      "shop": "Boutique",
+      "tenant": "Locataire",
+      "status": "Statut",
+      "periodStart": "Début de période",
+      "periodEnd": "Fin de période",
+      "search": "Recherche",
+      "reference": "Référence",
+      "period": "Période",
+      "turnover": "Chiffre d’affaires",
+      "amount": "Montant",
+      "royaltyAmount": "Montant de redevance",
+      "changeStatus": "Changer le statut",
+      "date": "Date",
+      "paymentMethod": "Mode de paiement",
+      "comment": "Commentaire",
+      "reason": "Motif",
+      "initialStatus": "Statut initial",
+      "code": "Code",
+      "type": "Type",
+      "rate": "Taux",
+      "priority": "Priorité"
+    },
+    "filters": {
+      "allShops": "Toutes les boutiques",
+      "allTenants": "Tous les locataires",
+      "allStatuses": "Tous les statuts",
+      "searchPlaceholder": "Référence, boutique, locataire, statut..."
+    },
+    "sections": {
+      "calculations": "Calculs de redevance",
+      "calculationDetail": "Détail du calcul",
+      "relatedPayments": "Paiements associés",
+      "adjustments": "Régularisations",
+      "quickCreation": "Calcul automatique",
+      "activeRules": "Règles actives"
+    },
+    "count": {
+      "calculations": "{{count}} calcul(s) dans la sélection.",
+      "payments": "{{count}} paiement(s)",
+      "adjustments": "{{count}} régularisation(s)",
+      "activeRules": "{{count}} règle(s) active(s) actuellement."
+    },
+    "hints": {
+      "selectCalculation": "Sélectionnez un calcul pour gérer son cycle de vie.",
+      "chooseCalculation": "Choisissez un calcul dans la liste pour afficher son détail.",
+      "quickCreation": "Calculez les redevances depuis les ventes validées de la boutique, du locataire et de la période sélectionnés."
+    },
+    "empty": {
+      "noCalculation": "Aucun calcul ne correspond aux filtres.",
+      "noPayment": "Aucun paiement lié à ce calcul.",
+      "noAdjustment": "Aucune régularisation pour ce calcul.",
+      "noSelectedCalculation": "Aucun calcul sélectionné",
+      "noActiveRule": "Aucune règle active."
+    },
+    "messages": {
+      "loadFailed": "Le chargement des données de redevances a échoué.",
+      "shopAndTenantRequired": "Sélectionnez une boutique et un locataire avant de créer un calcul.",
+      "calculationSaved": "Le calcul de redevance a été enregistré.",
+      "calculationSaveFailed": "Impossible d’enregistrer le calcul de redevance.",
+      "statusUpdated": "Le statut du calcul a été mis à jour.",
+      "statusUpdateFailed": "La mise à jour du statut a échoué.",
+      "paymentAmountRequired": "Le montant du paiement est obligatoire.",
+      "paymentExceedsBalance": "Le montant saisi depasse le solde restant a payer.",
+      "paymentSaved": "Le paiement a été enregistré.",
+      "paymentSaveFailed": "Impossible d’enregistrer le paiement.",
+      "adjustmentFieldsRequired": "Le montant et le motif de régularisation sont obligatoires.",
+      "adjustmentSaved": "La régularisation a été enregistrée.",
+      "adjustmentSaveFailed": "Impossible d’enregistrer la régularisation."
+    },
+    "common": {
+      "unavailable": "Indisponible"
+    }
+  }
+}

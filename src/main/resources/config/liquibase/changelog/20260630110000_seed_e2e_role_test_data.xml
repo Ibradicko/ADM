@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <!--
+        Re-creates the 5-role Playwright e2e fixture data (admin reuses the existing
+        jhi_user row). The original seed changesets (20260601100000, 20260611100000,
+        20260611110000, 20260616160000...) were manually purged from this dev database
+        without resetting databasechangelog, so they no longer reflect the live schema:
+        `boutique.email` and `groupe_article.boutique_id` were dropped afterwards
+        (20260616140000-1, 20260624160000). This changeset targets the current schema
+        directly instead of replaying the historical SQL verbatim.
+
+        context="dev" ties this to application-dev.yml's `liquibase.contexts: dev, faker`;
+        application-prod.yml only activates `contexts: prod`, so this never runs in prod.
+    -->
+    <changeSet id="20260630110000-1" author="claude" context="dev">
+        <comment>Seed e2e role-test fixture: profils/permissions, ADM-BTK-01/02, managers/vendeurs/locataires, catalogue, ventes, redevances.</comment>
+        <sql>
+            INSERT INTO profil_metier (id, code, libelle, description, statut) VALUES
+              (900101, 'ADMINISTRATEUR', 'Administrateur', 'Acces complet a la plateforme', 'ACTIF'),
+              (900102, 'MANAGER_ADM', 'Manager ADM', 'Creation des boutiques, gestion des acces, redevances, reporting et supervision ADM', 'ACTIF'),
+              (900103, 'MANAGER_BOUTIQUE', 'Manager boutique', 'Exploitation operationnelle d''une boutique', 'ACTIF'),
+              (900104, 'VENDEUR', 'Vendeur', 'Encaissement et ventes en boutique', 'ACTIF')
+            ON CONFLICT (code) DO UPDATE SET libelle = EXCLUDED.libelle, description = EXCLUDED.description, statut = EXCLUDED.statut;
+
+            INSERT INTO permission_metier (id, code, libelle, module, description) VALUES
+              (900001, 'USER_READ', 'Consulter les utilisateurs', 'UTILISATEURS', null),
+              (900002, 'USER_CREATE', 'Creer les utilisateurs', 'UTILISATEURS', null),
+              (900003, 'USER_UPDATE', 'Modifier les utilisateurs', 'UTILISATEURS', null),
+              (900004, 'USER_DEACTIVATE', 'Desactiver les utilisateurs', 'UTILISATEURS', null),
+              (900005, 'USER_MANAGE', 'Administrer les utilisateurs', 'UTILISATEURS', null),
+              (900010, 'SALES_READ', 'Consulter les ventes', 'CAISSE', null),
+              (900011, 'SALES_MANAGE', 'Gerer les ventes', 'CAISSE', null),
+              (900020, 'STOCK_READ', 'Consulter le stock', 'STOCK', null),
+              (900021, 'STOCK_MANAGE', 'Gerer le stock', 'STOCK', null),
+              (900030, 'REPORTING_READ', 'Consulter le reporting', 'REPORTING', null),
+              (900031, 'REPORTING_EXPORT', 'Exporter le reporting', 'REPORTING', null),
+              (900040, 'ROYALTY_READ', 'Consulter les redevances', 'REDEVANCES', null),
+              (900041, 'ROYALTY_MANAGE', 'Gerer les redevances', 'REDEVANCES', null),
+              (900050, 'SETTINGS_READ', 'Consulter les parametres', 'PARAMETRES', null),
+              (900051, 'SETTINGS_MANAGE', 'Gerer les parametres', 'PARAMETRES', null),
+              (900060, 'AUDIT_READ', 'Consulter audit et supervision', 'AUDIT', null)
+            ON CONFLICT (code) DO UPDATE SET libelle = EXCLUDED.libelle, module = EXCLUDED.module;
+
+            -- Final permission set per role (already reflects 20260611120000_enforce_manager_adm_scope
+            -- and this repo's 20260630090000_restrict_manager_boutique_settings_audit).
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT profil.id, permission.id FROM profil_metier profil
+            JOIN permission_metier permission ON permission.code IN (
+              'USER_READ','USER_CREATE','USER_UPDATE','USER_DEACTIVATE','USER_MANAGE',
+              'SALES_READ','SALES_MANAGE','STOCK_READ','STOCK_MANAGE',
+              'REPORTING_READ','REPORTING_EXPORT','ROYALTY_READ','ROYALTY_MANAGE',
+              'SETTINGS_READ','SETTINGS_MANAGE','AUDIT_READ'
+            ) WHERE profil.code = 'ADMINISTRATEUR'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT profil.id, permission.id FROM profil_metier profil
+            JOIN permission_metier permission ON permission.code IN (
+              'USER_READ','USER_CREATE','USER_UPDATE','USER_DEACTIVATE','USER_MANAGE',
+              'SALES_READ','REPORTING_READ','REPORTING_EXPORT','ROYALTY_READ','ROYALTY_MANAGE',
+              'SETTINGS_READ','SETTINGS_MANAGE','AUDIT_READ'
+            ) WHERE profil.code = 'MANAGER_ADM'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT profil.id, permission.id FROM profil_metier profil
+            JOIN permission_metier permission ON permission.code IN (
+              'USER_READ','USER_CREATE','USER_UPDATE','USER_DEACTIVATE',
+              'SALES_READ','SALES_MANAGE','STOCK_READ','STOCK_MANAGE','REPORTING_READ','ROYALTY_READ'
+            ) WHERE profil.code = 'MANAGER_BOUTIQUE'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT profil.id, permission.id FROM profil_metier profil
+            JOIN permission_metier permission ON permission.code IN ('SALES_READ','SALES_MANAGE')
+            WHERE profil.code = 'VENDEUR'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO boutique (id, code, nom, type, emplacement, telephone, statut, date_creation) VALUES
+              (901101, 'ADM-BTK-01', 'Boutique Test Alpha', 'COMMERCE', 'Terminal A - Zone publique', '+221770000101', 'ACTIF', current_timestamp),
+              (901102, 'ADM-BTK-02', 'Boutique Test Beta', 'DUTY_FREE', 'Terminal B - Zone embarquement', '+221770000102', 'ACTIF', current_timestamp)
+            ON CONFLICT (code) DO UPDATE SET nom = EXCLUDED.nom, type = EXCLUDED.type, statut = EXCLUDED.statut;
+
+            INSERT INTO locataire (id, code, nom, type_locataire, numero_identification, telephone, email, adresse, statut, date_creation) VALUES
+              (903101, 'LOC-ALPHA', 'Locataire Alpha Test', 'PERSONNE_MORALE', 'NINEA-ALPHA-TEST', '+221770001101', 'locataire.alpha@test.adm', 'Terminal A - Zone publique', 'ACTIF', current_timestamp),
+              (903102, 'LOC-BETA', 'Locataire Beta Test', 'PERSONNE_MORALE', 'NINEA-BETA-TEST', '+221770001102', 'locataire.beta@test.adm', 'Terminal B - Zone embarquement', 'ACTIF', current_timestamp)
+            ON CONFLICT (code) DO UPDATE SET nom = EXCLUDED.nom, statut = EXCLUDED.statut;
+
+            INSERT INTO exploitation_boutique (id, numero_contrat, date_debut, date_fin, taux_redevance_defaut, statut, commentaire, boutique_id, locataire_id) VALUES
+              (903201, 'CTR-ALPHA-2026', DATE '2026-01-01', null, 12.00, 'ACTIF', 'Contrat de recette test Alpha', 901101, 903101),
+              (903202, 'CTR-BETA-2026', DATE '2026-01-01', null, 10.00, 'ACTIF', 'Contrat de recette test Beta', 901102, 903102)
+            ON CONFLICT (id) DO UPDATE SET statut = EXCLUDED.statut, boutique_id = EXCLUDED.boutique_id, locataire_id = EXCLUDED.locataire_id;
+
+            -- password "admin" for every test account below (same bcrypt hash as the seeded jhi_user admin row).
+            INSERT INTO jhi_user (id, login, password_hash, first_name, last_name, email, activated, lang_key, created_by, last_modified_by, must_change_password) VALUES
+              (901201, 'manager_adm', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Manager', 'ADM', 'manager.adm@test.adm', true, 'fr', 'system', 'system', false),
+              (901202, 'manager_alpha', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Manager', 'Alpha', 'manager.alpha@test.adm', true, 'fr', 'system', 'system', false),
+              (901203, 'manager_beta', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Manager', 'Beta', 'manager.beta@test.adm', true, 'fr', 'system', 'system', false),
+              (905001, 'vendeur_alpha', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Vendeur', 'Alpha', 'vendeur.alpha@test.adm', true, 'fr', 'system', 'system', false),
+              (905002, 'vendeur_beta', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Vendeur', 'Beta', 'vendeur.beta@test.adm', true, 'fr', 'system', 'system', false),
+              (905003, 'loc_alpha', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Locataire', 'Alpha', 'loc.alpha@test.adm', true, 'fr', 'system', 'system', true),
+              (905004, 'loc_beta', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Locataire', 'Beta', 'loc.beta@test.adm', true, 'fr', 'system', 'system', true)
+            ON CONFLICT (login) DO UPDATE SET password_hash = EXCLUDED.password_hash, activated = EXCLUDED.activated, must_change_password = EXCLUDED.must_change_password;
+
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT id, 'ROLE_USER' FROM jhi_user WHERE login IN ('manager_adm','manager_alpha','manager_beta','vendeur_alpha','vendeur_beta','loc_alpha','loc_beta')
+            ON CONFLICT DO NOTHING;
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT id, 'ROLE_VENDEUR' FROM jhi_user WHERE login IN ('vendeur_alpha','vendeur_beta')
+            ON CONFLICT DO NOTHING;
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT id, 'ROLE_LOCATAIRE' FROM jhi_user WHERE login IN ('loc_alpha','loc_beta')
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901301, DATE '2026-01-01', null, true, u.id, b.id, p.id FROM jhi_user u, boutique b, profil_metier p
+              WHERE u.login = 'manager_adm' AND b.code = 'ADM-BTK-01' AND p.code = 'MANAGER_ADM'
+            ON CONFLICT (id) DO UPDATE SET actif = EXCLUDED.actif, user_id = EXCLUDED.user_id, boutique_id = EXCLUDED.boutique_id, profil_id = EXCLUDED.profil_id;
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901302, DATE '2026-01-01', null, true, u.id, b.id, p.id FROM jhi_user u, boutique b, profil_metier p
+              WHERE u.login = 'manager_adm' AND b.code = 'ADM-BTK-02' AND p.code = 'MANAGER_ADM'
+            ON CONFLICT (id) DO UPDATE SET actif = EXCLUDED.actif, user_id = EXCLUDED.user_id, boutique_id = EXCLUDED.boutique_id, profil_id = EXCLUDED.profil_id;
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901303, DATE '2026-01-01', null, true, u.id, b.id, p.id FROM jhi_user u, boutique b, profil_metier p
+              WHERE u.login = 'manager_alpha' AND b.code = 'ADM-BTK-01' AND p.code = 'MANAGER_BOUTIQUE'
+            ON CONFLICT (id) DO UPDATE SET actif = EXCLUDED.actif, user_id = EXCLUDED.user_id, boutique_id = EXCLUDED.boutique_id, profil_id = EXCLUDED.profil_id;
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901304, DATE '2026-01-01', null, true, u.id, b.id, p.id FROM jhi_user u, boutique b, profil_metier p
+              WHERE u.login = 'manager_beta' AND b.code = 'ADM-BTK-02' AND p.code = 'MANAGER_BOUTIQUE'
+            ON CONFLICT (id) DO UPDATE SET actif = EXCLUDED.actif, user_id = EXCLUDED.user_id, boutique_id = EXCLUDED.boutique_id, profil_id = EXCLUDED.profil_id;
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 905101, DATE '2026-01-01', null, true, u.id, b.id, p.id FROM jhi_user u, boutique b, profil_metier p
+              WHERE u.login = 'vendeur_alpha' AND b.code = 'ADM-BTK-01' AND p.code = 'VENDEUR'
+            ON CONFLICT (id) DO UPDATE SET actif = EXCLUDED.actif, user_id = EXCLUDED.user_id, boutique_id = EXCLUDED.boutique_id, profil_id = EXCLUDED.profil_id;
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 905102, DATE '2026-01-01', null, true, u.id, b.id, p.id FROM jhi_user u, boutique b, profil_metier p
+              WHERE u.login = 'vendeur_beta' AND b.code = 'ADM-BTK-02' AND p.code = 'VENDEUR'
+            ON CONFLICT (id) DO UPDATE SET actif = EXCLUDED.actif, user_id = EXCLUDED.user_id, boutique_id = EXCLUDED.boutique_id, profil_id = EXCLUDED.profil_id;
+
+            UPDATE locataire SET user_id = (SELECT id FROM jhi_user WHERE login = 'loc_alpha') WHERE code = 'LOC-ALPHA';
+            UPDATE locataire SET user_id = (SELECT id FROM jhi_user WHERE login = 'loc_beta') WHERE code = 'LOC-BETA';
+
+            INSERT INTO unite_mesure (id, code, libelle, symbole) VALUES (903301, 'PCS', 'Piece', 'pcs')
+            ON CONFLICT (code) DO UPDATE SET libelle = EXCLUDED.libelle;
+
+            INSERT INTO groupe_article (id, code, libelle, statut) VALUES
+              (903401, 'GRP-ALPHA', 'Groupe Alpha Test', 'ACTIF'),
+              (903402, 'GRP-BETA', 'Groupe Beta Test', 'ACTIF')
+            ON CONFLICT (id) DO UPDATE SET code = EXCLUDED.code, statut = EXCLUDED.statut;
+
+            INSERT INTO famille_article (id, code, libelle, statut, groupe_article_id) VALUES
+              (903411, 'FAM-ALPHA', 'Famille Alpha Test', 'ACTIF', 903401),
+              (903412, 'FAM-BETA', 'Famille Beta Test', 'ACTIF', 903402)
+            ON CONFLICT (id) DO UPDATE SET code = EXCLUDED.code, statut = EXCLUDED.statut, groupe_article_id = EXCLUDED.groupe_article_id;
+
+            INSERT INTO sous_famille_article (id, code, libelle, statut, famille_article_id) VALUES
+              (903421, 'SF-ALPHA', 'Sous famille Alpha Test', 'ACTIF', 903411),
+              (903422, 'SF-BETA', 'Sous famille Beta Test', 'ACTIF', 903412)
+            ON CONFLICT (id) DO UPDATE SET code = EXCLUDED.code, statut = EXCLUDED.statut, famille_article_id = EXCLUDED.famille_article_id;
+
+            INSERT INTO produit (id, code_interne, designation, description, type_prix, prix_vente, taux_redevance_applicable, statut, date_creation, boutique_id, groupe_article_id, famille_article_id, sous_famille_article_id, unite_mesure_id) VALUES
+              (903501, 'ALPHA-CAF-001', 'Cafe Alpha Test', 'Produit test Alpha', 'STANDARD', 3000.00, 12.00, 'ACTIF', current_timestamp, 901101, 903401, 903411, 903421, 903301),
+              (903502, 'ALPHA-EAU-001', 'Eau Alpha Test', 'Produit test Alpha', 'STANDARD', 8000.00, 12.00, 'ACTIF', current_timestamp, 901101, 903401, 903411, 903421, 903301),
+              (903503, 'BETA-PARF-001', 'Parfum Beta Test', 'Produit test Beta', 'STANDARD', 10000.00, 10.00, 'ACTIF', current_timestamp, 901102, 903402, 903412, 903422, 903301),
+              (903504, 'BETA-SOUV-001', 'Souvenir Beta Test', 'Produit test Beta', 'STANDARD', 2500.00, 10.00, 'ACTIF', current_timestamp, 901102, 903402, 903412, 903422, 903301)
+            ON CONFLICT (id) DO UPDATE SET designation = EXCLUDED.designation, statut = EXCLUDED.statut, boutique_id = EXCLUDED.boutique_id;
+
+            INSERT INTO tarif_produit (id, montant, type_prix, date_debut, date_fin, actif, produit_id) VALUES
+              (903601, 3000.00, 'STANDARD', DATE '2026-01-01', null, true, 903501),
+              (903602, 8000.00, 'STANDARD', DATE '2026-01-01', null, true, 903502),
+              (903603, 10000.00, 'STANDARD', DATE '2026-01-01', null, true, 903503),
+              (903604, 2500.00, 'STANDARD', DATE '2026-01-01', null, true, 903504)
+            ON CONFLICT (id) DO UPDATE SET montant = EXCLUDED.montant, actif = EXCLUDED.actif;
+
+            INSERT INTO code_barres_produit (id, code, type, principal, genere_par_systeme, actif, date_affectation, produit_id) VALUES
+              (903701, 'ALPHA-CAF-001-CB', 'CODE128', true, false, true, current_timestamp, 903501),
+              (903702, 'ALPHA-EAU-001-CB', 'CODE128', true, false, true, current_timestamp, 903502),
+              (903703, 'BETA-PARF-001-CB', 'CODE128', true, false, true, current_timestamp, 903503),
+              (903704, 'BETA-SOUV-001-CB', 'CODE128', true, false, true, current_timestamp, 903504)
+            ON CONFLICT (id) DO UPDATE SET code = EXCLUDED.code, actif = EXCLUDED.actif;
+
+            INSERT INTO depot_stock (id, code, libelle, emplacement, actif, boutique_id) VALUES
+              (903801, 'DEP-ALPHA-PRINC', 'Depot principal Alpha', 'Reserve Alpha', true, 901101),
+              (903802, 'DEP-BETA-PRINC', 'Depot principal Beta', 'Reserve Beta', true, 901102)
+            ON CONFLICT (id) DO UPDATE SET actif = EXCLUDED.actif, boutique_id = EXCLUDED.boutique_id;
+
+            INSERT INTO stock_produit (id, quantite_theorique, stock_alerte, date_dernier_mouvement, produit_id, depot_id) VALUES
+              (903901, 48.00, 5.00, current_timestamp, 903501, 903801),
+              (903902, 30.00, 5.00, current_timestamp, 903502, 903801),
+              (903903, 20.00, 3.00, current_timestamp, 903503, 903802),
+              (903904, 90.00, 10.00, current_timestamp, 903504, 903802)
+            ON CONFLICT (produit_id, depot_id) DO UPDATE SET quantite_theorique = EXCLUDED.quantite_theorique;
+
+            INSERT INTO mode_paiement_ref (id, code, libelle, actif) VALUES
+              (900201, 'ESPECES', 'Especes', true),
+              (900202, 'CARTE', 'Carte bancaire', true)
+            ON CONFLICT (id) DO UPDATE SET libelle = EXCLUDED.libelle, actif = EXCLUDED.actif;
+
+            INSERT INTO vente (id, numero_ticket, date_heure, statut, reference_passager, reference_carte_embarquement, montant_brut, montant_remise, montant_net, commentaire, boutique_id, locataire_id, vendeur_id) VALUES
+              (904001, 'TCK-ALPHA-2026-001', current_timestamp, 'VALIDEE', 'PAX-ALPHA-001', 'BP-ALPHA-001', 14000.00, 0.00, 14000.00, 'Vente test Alpha', 901101, 903101, 905001),
+              (904002, 'TCK-BETA-2026-001', current_timestamp, 'VALIDEE', 'PAX-BETA-001', 'BP-BETA-001', 17500.00, 0.00, 17500.00, 'Vente test Beta', 901102, 903102, 905002)
+            ON CONFLICT (numero_ticket) DO UPDATE SET statut = EXCLUDED.statut, montant_net = EXCLUDED.montant_net, vendeur_id = EXCLUDED.vendeur_id;
+
+            INSERT INTO ligne_vente (id, quantite, prix_unitaire, remise, montant_ligne, code_barres_scanne, vente_id, produit_id) VALUES
+              (904101, 2.00, 3000.00, 0.00, 6000.00, 'ALPHA-CAF-001-CB', 904001, 903501),
+              (904102, 1.00, 8000.00, 0.00, 8000.00, 'ALPHA-EAU-001-CB', 904001, 903502),
+              (904103, 1.00, 10000.00, 0.00, 10000.00, 'BETA-PARF-001-CB', 904002, 903503),
+              (904104, 3.00, 2500.00, 0.00, 7500.00, 'BETA-SOUV-001-CB', 904002, 903504)
+            ON CONFLICT (id) DO UPDATE SET montant_ligne = EXCLUDED.montant_ligne;
+
+            INSERT INTO paiement_vente (id, montant, statut, reference_paiement, date_paiement, vente_id, mode_paiement_id) VALUES
+              (904201, 14000.00, 'PAYE', 'PAY-ALPHA-2026-001', current_timestamp, 904001, 900201),
+              (904202, 17500.00, 'PAYE', 'PAY-BETA-2026-001', current_timestamp, 904002, 900202)
+            ON CONFLICT (id) DO UPDATE SET montant = EXCLUDED.montant, statut = EXCLUDED.statut;
+
+            INSERT INTO regle_redevance (id, code, type_regle, taux, date_debut, date_fin, priorite, actif, boutique_id, locataire_id, groupe_article_id, produit_id) VALUES
+              (904301, 'RDEV-ALPHA-12', 'BOUTIQUE', 12.00, DATE '2026-01-01', null, 10, true, 901101, null, null, null),
+              (904302, 'RDEV-BETA-10', 'BOUTIQUE', 10.00, DATE '2026-01-01', null, 10, true, 901102, null, null, null)
+            ON CONFLICT (code) DO UPDATE SET taux = EXCLUDED.taux, actif = EXCLUDED.actif;
+
+            INSERT INTO calcul_redevance (id, reference, periode_debut, periode_fin, chiffre_affaires, montant_redevance, statut, date_calcul, boutique_id, locataire_id) VALUES
+              (904401, 'CALC-ALPHA-2026-06', DATE '2026-06-01', DATE '2026-06-30', 14000.00, 1680.00, 'PARTIELLEMENT_PAYEE', current_timestamp, 901101, 903101),
+              (904402, 'CALC-BETA-2026-06', DATE '2026-06-01', DATE '2026-06-30', 17500.00, 1750.00, 'CALCULEE', current_timestamp, 901102, 903102)
+            ON CONFLICT (reference) DO UPDATE SET statut = EXCLUDED.statut, montant_redevance = EXCLUDED.montant_redevance;
+
+            INSERT INTO ligne_calcul_redevance (id, base_calcul, taux_applique, montant_redevance, calcul_id, vente_id) VALUES
+              (904501, 14000.00, 12.00, 1680.00, 904401, 904001),
+              (904502, 17500.00, 10.00, 1750.00, 904402, 904002)
+            ON CONFLICT (id) DO UPDATE SET montant_redevance = EXCLUDED.montant_redevance;
+
+            INSERT INTO paiement_redevance (id, reference, montant, date_paiement, mode_paiement, commentaire, calcul_id) VALUES
+              (904601, 'PR-ALPHA-2026-001', 1000.00, DATE '2026-06-11', 'ESPECES', 'Paiement partiel redevance Alpha', 904401)
+            ON CONFLICT (reference) DO UPDATE SET montant = EXCLUDED.montant;
+
+            SELECT setval('sequence_generator', GREATEST((SELECT last_value FROM sequence_generator), 906000), true);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

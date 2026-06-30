@@ -1,0 +1,156 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="RapportExportHeading">
+    <div>
+      <h1>Rapports &amp; Exports</h1>
+      <p>Historique des rapports générés et fichiers exportés</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutExporterReporting()) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/rapport-export/new']">
+          <fa-icon icon="plus" />
+          <span>Nouveau rapport</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <section class="adm-toolbar" aria-label="Filtres rapports">
+    <jhi-filter [filters]="filters" />
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des rapports exportés</h2>
+        <p>Rapports générés par boutique, locataire et utilisateur</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ totalItems() }} rapport(s)</span>
+    </div>
+
+    @if (rapportExports().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun rapport trouvé</strong>
+        <p>Ajustez les filtres ou générez un nouveau rapport.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="reference">Référence <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="typeRapport">Type <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="format">Format <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="periodeDebut">Période <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique / Locataire <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="utilisateur.login">Utilisateur <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateGeneration">Date génération <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (re of rapportExports(); track trackId(re); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <a [routerLink]="['/rapport-export', re.id, 'view']" class="adm-link">
+                    <span class="adm-code">{{ re.reference ?? '#' + re.id }}</span>
+                  </a>
+                </td>
+                <td>
+                  <span class="adm-pill adm-pill--info">{{ re.typeRapport ?? '—' }}</span>
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--primary]="re.format === 'PDF'"
+                    [class.adm-pill--success]="re.format === 'EXCEL'"
+                    [class.adm-pill--dark]="!re.format"
+                  >
+                    {{ re.format ?? '—' }}
+                  </span>
+                </td>
+                <td>
+                  @if (re.periodeDebut || re.periodeFin) {
+                    <div class="adm-table-title">
+                      <strong>{{ re.periodeDebut | formatMediumDate }}</strong>
+                      <small>→ {{ re.periodeFin | formatMediumDate }}</small>
+                    </div>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>
+                  @if (re.boutique || re.locataire) {
+                    <div class="adm-table-title">
+                      @if (re.boutique) {
+                        <strong>
+                          <a [routerLink]="['/boutique', re.boutique.id, 'view']" class="adm-link">{{ re.boutique.nom }}</a>
+                        </strong>
+                      }
+                      @if (re.locataire) {
+                        <small>
+                          <a [routerLink]="['/locataire', re.locataire.id, 'view']" class="adm-link">{{ re.locataire.nom }}</a>
+                        </small>
+                      }
+                    </div>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>{{ re.utilisateur?.login ?? '—' }}</td>
+                <td>{{ re.dateGeneration ? (re.dateGeneration | formatMediumDatetime) : '—' }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/rapport-export', re.id, 'view']" class="adm-icon-button" data-cy="entityDetailsButton" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutExporterReporting()) {
+                      <a
+                        [routerLink]="['/rapport-export', re.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(re)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (rapportExports().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

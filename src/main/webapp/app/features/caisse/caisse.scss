@@ -1,0 +1,154 @@
+:host {
+  display: block;
+}
+
+.adm-pos-tabs {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 1rem;
+  background: var(--adm-surface-soft);
+}
+
+.adm-pos-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border: none;
+  border-radius: 0.8rem;
+  background: transparent;
+  color: var(--adm-text-soft);
+  font-weight: 600;
+}
+
+.adm-pos-tab--active {
+  background: var(--adm-sidebar);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(11, 31, 58, 0.18);
+}
+
+.adm-pos-context {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.adm-pos-context .adm-field {
+  min-width: 9rem;
+}
+
+.adm-pos-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 22rem);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.adm-pos-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.adm-pos-categories {
+  display: flex;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.adm-pos-category {
+  flex: 0 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--adm-border);
+  background: #fff;
+  color: var(--adm-text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.adm-pos-category--active {
+  background: var(--adm-sidebar);
+  color: #fff;
+  border-color: transparent;
+}
+
+.adm-pos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  gap: 0.85rem;
+  max-height: 32rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.adm-pos-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 6.5rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 1rem;
+  background: #fff;
+  text-align: left;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.adm-pos-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--adm-primary);
+  box-shadow: 0 12px 24px rgba(29, 78, 216, 0.12);
+}
+
+.adm-pos-tile strong {
+  display: block;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.adm-pos-tile small {
+  display: block;
+  color: var(--adm-text-soft);
+}
+
+.adm-pos-tile__price {
+  align-self: flex-end;
+  font-weight: 700;
+  color: var(--adm-primary);
+}
+
+.adm-pos-sidebar {
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.adm-pos-validate {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1100px) {
+  .adm-pos-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-pos-sidebar {
+    position: static;
+    max-height: none;
+  }
+}

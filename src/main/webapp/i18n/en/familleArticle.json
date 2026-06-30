@@ -1,0 +1,27 @@
+{
+  "admSupervisionVentesApp": {
+    "familleArticle": {
+      "home": {
+        "title": "Famille Articles",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Famille Article",
+        "createOrEditLabel": "Create or edit a Famille Article",
+        "notFound": "No Famille Articles found"
+      },
+      "created": "A new Famille Article is created with identifier {{ param }}",
+      "updated": "A Famille Article is updated with identifier {{ param }}",
+      "deleted": "A Famille Article is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Famille Article {{ id }}?"
+      },
+      "detail": {
+        "title": "Famille Article"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libelle",
+      "statut": "Statut",
+      "groupeArticle": "Groupe Article"
+    }
+  }
+}

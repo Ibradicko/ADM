@@ -1,0 +1,10 @@
+{
+  "admSupervisionVentesApp": {
+    "StatutGeneral": {
+      "null": "",
+      "ACTIF": "Active",
+      "INACTIF": "Inactive",
+      "SUSPENDU": "Suspended"
+    }
+  }
+}

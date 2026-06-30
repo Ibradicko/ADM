@@ -1,138 +1,201 @@
-<div>
-  <h2 id="page-heading" data-cy="UserManagementHeading">
-    <span jhiTranslate="userManagement.home.title">Users</span>
-
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="loadAll()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="userManagement.home.refreshListLabel">Refresh list</span>
-      </button>
-      <button class="btn btn-primary jh-create-entity" [routerLink]="['./new']" data-cy="entityCreateButton">
-        <fa-icon icon="plus" />
-        <span jhiTranslate="userManagement.home.createLabel">Create a new user</span>
-      </button>
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="UserManagementHeading">
+    <div>
+      <h1>Administration des utilisateurs</h1>
+      <p>Gestion des acces, activations et comptes internes</p>
     </div>
-  </h2>
+
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="loadAll()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      <a class="adm-button adm-button--primary" [routerLink]="['./new']" data-cy="entityCreateButton">
+        <fa-icon icon="plus" />
+        <span>Nouvel utilisateur</span>
+      </a>
+    </div>
+  </div>
 
   <jhi-alert-error />
-
   <jhi-alert />
 
-  @if (users()) {
-    <div class="table-responsive">
-      <table class="table table-striped" aria-describedby="user-management-page-heading">
-        <thead>
-          <tr jhiSort [(sortState)]="sortState" (sortChange)="transition($event)">
-            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
-            <th scope="col" jhiSortBy="login"><span jhiTranslate="userManagement.login">Login</span> <fa-icon icon="sort" /></th>
-            <th scope="col" jhiSortBy="email"><span jhiTranslate="userManagement.email">Email</span> <fa-icon icon="sort" /></th>
-            <th scope="col"></th>
-            <th scope="col" jhiSortBy="langKey"><span jhiTranslate="userManagement.langKey">Language</span> <fa-icon icon="sort" /></th>
-            <th scope="col"><span jhiTranslate="userManagement.profiles">Profiles</span></th>
-            <th scope="col" jhiSortBy="createdDate">
-              <span jhiTranslate="userManagement.createdDate">Created date</span> <fa-icon icon="sort" />
-            </th>
-            <th scope="col" jhiSortBy="lastModifiedBy">
-              <span jhiTranslate="userManagement.lastModifiedBy">Modified by</span> <fa-icon icon="sort" />
-            </th>
-            <th scope="col" jhiSortBy="lastModifiedDate">
-              <span jhiTranslate="userManagement.lastModifiedDate">Modified date</span> <fa-icon icon="sort" />
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (userManagement of users(); track trackIdentity(userManagement)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['./', userManagement.login, 'view']">{{ userManagement.id }}</a>
-              </td>
-              <td>{{ userManagement.login }}</td>
-              <td>{{ userManagement.email }}</td>
-              <td>
-                @if (!userManagement.activated) {
-                  <button class="btn btn-danger btn-sm" (click)="setActive(userManagement, true)" jhiTranslate="userManagement.deactivated">
-                    Deactivated
-                  </button>
-                } @else {
-                  <button
-                    class="btn btn-success btn-sm"
-                    (click)="setActive(userManagement, false)"
-                    [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
-                    jhiTranslate="userManagement.activated"
-                  >
-                    Activated
-                  </button>
-                }
-              </td>
-              <td>{{ userManagement.langKey }}</td>
-              <td>
-                @for (authority of userManagement.authorities; track $index) {
-                  <div>
-                    <span class="badge bg-info">{{ authority }}</span>
-                  </div>
-                }
-              </td>
-              <td>{{ userManagement.createdDate | date: 'dd/MM/yy HH:mm' }}</td>
-              <td>{{ userManagement.lastModifiedBy }}</td>
-              <td>{{ userManagement.lastModifiedDate | date: 'dd/MM/yy HH:mm' }}</td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <button
-                    type="submit"
-                    [routerLink]="['./', userManagement.login, 'view']"
-                    class="btn btn-info btn-sm"
-                    data-cy="entityDetailsButton"
-                  >
-                    <fa-icon icon="eye" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
-                  </button>
+  <div class="adm-stats-grid adm-stats-grid--compact">
+    <article class="adm-stat-card">
+      <span>Total comptes</span>
+      <strong>{{ totalItems() || users().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Comptes actifs</span>
+      <strong>{{ activeCount() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Comptes inactifs</span>
+      <strong>{{ inactiveCount() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Administrateurs</span>
+      <strong>{{ adminCount() }}</strong>
+    </article>
+  </div>
 
-                  <button
-                    type="submit"
-                    [routerLink]="['./', userManagement.login, 'edit']"
-                    queryParamsHandling="merge"
-                    class="btn btn-primary btn-sm"
-                    data-cy="entityEditButton"
-                  >
-                    <fa-icon icon="pencil-alt" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
-                  </button>
+  <section class="adm-toolbar" aria-label="Filtres utilisateurs">
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input type="search" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Rechercher un utilisateur..." />
+    </label>
 
-                  <button
-                    type="button"
-                    (click)="deleteUser(userManagement)"
-                    class="btn btn-danger btn-sm"
-                    data-cy="entityDeleteButton"
-                    [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
-                  >
-                    <fa-icon icon="times" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
+    <div class="adm-toolbar__filters">
+      <label class="adm-field">
+        <span>Statut</span>
+        <select class="adm-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+          <option value="ALL">Tous les statuts</option>
+          <option value="ACTIVE">Actif</option>
+          <option value="INACTIVE">Inactif</option>
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span>Role</span>
+        <select class="adm-select" [ngModel]="selectedAuthority()" (ngModelChange)="selectedAuthority.set($event)">
+          <option value="ALL">Tous les roles</option>
+          @for (authority of availableAuthorities(); track authority) {
+            <option [value]="authority">{{ formatAuthority(authority) }}</option>
           }
-        </tbody>
-      </table>
+        </select>
+      </label>
+
+      <button type="button" class="adm-button adm-button--ghost" (click)="clearFilters()">Reinitialiser</button>
+    </div>
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des utilisateurs</h2>
+        <p>Controle des comptes, profils et activation des acces</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ visibleUsers().length }} affiches</span>
     </div>
 
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+    @if (visibleUsers().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun utilisateur ne correspond aux criteres selectionnes</strong>
+        <p>Ajoutez un compte ou ajustez les filtres pour retrouver un profil plus rapidement.</p>
       </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="transition($event)">
+              <th scope="col" jhiSortBy="login">Utilisateur <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="email">Contact <fa-icon icon="sort" /></th>
+              <th scope="col">Statut</th>
+              <th scope="col">Roles</th>
+              <th scope="col" jhiSortBy="langKey">Langue <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="createdDate">Cree le <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="lastModifiedDate">Derniere mise a jour <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (userManagement of visibleUsers(); track trackIdentity(userManagement); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ fullName(userManagement) }}</strong>
+                    <small>{{ userManagement.login }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValue(userManagement.email) }}</strong>
+                    <small>ID #{{ userManagement.id }}</small>
+                  </div>
+                </td>
+                <td>
+                  @if (!userManagement.activated) {
+                    <button type="button" class="adm-pill adm-pill--danger" (click)="setActive(userManagement, true)">Inactif</button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="adm-pill adm-pill--success"
+                      (click)="setActive(userManagement, false)"
+                      [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
+                    >
+                      Actif
+                    </button>
+                  }
+                </td>
+                <td>
+                  <div class="adm-authority-list">
+                    @for (authority of userManagement.authorities ?? []; track authority) {
+                      <span class="adm-chip">{{ formatAuthority(authority) }}</span>
+                    }
+                  </div>
+                </td>
+                <td>{{ formatValue(userManagement.langKey) }}</td>
+                <td>{{ userManagement.createdDate | date: 'dd/MM/yy HH:mm' }}</td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValue(userManagement.lastModifiedBy) }}</strong>
+                    <small>{{ userManagement.lastModifiedDate | date: 'dd/MM/yy HH:mm' }}</small>
+                  </div>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['./', userManagement.login, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
 
-      <div class="d-flex justify-content-center">
-        <ngb-pagination
-          [collectionSize]="totalItems()"
-          [(page)]="page"
-          [pageSize]="itemsPerPage()"
-          [maxSize]="5"
-          [rotate]="true"
-          [boundaryLinks]="true"
-          (pageChange)="transition()"
-        />
+                    <a
+                      [routerLink]="['./', userManagement.login, 'edit']"
+                      queryParamsHandling="merge"
+                      class="adm-icon-button"
+                      data-cy="entityEditButton"
+                      title="Modifier"
+                    >
+                      <fa-icon icon="pencil-alt" />
+                    </a>
+
+                    <button
+                      type="button"
+                      (click)="deleteUser(userManagement)"
+                      class="adm-icon-button adm-icon-button--danger"
+                      data-cy="entityDeleteButton"
+                      [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
+                      title="Desactiver"
+                    >
+                      <fa-icon icon="times" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
+    }
+  </article>
+
+  @if (users().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
     </div>
   }
-</div>
+</section>

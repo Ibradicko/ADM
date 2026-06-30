@@ -1,0 +1,92 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (vente(); as venteRef) {
+      <div>
+        <h2 data-cy="venteDetailsHeading"><span jhiTranslate="admSupervisionVentesApp.vente.detail.title">Vente</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ venteRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.numeroTicket">Numero Ticket</span></dt>
+          <dd>
+            <span>{{ venteRef.numeroTicket }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.dateHeure">Date Heure</span></dt>
+          <dd>
+            <span>{{ venteRef.dateHeure | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutVente.' + (venteRef.statut ?? 'null')">{{
+              { null: '', BROUILLON: 'BROUILLON', VALIDEE: 'VALIDEE', ANNULEE: 'ANNULEE', RETOURNEE: 'RETOURNEE', AJUSTEE: 'AJUSTEE' }[
+                venteRef.statut ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.referencePassager">Reference Passager</span></dt>
+          <dd>
+            <span>{{ venteRef.referencePassager }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.referenceCarteEmbarquement">Reference Carte Embarquement</span></dt>
+          <dd>
+            <span>{{ venteRef.referenceCarteEmbarquement }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.montantBrut">Montant Brut</span></dt>
+          <dd>
+            <span>{{ venteRef.montantBrut }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.montantRemise">Montant Remise</span></dt>
+          <dd>
+            <span>{{ venteRef.montantRemise }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.montantNet">Montant Net</span></dt>
+          <dd>
+            <span>{{ venteRef.montantNet }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.commentaire">Commentaire</span></dt>
+          <dd>
+            <span>{{ venteRef.commentaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.boutique">Boutique</span></dt>
+          <dd>
+            @if (vente()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', vente()!.boutique?.id, 'view']">{{ venteRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.locataire">Locataire</span></dt>
+          <dd>
+            @if (vente()!.locataire) {
+              <div>
+                <a [routerLink]="['/locataire', vente()!.locataire?.id, 'view']">{{ venteRef.locataire?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.vente.vendeur">Vendeur</span></dt>
+          <dd>
+            <span>{{ venteRef.vendeur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        @if (venteRef.statut === 'BROUILLON') {
+          <button type="button" [routerLink]="['/vente', venteRef.id, 'edit']" class="btn btn-primary">
+            <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,329 @@
+<div class="adm-page-container">
+  <div class="adm-form-card">
+    <div class="adm-form-card__header">
+      <div class="adm-form-card__header-icon">
+        <fa-icon icon="building" />
+      </div>
+      <div>
+        <h2 data-cy="LocataireCreateUpdateHeading">
+          @if (editForm.controls.id.value !== null) {
+            {{ 'admSupervisionVentesApp.locataire.form.editHeading' | translate }}
+          } @else {
+            {{ 'admSupervisionVentesApp.locataire.form.createHeading' | translate }}
+          }
+        </h2>
+        <p class="adm-form-card__subtitle">
+          @if (editForm.controls.id.value === null) {
+            {{ 'admSupervisionVentesApp.locataire.form.createSubtitle' | translate }}
+          } @else {
+            {{ 'admSupervisionVentesApp.locataire.form.editSubtitle' | translate }}
+          }
+        </p>
+      </div>
+    </div>
+
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <jhi-alert-error />
+
+      @if (editForm.controls.id.value !== null) {
+        <div class="adm-form-field adm-form-field--readonly">
+          <label class="adm-form-field__label" for="field_id">{{ 'admSupervisionVentesApp.locataire.form.idLabel' | translate }}</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" readonly />
+        </div>
+      }
+
+      <!-- Section : Identification -->
+      <div class="adm-form-section">
+        <h3 class="adm-form-section__title">{{ 'admSupervisionVentesApp.locataire.form.sectionIdentification' | translate }}</h3>
+        <div class="adm-form-row">
+          @let codeRef = editForm.get('code')!;
+          <div class="adm-form-field adm-form-field--half">
+            <label class="adm-form-field__label" for="field_code">
+              {{ 'admSupervisionVentesApp.locataire.form.codeLabel' | translate }} <span class="adm-required">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              [class.is-invalid]="codeRef.invalid && (codeRef.dirty || codeRef.touched)"
+              name="code"
+              id="field_code"
+              data-cy="code"
+              formControlName="code"
+              [placeholder]="'admSupervisionVentesApp.locataire.form.codePlaceholder' | translate"
+            />
+            @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
+              <div class="invalid-feedback">
+                @if (codeRef.errors?.['required']) {
+                  {{ 'entity.validation.required' | translate }}
+                }
+                @if (codeRef.errors?.['maxlength']) {
+                  {{ 'entity.validation.maxlength' | translate: { max: 30 } }}
+                }
+              </div>
+            }
+            <small class="adm-form-field__hint">{{ 'admSupervisionVentesApp.locataire.form.codeHint' | translate }}</small>
+          </div>
+
+          @let typeLocataireRef = editForm.get('typeLocataire')!;
+          <div class="adm-form-field adm-form-field--half">
+            <label class="adm-form-field__label" for="field_typeLocataire">
+              {{ 'admSupervisionVentesApp.locataire.form.typeLabel' | translate }} <span class="adm-required">*</span>
+            </label>
+            <select
+              class="form-select"
+              [class.is-invalid]="typeLocataireRef.invalid && (typeLocataireRef.dirty || typeLocataireRef.touched)"
+              name="typeLocataire"
+              formControlName="typeLocataire"
+              id="field_typeLocataire"
+              data-cy="typeLocataire"
+            >
+              <option [ngValue]="null">{{ 'admSupervisionVentesApp.locataire.form.typeChoose' | translate }}</option>
+              @for (typeLocataire of typeLocataireValues; track $index) {
+                <option [value]="typeLocataire">{{ 'admSupervisionVentesApp.TypeLocataire.' + typeLocataire | translate }}</option>
+              }
+            </select>
+            @if (typeLocataireRef.invalid && (typeLocataireRef.dirty || typeLocataireRef.touched)) {
+              <div class="invalid-feedback">{{ 'entity.validation.required' | translate }}</div>
+            }
+          </div>
+        </div>
+
+        <div class="adm-form-row">
+          @let nomRef = editForm.get('nom')!;
+          <div class="adm-form-field adm-form-field--full">
+            <label class="adm-form-field__label" for="field_nom">
+              {{ 'admSupervisionVentesApp.locataire.form.nomLabel' | translate }} <span class="adm-required">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              [class.is-invalid]="nomRef.invalid && (nomRef.dirty || nomRef.touched)"
+              name="nom"
+              id="field_nom"
+              data-cy="nom"
+              formControlName="nom"
+              [placeholder]="'admSupervisionVentesApp.locataire.form.nomPlaceholder' | translate"
+            />
+            @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+              <div class="invalid-feedback">
+                @if (nomRef.errors?.['required']) {
+                  {{ 'entity.validation.required' | translate }}
+                }
+                @if (nomRef.errors?.['maxlength']) {
+                  {{ 'entity.validation.maxlength' | translate: { max: 150 } }}
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="adm-form-row">
+          @let numeroIdentificationRef = editForm.get('numeroIdentification')!;
+          <div class="adm-form-field adm-form-field--half">
+            <label class="adm-form-field__label" for="field_numeroIdentification">{{
+              'admSupervisionVentesApp.locataire.form.numeroIdentificationLabel' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              [class.is-invalid]="numeroIdentificationRef.invalid && (numeroIdentificationRef.dirty || numeroIdentificationRef.touched)"
+              name="numeroIdentification"
+              id="field_numeroIdentification"
+              data-cy="numeroIdentification"
+              formControlName="numeroIdentification"
+              [placeholder]="'admSupervisionVentesApp.locataire.form.numeroIdentificationPlaceholder' | translate"
+            />
+            @if (numeroIdentificationRef.invalid && (numeroIdentificationRef.dirty || numeroIdentificationRef.touched)) {
+              <div class="invalid-feedback">{{ 'entity.validation.maxlength' | translate: { max: 80 } }}</div>
+            }
+          </div>
+
+          @let statutRef = editForm.get('statut')!;
+          <div class="adm-form-field adm-form-field--half">
+            <label class="adm-form-field__label" for="field_statut">
+              {{ 'admSupervisionVentesApp.locataire.form.statutLabel' | translate }} <span class="adm-required">*</span>
+            </label>
+            <select
+              class="form-select"
+              [class.is-invalid]="statutRef.invalid && (statutRef.dirty || statutRef.touched)"
+              name="statut"
+              formControlName="statut"
+              id="field_statut"
+              data-cy="statut"
+            >
+              <option [ngValue]="null">{{ 'admSupervisionVentesApp.locataire.form.statutChoose' | translate }}</option>
+              @for (statutGeneral of statutGeneralValues; track $index) {
+                <option [value]="statutGeneral">{{ 'admSupervisionVentesApp.StatutGeneral.' + statutGeneral | translate }}</option>
+              }
+            </select>
+            @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
+              <div class="invalid-feedback">{{ 'entity.validation.required' | translate }}</div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Section : Contact -->
+      <div class="adm-form-section">
+        <h3 class="adm-form-section__title">{{ 'admSupervisionVentesApp.locataire.form.sectionContact' | translate }}</h3>
+        <div class="adm-form-row">
+          @let telephoneRef = editForm.get('telephone')!;
+          <div class="adm-form-field adm-form-field--half">
+            <label class="adm-form-field__label" for="field_telephone">{{
+              'admSupervisionVentesApp.locataire.form.telephoneLabel' | translate
+            }}</label>
+            <input
+              type="tel"
+              class="form-control"
+              [class.is-invalid]="telephoneRef.invalid && (telephoneRef.dirty || telephoneRef.touched)"
+              name="telephone"
+              id="field_telephone"
+              data-cy="telephone"
+              formControlName="telephone"
+              [placeholder]="'admSupervisionVentesApp.locataire.form.telephonePlaceholder' | translate"
+            />
+            @if (telephoneRef.invalid && (telephoneRef.dirty || telephoneRef.touched)) {
+              <div class="invalid-feedback">{{ 'entity.validation.maxlength' | translate: { max: 30 } }}</div>
+            }
+          </div>
+
+          @let emailRef = editForm.get('email')!;
+          <div class="adm-form-field adm-form-field--half">
+            <label class="adm-form-field__label" for="field_email">{{
+              'admSupervisionVentesApp.locataire.form.emailLabel' | translate
+            }}</label>
+            <input
+              type="email"
+              class="form-control"
+              [class.is-invalid]="emailRef.invalid && (emailRef.dirty || emailRef.touched)"
+              name="email"
+              id="field_email"
+              data-cy="email"
+              formControlName="email"
+              [placeholder]="'admSupervisionVentesApp.locataire.form.emailPlaceholder' | translate"
+            />
+            @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
+              <div class="invalid-feedback">{{ 'entity.validation.maxlength' | translate: { max: 120 } }}</div>
+            }
+          </div>
+        </div>
+
+        @let adresseRef = editForm.get('adresse')!;
+        <div class="adm-form-field adm-form-field--full">
+          <label class="adm-form-field__label" for="field_adresse">{{
+            'admSupervisionVentesApp.locataire.form.adresseLabel' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="adresseRef.invalid && (adresseRef.dirty || adresseRef.touched)"
+            name="adresse"
+            id="field_adresse"
+            data-cy="adresse"
+            formControlName="adresse"
+            [placeholder]="'admSupervisionVentesApp.locataire.form.adressePlaceholder' | translate"
+          />
+          @if (adresseRef.invalid && (adresseRef.dirty || adresseRef.touched)) {
+            <div class="invalid-feedback">{{ 'entity.validation.maxlength' | translate: { max: 255 } }}</div>
+          }
+        </div>
+      </div>
+
+      <!-- Champ caché géré par le backend -->
+      <input type="hidden" formControlName="dateCreation" />
+
+      <!-- Boutons d'action -->
+      <div class="adm-form-actions">
+        <button
+          type="button"
+          id="cancel-save"
+          data-cy="entityCreateCancelButton"
+          class="btn btn-outline-secondary"
+          (click)="previousState()"
+        >
+          <fa-icon icon="ban" />&nbsp;{{ 'admSupervisionVentesApp.locataire.form.btnCancel' | translate }}
+        </button>
+
+        @if (editForm.controls.id.value !== null) {
+          <button type="button" class="btn btn-warning" (click)="reinitialiserMotDePasse()" [disabled]="resetMdpEnCours()">
+            @if (resetMdpEnCours()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            } @else {
+              <fa-icon icon="key" />&nbsp;
+            }
+            {{ 'admSupervisionVentesApp.locataire.form.btnResetPassword' | translate }}
+          </button>
+        }
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          @if (isSaving()) {
+            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+          } @else {
+            <fa-icon icon="save" />&nbsp;
+          }
+          {{
+            editForm.controls.id.value !== null
+              ? ('admSupervisionVentesApp.locataire.form.btnUpdate' | translate)
+              : ('admSupervisionVentesApp.locataire.form.btnCreate' | translate)
+          }}
+        </button>
+      </div>
+
+      @if (resetMdpOk()) {
+        <div class="adm-login-banner adm-login-banner--success">
+          <fa-icon icon="check-circle" />
+          <span>{{ 'admSupervisionVentesApp.locataire.form.resetSuccess' | translate }}</span>
+        </div>
+      }
+    </form>
+  </div>
+</div>
+
+@if (loginGenere()) {
+  @let titleKey =
+    credentialsContext() === 'creation'
+      ? 'admSupervisionVentesApp.locataire.form.loginCreatedTitle'
+      : 'admSupervisionVentesApp.locataire.form.passwordResetTitle';
+  @let bodyKey =
+    credentialsContext() === 'creation'
+      ? 'admSupervisionVentesApp.locataire.form.loginCreatedBody'
+      : 'admSupervisionVentesApp.locataire.form.passwordResetBody';
+  <div class="adm-login-overlay" role="dialog" aria-modal="true" [attr.aria-label]="titleKey | translate">
+    <div class="adm-login-modal">
+      <div class="adm-login-modal__icon">
+        <fa-icon icon="user-check" />
+      </div>
+      <h3 class="adm-login-modal__title">{{ titleKey | translate }}</h3>
+      <p class="adm-login-modal__body">
+        {{ bodyKey | translate }}
+      </p>
+      <div class="adm-login-modal__credentials">
+        <div class="adm-login-modal__row">
+          <span class="adm-login-modal__label">{{ 'admSupervisionVentesApp.locataire.form.loginLabel' | translate }}</span>
+          <strong class="adm-login-modal__value">{{ loginGenere() }}</strong>
+        </div>
+        <div class="adm-login-modal__row">
+          <span class="adm-login-modal__label">{{ 'admSupervisionVentesApp.locataire.form.initialPasswordLabel' | translate }}</span>
+          <strong class="adm-login-modal__value">Adm&#64;2026</strong>
+        </div>
+      </div>
+      <div class="adm-login-modal__actions">
+        <button type="button" class="btn btn-primary" (click)="closeCredentialsModal()">
+          <fa-icon icon="check" />&nbsp;
+          {{
+            (credentialsContext() === 'creation'
+              ? 'admSupervisionVentesApp.locataire.form.btnOk'
+              : 'admSupervisionVentesApp.locataire.form.btnClose'
+            ) | translate
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

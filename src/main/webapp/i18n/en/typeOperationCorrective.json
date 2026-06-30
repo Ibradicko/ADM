@@ -1,0 +1,10 @@
+{
+  "admSupervisionVentesApp": {
+    "TypeOperationCorrective": {
+      "null": "",
+      "ANNULATION": "ANNULATION",
+      "RETOUR": "RETOUR",
+      "AJUSTEMENT": "AJUSTEMENT"
+    }
+  }
+}

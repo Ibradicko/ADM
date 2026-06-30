@@ -1,0 +1,29 @@
+{
+  "admSupervisionVentesApp": {
+    "receptionProduit": {
+      "home": {
+        "title": "Reception Produits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Reception Produit",
+        "createOrEditLabel": "Create or edit a Reception Produit",
+        "notFound": "No Reception Produits found"
+      },
+      "created": "A new Reception Produit is created with identifier {{ param }}",
+      "updated": "A Reception Produit is updated with identifier {{ param }}",
+      "deleted": "A Reception Produit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Reception Produit {{ id }}?"
+      },
+      "detail": {
+        "title": "Reception Produit"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "dateReception": "Date Reception",
+      "fournisseur": "Fournisseur",
+      "commentaire": "Commentaire",
+      "boutique": "Boutique",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

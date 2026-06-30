@@ -1,0 +1,80 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (inventaireStock(); as inventaireStockRef) {
+      <div>
+        <h2 data-cy="inventaireStockDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.inventaireStock.detail.title">Inventaire Stock</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ inventaireStockRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.reference">Reference</span></dt>
+          <dd>
+            <span>{{ inventaireStockRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.typeInventaire">Type Inventaire</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypeInventaire.' + (inventaireStockRef.typeInventaire ?? 'null')">{{
+              { null: '', TOURNANT: 'TOURNANT', COMPLET: 'COMPLET', CONTROLE_PONCTUEL: 'CONTROLE_PONCTUEL' }[
+                inventaireStockRef.typeInventaire ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutInventaire.' + (inventaireStockRef.statut ?? 'null')">{{
+              { null: '', PLANIFIE: 'PLANIFIE', EN_COURS: 'EN_COURS', CLOTURE: 'CLOTURE', ANNULE: 'ANNULE' }[
+                inventaireStockRef.statut ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.dateDebut">Date Debut</span></dt>
+          <dd>
+            <span>{{ inventaireStockRef.dateDebut | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.dateFin">Date Fin</span></dt>
+          <dd>
+            <span>{{ inventaireStockRef.dateFin | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.boutique">Boutique</span></dt>
+          <dd>
+            @if (inventaireStock()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', inventaireStock()!.boutique?.id, 'view']">{{ inventaireStockRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.depot">Depot</span></dt>
+          <dd>
+            @if (inventaireStock()!.depot) {
+              <div>
+                <a [routerLink]="['/depot-stock', inventaireStock()!.depot?.id, 'view']">{{ inventaireStockRef.depot?.code }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.inventaireStock.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ inventaireStockRef.utilisateur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/inventaire-stock', inventaireStockRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

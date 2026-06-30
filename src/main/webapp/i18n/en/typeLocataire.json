@@ -1,0 +1,9 @@
+{
+  "admSupervisionVentesApp": {
+    "TypeLocataire": {
+      "null": "",
+      "PERSONNE_PHYSIQUE": "Individual",
+      "PERSONNE_MORALE": "Legal entity"
+    }
+  }
+}

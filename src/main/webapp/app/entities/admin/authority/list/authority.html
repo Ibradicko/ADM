@@ -25,40 +25,44 @@
   <jhi-alert />
 
   @if (authorities().length === 0) {
-    <div class="alert alert-warning" id="no-result">
+    <div class="adm-empty-state" id="no-result">
       <span jhiTranslate="admSupervisionVentesApp.adminAuthority.home.notFound">No Authorities found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="name">
-              <div class="d-flex">
-                <span jhiTranslate="admSupervisionVentesApp.adminAuthority.name">Name</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
+              <span jhiTranslate="admSupervisionVentesApp.adminAuthority.name">Name</span> <fa-icon icon="sort" />
             </th>
             <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
-          @for (authority of authorities(); track trackName(authority)) {
-            <tr data-cy="entityTable">
+          @for (authority of authorities(); track trackName(authority); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
               <td>
                 <a [routerLink]="['/authority', authority.name, 'view']">{{ authority.name }}</a>
               </td>
               <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/authority', authority.name, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/authority', authority.name, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
                     <fa-icon icon="eye" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
                   </a>
-
-                  <button type="submit" (click)="delete(authority)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <button
+                    type="button"
+                    (click)="delete(authority)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    title="Supprimer"
+                  >
                     <fa-icon icon="times" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
                   </button>
                 </div>
               </td>

@@ -1,0 +1,26 @@
+{
+  "admSupervisionVentesApp": {
+    "modePaiementRef": {
+      "home": {
+        "title": "Mode Paiement Refs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Mode Paiement Ref",
+        "createOrEditLabel": "Create or edit a Mode Paiement Ref",
+        "notFound": "No Mode Paiement Refs found"
+      },
+      "created": "A new Mode Paiement Ref is created with identifier {{ param }}",
+      "updated": "A Mode Paiement Ref is updated with identifier {{ param }}",
+      "deleted": "A Mode Paiement Ref is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Mode Paiement Ref {{ id }}?"
+      },
+      "detail": {
+        "title": "Mode Paiement Ref"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libelle",
+      "actif": "Actif"
+    }
+  }
+}

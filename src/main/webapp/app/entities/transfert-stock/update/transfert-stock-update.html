@@ -1,0 +1,217 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-transfert-stock-heading"
+        data-cy="TransfertStockCreateUpdateHeading"
+        jhiTranslate="admSupervisionVentesApp.transfertStock.home.createOrEditLabel"
+      >
+        Create or edit a Transfert Stock
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let referenceRef = editForm.get('reference')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_reference" jhiTranslate="admSupervisionVentesApp.transfertStock.reference">Reference</label>
+          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+            <div>
+              @if (editForm.get('reference')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('reference')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+                  >This field cannot be longer than 80 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let dateTransfertRef = editForm.get('dateTransfert')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateTransfert" jhiTranslate="admSupervisionVentesApp.transfertStock.dateTransfert"
+            >Date Transfert</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_dateTransfert"
+              data-cy="dateTransfert"
+              type="datetime-local"
+              class="form-control"
+              name="dateTransfert"
+              formControlName="dateTransfert"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (dateTransfertRef.invalid && (dateTransfertRef.dirty || dateTransfertRef.touched)) {
+            <div>
+              @if (editForm.get('dateTransfert')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('dateTransfert')?.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let statutRef = editForm.get('statut')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_statut" jhiTranslate="admSupervisionVentesApp.transfertStock.statut">Statut</label>
+          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
+            <option [ngValue]="null">{{ 'admSupervisionVentesApp.StatutMouvementStock.null' | translate }}</option>
+            @for (statutMouvementStock of statutMouvementStockValues; track $index) {
+              <option [value]="statutMouvementStock">
+                {{ 'admSupervisionVentesApp.StatutMouvementStock.' + statutMouvementStock | translate }}
+              </option>
+            }
+          </select>
+          @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
+            <div>
+              @if (editForm.get('statut')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let motifRef = editForm.get('motif')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_motif" jhiTranslate="admSupervisionVentesApp.transfertStock.motif">Motif</label>
+          <input type="text" class="form-control" name="motif" id="field_motif" data-cy="motif" formControlName="motif" />
+          @if (motifRef.invalid && (motifRef.dirty || motifRef.touched)) {
+            <div>
+              @if (editForm.get('motif')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+                  >This field cannot be longer than 255 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_boutiqueOrigine" jhiTranslate="admSupervisionVentesApp.transfertStock.boutiqueOrigine"
+            >Boutique Origine</label
+          >
+          <select
+            class="form-control"
+            id="field_boutiqueOrigine"
+            data-cy="boutiqueOrigine"
+            name="boutiqueOrigine"
+            formControlName="boutiqueOrigine"
+            [compareWith]="compareBoutique"
+          >
+            @if (!editForm.get('boutiqueOrigine')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
+              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
+            }
+          </select>
+        </div>
+        @if (
+          editForm.get(['boutiqueOrigine'])!.invalid &&
+          (editForm.get(['boutiqueOrigine'])!.dirty || editForm.get(['boutiqueOrigine'])!.touched)
+        ) {
+          <div>
+            @if (editForm.get(['boutiqueOrigine'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label
+            class="form-label"
+            for="field_boutiqueDestination"
+            jhiTranslate="admSupervisionVentesApp.transfertStock.boutiqueDestination"
+            >Boutique Destination</label
+          >
+          <select
+            class="form-control"
+            id="field_boutiqueDestination"
+            data-cy="boutiqueDestination"
+            name="boutiqueDestination"
+            formControlName="boutiqueDestination"
+            [compareWith]="compareBoutique"
+          >
+            @if (!editForm.get('boutiqueDestination')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
+              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
+            }
+          </select>
+        </div>
+        @if (
+          editForm.get(['boutiqueDestination'])!.invalid &&
+          (editForm.get(['boutiqueDestination'])!.dirty || editForm.get(['boutiqueDestination'])!.touched)
+        ) {
+          <div>
+            @if (editForm.get(['boutiqueDestination'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_utilisateur" jhiTranslate="admSupervisionVentesApp.transfertStock.utilisateur"
+            >Utilisateur</label
+          >
+          <select
+            class="form-control"
+            id="field_utilisateur"
+            data-cy="utilisateur"
+            name="utilisateur"
+            formControlName="utilisateur"
+            [compareWith]="compareUser"
+          >
+            @if (!editForm.get('utilisateur')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
+          <div>
+            @if (editForm.get(['utilisateur'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

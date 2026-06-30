@@ -1,0 +1,27 @@
+{
+  "admSupervisionVentesApp": {
+    "sousFamilleArticle": {
+      "home": {
+        "title": "Sous Famille Articles",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Sous Famille Article",
+        "createOrEditLabel": "Create or edit a Sous Famille Article",
+        "notFound": "No Sous Famille Articles found"
+      },
+      "created": "A new Sous Famille Article is created with identifier {{ param }}",
+      "updated": "A Sous Famille Article is updated with identifier {{ param }}",
+      "deleted": "A Sous Famille Article is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Sous Famille Article {{ id }}?"
+      },
+      "detail": {
+        "title": "Sous Famille Article"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libelle",
+      "statut": "Statut",
+      "familleArticle": "Famille Article"
+    }
+  }
+}

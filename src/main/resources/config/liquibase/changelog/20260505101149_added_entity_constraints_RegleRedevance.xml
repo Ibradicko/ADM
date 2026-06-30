@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity RegleRedevance.
+    -->
+    <changeSet id="20260505101149-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="boutique_id"
+                                 baseTableName="regle_redevance"
+                                 constraintName="fk_regle_redevance__boutique_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="boutique"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="locataire_id"
+                                 baseTableName="regle_redevance"
+                                 constraintName="fk_regle_redevance__locataire_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="locataire"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="groupe_article_id"
+                                 baseTableName="regle_redevance"
+                                 constraintName="fk_regle_redevance__groupe_article_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="groupe_article"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="produit_id"
+                                 baseTableName="regle_redevance"
+                                 constraintName="fk_regle_redevance__produit_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="produit"
+                                 />
+    </changeSet>
+</databaseChangeLog>

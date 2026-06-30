@@ -1,0 +1,78 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (mouvementStock(); as mouvementStockRef) {
+      <div>
+        <h2 data-cy="mouvementStockDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.mouvementStock.detail.title">Mouvement Stock</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ mouvementStockRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.mouvementStock.reference">Reference</span></dt>
+          <dd>
+            <span>{{ mouvementStockRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.mouvementStock.typeMouvement">Type Mouvement</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypeMouvementStock.' + (mouvementStockRef.typeMouvement ?? 'null')">{{
+              {
+                null: '',
+                ENTREE: 'ENTREE',
+                SORTIE: 'SORTIE',
+                AJUSTEMENT: 'AJUSTEMENT',
+                TRANSFERT: 'TRANSFERT',
+                INVENTAIRE: 'INVENTAIRE',
+                PERTE: 'PERTE',
+                RETOUR_CLIENT: 'RETOUR_CLIENT',
+                VENTE: 'VENTE',
+              }[mouvementStockRef.typeMouvement ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.mouvementStock.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutMouvementStock.' + (mouvementStockRef.statut ?? 'null')">{{
+              { null: '', BROUILLON: 'BROUILLON', VALIDE: 'VALIDE', ANNULE: 'ANNULE' }[mouvementStockRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.mouvementStock.dateMouvement">Date Mouvement</span></dt>
+          <dd>
+            <span>{{ mouvementStockRef.dateMouvement | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.mouvementStock.motif">Motif</span></dt>
+          <dd>
+            <span>{{ mouvementStockRef.motif }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.mouvementStock.boutique">Boutique</span></dt>
+          <dd>
+            @if (mouvementStock()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', mouvementStock()!.boutique?.id, 'view']">{{ mouvementStockRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.mouvementStock.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ mouvementStockRef.utilisateur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/mouvement-stock', mouvementStockRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

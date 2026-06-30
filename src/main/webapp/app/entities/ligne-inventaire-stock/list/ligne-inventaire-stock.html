@@ -1,0 +1,123 @@
+<div>
+  <h2 id="page-heading" data-cy="LigneInventaireStockHeading">
+    <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.home.title">Ligne Inventaire Stocks</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-ligne-inventaire-stock"
+        [routerLink]="['/ligne-inventaire-stock/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.home.createLabel">Create a new Ligne Inventaire Stock</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (ligneInventaireStocks().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.home.notFound">No Ligne Inventaire Stocks found</span>
+    </div>
+  } @else {
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="quantiteTheorique">
+              <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.quantiteTheorique">Quantite Theorique</span>
+              <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="quantiteComptee">
+              <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.quantiteComptee">Quantite Comptee</span>
+              <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="ecart">
+              <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.ecart">Ecart</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="commentaire">
+              <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.commentaire">Commentaire</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="inventaire.reference">
+              <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.inventaire">Inventaire</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="produit.designation">
+              <span jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.produit">Produit</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ligneInventaireStock of ligneInventaireStocks(); track trackId(ligneInventaireStock); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+              <td>
+                <a [routerLink]="['/ligne-inventaire-stock', ligneInventaireStock.id, 'view']">{{ ligneInventaireStock.id }}</a>
+              </td>
+              <td>{{ ligneInventaireStock.quantiteTheorique }}</td>
+              <td>{{ ligneInventaireStock.quantiteComptee }}</td>
+              <td>{{ ligneInventaireStock.ecart }}</td>
+              <td>{{ ligneInventaireStock.commentaire }}</td>
+              <td>
+                @if (ligneInventaireStock.inventaire) {
+                  <div>
+                    <a [routerLink]="['/inventaire-stock', ligneInventaireStock.inventaire.id, 'view']">{{
+                      ligneInventaireStock.inventaire.reference
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (ligneInventaireStock.produit) {
+                  <div>
+                    <a [routerLink]="['/produit', ligneInventaireStock.produit.id, 'view']">{{
+                      ligneInventaireStock.produit.designation
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/ligne-inventaire-stock', ligneInventaireStock.id, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
+                    <fa-icon icon="eye" />
+                  </a>
+                  <a
+                    [routerLink]="['/ligne-inventaire-stock', ligneInventaireStock.id, 'edit']"
+                    class="adm-icon-button"
+                    data-cy="entityEditButton"
+                    title="Modifier"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                  </a>
+                  <button
+                    type="button"
+                    (click)="delete(ligneInventaireStock)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    title="Supprimer"
+                  >
+                    <fa-icon icon="times" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

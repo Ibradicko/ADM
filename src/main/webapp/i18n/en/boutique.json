@@ -1,0 +1,33 @@
+{
+  "admSupervisionVentesApp": {
+    "boutique": {
+      "home": {
+        "title": "Boutiques",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Boutique",
+        "createOrEditLabel": "Create or edit a Boutique",
+        "notFound": "No Boutiques found"
+      },
+      "created": "A new Boutique is created with identifier {{ param }}",
+      "createdWithNewManager": "Boutique {{ param }} created. A new manager account was created and must change its password at first sign-in.",
+      "createdWithExistingManager": "Boutique {{ param }} created and attached to the existing manager account.",
+      "updated": "A Boutique is updated with identifier {{ param }}",
+      "deleted": "A Boutique is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Boutique {{ id }}?"
+      },
+      "detail": {
+        "title": "Boutique"
+      },
+      "id": "ID",
+      "code": "Code",
+      "nom": "Nom",
+      "type": "Type",
+      "emplacement": "Emplacement",
+      "telephone": "Telephone",
+      "email": "Email",
+      "statut": "Statut",
+      "dateCreation": "Date Creation"
+    }
+  }
+}

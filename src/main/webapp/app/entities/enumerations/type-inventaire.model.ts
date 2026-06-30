@@ -1,0 +1,7 @@
+export enum TypeInventaire {
+  TOURNANT = 'TOURNANT',
+
+  COMPLET = 'COMPLET',
+
+  CONTROLE_PONCTUEL = 'CONTROLE_PONCTUEL',
+}

@@ -1,0 +1,135 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="StockProduitHeading">
+    <div>
+      <h1>Niveaux de stock</h1>
+      <p>Quantités disponibles par produit et par dépôt — alertes de réapprovisionnement</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutGererStock()) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/stock-produit/new']">
+          <fa-icon icon="plus" />
+          <span>Nouveau stock</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <section class="adm-toolbar" aria-label="Filtres stock">
+    <jhi-filter [filters]="filters" />
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>État des stocks produits</h2>
+        <p>Quantités théoriques et seuils d'alerte par produit et dépôt</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ totalItems() }} article(s)</span>
+    </div>
+
+    @if (stockProduits().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun stock produit trouvé</strong>
+        <p>Ajustez les filtres ou créez des entrées de stock pour vos produits.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="produit.designation">Produit <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="depot.code">Dépôt <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="quantiteTheorique" class="text-end">Qté théorique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="stockAlerte" class="text-end">Seuil alerte <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateDernierMouvement">Dernier mouvement <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sp of stockProduits(); track trackId(sp); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  @if (sp.produit) {
+                    <a [routerLink]="['/produit', sp.produit.id, 'view']" class="adm-link">
+                      <strong>{{ sp.produit.designation }}</strong>
+                    </a>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>
+                  @if (sp.depot) {
+                    <a [routerLink]="['/depot-stock', sp.depot.id, 'view']" class="adm-link">
+                      <span class="adm-code">{{ sp.depot.code }}</span>
+                    </a>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <strong
+                    [class.adm-text--danger]="
+                      sp.stockAlerte != null && sp.quantiteTheorique != null && sp.quantiteTheorique <= sp.stockAlerte
+                    "
+                  >
+                    {{ sp.quantiteTheorique ?? '—' }}
+                  </strong>
+                </td>
+                <td class="text-end">{{ sp.stockAlerte ?? '—' }}</td>
+                <td>{{ sp.dateDernierMouvement ? (sp.dateDernierMouvement | formatMediumDatetime) : '—' }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/stock-produit', sp.id, 'view']" class="adm-icon-button" data-cy="entityDetailsButton" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutGererStock()) {
+                      <a
+                        [routerLink]="['/stock-produit', sp.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(sp)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (stockProduits().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

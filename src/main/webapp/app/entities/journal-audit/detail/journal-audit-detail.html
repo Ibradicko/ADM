@@ -1,0 +1,87 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (journalAudit(); as journalAuditRef) {
+      <div>
+        <h2 data-cy="journalAuditDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.journalAudit.detail.title">Journal Audit</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ journalAuditRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.typeAction">Type Action</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypeActionAudit.' + (journalAuditRef.typeAction ?? 'null')">{{
+              {
+                null: '',
+                CONNEXION: 'CONNEXION',
+                DECONNEXION: 'DECONNEXION',
+                CREATION: 'CREATION',
+                MODIFICATION: 'MODIFICATION',
+                DESACTIVATION: 'DESACTIVATION',
+                CHANGEMENT_PRIX: 'CHANGEMENT_PRIX',
+                CHANGEMENT_TAUX_REDEVANCE: 'CHANGEMENT_TAUX_REDEVANCE',
+                CHANGEMENT_CODE_BARRES: 'CHANGEMENT_CODE_BARRES',
+                VENTE_VALIDEE: 'VENTE_VALIDEE',
+                VENTE_ANNULEE: 'VENTE_ANNULEE',
+                RETOUR_VENTE: 'RETOUR_VENTE',
+                MOUVEMENT_STOCK: 'MOUVEMENT_STOCK',
+                INVENTAIRE: 'INVENTAIRE',
+                PARAMETRAGE: 'PARAMETRAGE',
+                EXPORT: 'EXPORT',
+              }[journalAuditRef.typeAction ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.entiteConcernee">Entite Concernee</span></dt>
+          <dd>
+            <span>{{ journalAuditRef.entiteConcernee }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.identifiantEntite">Identifiant Entite</span></dt>
+          <dd>
+            <span>{{ journalAuditRef.identifiantEntite }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.description">Description</span></dt>
+          <dd>
+            <span>{{ journalAuditRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.adresseIp">Adresse Ip</span></dt>
+          <dd>
+            <span>{{ journalAuditRef.adresseIp }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.dateAction">Date Action</span></dt>
+          <dd>
+            <span>{{ journalAuditRef.dateAction | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.boutique">Boutique</span></dt>
+          <dd>
+            @if (journalAudit()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', journalAudit()!.boutique?.id, 'view']">{{ journalAuditRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.journalAudit.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ journalAuditRef.utilisateur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/journal-audit', journalAuditRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

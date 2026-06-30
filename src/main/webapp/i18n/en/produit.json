@@ -1,0 +1,36 @@
+{
+  "admSupervisionVentesApp": {
+    "product": {
+      "home": {
+        "title": "Articles",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Article",
+        "createOrEditLabel": "Create or edit a Article",
+        "notFound": "No Articles found"
+      },
+      "created": "A new Article is created with identifier {{ param }}",
+      "updated": "A Article is updated with identifier {{ param }}",
+      "deleted": "A Article is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Article {{ id }}?"
+      },
+      "detail": {
+        "title": "Article"
+      },
+      "id": "ID",
+      "codeInterne": "Code Interne",
+      "designation": "Designation",
+      "description": "Description",
+      "typePrix": "Type Prix",
+      "prixVente": "Prix Vente",
+      "tauxRedevanceApplicable": "Taux Redevance Applicable",
+      "statut": "Statut",
+      "dateCreation": "Date Creation",
+      "boutique": "Boutique",
+      "groupeArticle": "Groupe Article",
+      "familleArticle": "Famille Article",
+      "sousFamilleArticle": "Sous Famille Article",
+      "uniteMesure": "Unite Mesure"
+    }
+  }
+}

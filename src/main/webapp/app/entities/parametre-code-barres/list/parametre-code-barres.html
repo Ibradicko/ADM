@@ -1,0 +1,153 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="ParametreCodeBarresHeading">
+    <div>
+      <h1>Parametres code-barres</h1>
+      <p>Configuration des formats actifs, prefixes metier et longueurs par defaut pour l'identification produit.</p>
+    </div>
+
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+
+      <a class="adm-button adm-button--primary" [routerLink]="['/parametre-code-barres/new']">
+        <fa-icon icon="plus" />
+        <span>Nouveau parametre</span>
+      </a>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="adm-stats-grid adm-stats-grid--compact">
+    <article class="adm-stat-card">
+      <span>Total configurations</span>
+      <strong>{{ parametreCodeBarreses().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Configurations actives</span>
+      <strong>{{ totalActifs() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Formats distincts</span>
+      <strong>{{ formatsDisponibles().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Longueur moyenne</span>
+      <strong>{{ longueurMoyenne() }}</strong>
+    </article>
+  </div>
+
+  <section class="adm-toolbar" aria-label="Filtres parametres code-barres">
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Rechercher un prefixe, un format ou une longueur..."
+      />
+    </label>
+
+    <div class="adm-toolbar__filters">
+      <label class="adm-field">
+        <span>Etat</span>
+        <select class="adm-select" [ngModel]="selectedEtat()" (ngModelChange)="selectedEtat.set($event)">
+          <option value="ALL">Tous</option>
+          <option value="ACTIF">Actifs</option>
+          <option value="INACTIF">Inactifs</option>
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span>Format</span>
+        <select class="adm-select" [ngModel]="selectedFormat()" (ngModelChange)="selectedFormat.set($event)">
+          <option value="ALL">Tous</option>
+          @for (format of formatsDisponibles(); track format) {
+            <option [value]="format">{{ format }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="button" class="adm-button adm-button--ghost" (click)="reinitialiserFiltres()">Reinitialiser</button>
+    </div>
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Configurations disponibles</h2>
+        <p>Parametres techniques qui servent a la generation, a l'impression et au controle des codes-barres.</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ parametresFiltres().length }} affiches</span>
+    </div>
+
+    @if (parametresFiltres().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun parametre ne correspond aux criteres selectionnes</strong>
+        <p>Revoyez les filtres ou ajoutez un nouveau format si le besoin metier evolue.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="formatParDefaut">Format <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="prefixe">Prefixe <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="longueur">Longueur <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="actif">Etat <fa-icon icon="sort" /></th>
+              <th scope="col">Lecture metier</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (parametreCodeBarres of parametresFiltres(); track trackId(parametreCodeBarres); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ parametreCodeBarres.formatParDefaut ?? '--' }}</span>
+                </td>
+                <td>{{ parametreCodeBarres.prefixe || '--' }}</td>
+                <td>{{ parametreCodeBarres.longueur ?? '--' }}</td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="parametreCodeBarres.actif"
+                    [class.adm-pill--warning]="!parametreCodeBarres.actif"
+                  >
+                    {{ parametreCodeBarres.actif ? 'Actif' : 'Inactif' }}
+                  </span>
+                </td>
+                <td>
+                  {{ parametreCodeBarres.prefixe || 'Sans prefixe' }}
+                  @if (parametreCodeBarres.longueur) {
+                    <small class="d-block text-muted">{{ parametreCodeBarres.longueur }} caracteres attendus</small>
+                  }
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/parametre-code-barres', parametreCodeBarres.id, 'view']" class="adm-icon-button" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    <a [routerLink]="['/parametre-code-barres', parametreCodeBarres.id, 'edit']" class="adm-icon-button" title="Modifier">
+                      <fa-icon icon="pencil-alt" />
+                    </a>
+                    <button
+                      type="button"
+                      class="adm-icon-button adm-icon-button--danger"
+                      title="Supprimer"
+                      (click)="delete(parametreCodeBarres)"
+                    >
+                      <fa-icon icon="times" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

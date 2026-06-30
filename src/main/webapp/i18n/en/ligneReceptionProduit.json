@@ -1,0 +1,29 @@
+{
+  "admSupervisionVentesApp": {
+    "ligneReceptionProduit": {
+      "home": {
+        "title": "Ligne Reception Produits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ligne Reception Produit",
+        "createOrEditLabel": "Create or edit a Ligne Reception Produit",
+        "notFound": "No Ligne Reception Produits found"
+      },
+      "created": "A new Ligne Reception Produit is created with identifier {{ param }}",
+      "updated": "A Ligne Reception Produit is updated with identifier {{ param }}",
+      "deleted": "A Ligne Reception Produit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ligne Reception Produit {{ id }}?"
+      },
+      "detail": {
+        "title": "Ligne Reception Produit"
+      },
+      "id": "ID",
+      "quantiteAttendue": "Quantite Attendue",
+      "quantiteRecue": "Quantite Recue",
+      "ecart": "Ecart",
+      "codeBarresScanne": "Code Barres Scanne",
+      "reception": "Reception",
+      "produit": "Produit"
+    }
+  }
+}

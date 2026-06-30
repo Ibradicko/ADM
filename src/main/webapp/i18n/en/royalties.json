@@ -1,0 +1,104 @@
+{
+  "royalties": {
+    "eyebrow": "Financial management",
+    "title": "Royalties",
+    "subtitle": "Track calculations, payments and adjustments by shop and tenant.",
+    "actions": {
+      "exportReport": "Export a report",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "saving": "Saving...",
+      "update": "Update",
+      "addPayment": "Add payment",
+      "addAdjustment": "Add adjustment",
+      "creating": "Creating...",
+      "createCalculation": "Create calculation"
+    },
+    "restricted": {
+      "title": "Limited access",
+      "description": "Your profile cannot access the royalties module.",
+      "manage": "Your profile cannot create or modify royalties."
+    },
+    "kpis": {
+      "filteredCalculations": "Filtered calculations",
+      "turnover": "Turnover",
+      "royaltiesDue": "Royalties due",
+      "paymentsReceived": "Payments received",
+      "adjustments": "Adjustments",
+      "outstandingBalance": "Outstanding balance"
+    },
+    "fields": {
+      "shop": "Shop",
+      "tenant": "Tenant",
+      "status": "Status",
+      "periodStart": "Period start",
+      "periodEnd": "Period end",
+      "search": "Search",
+      "reference": "Reference",
+      "period": "Period",
+      "turnover": "Turnover",
+      "amount": "Amount",
+      "royaltyAmount": "Royalty amount",
+      "changeStatus": "Change status",
+      "date": "Date",
+      "paymentMethod": "Payment method",
+      "comment": "Comment",
+      "reason": "Reason",
+      "initialStatus": "Initial status",
+      "code": "Code",
+      "type": "Type",
+      "rate": "Rate",
+      "priority": "Priority"
+    },
+    "filters": {
+      "allShops": "All shops",
+      "allTenants": "All tenants",
+      "allStatuses": "All statuses",
+      "searchPlaceholder": "Reference, shop, tenant, status..."
+    },
+    "sections": {
+      "calculations": "Royalty calculations",
+      "calculationDetail": "Calculation details",
+      "relatedPayments": "Related payments",
+      "adjustments": "Adjustments",
+      "quickCreation": "Automatic calculation",
+      "activeRules": "Active rules"
+    },
+    "count": {
+      "calculations": "{{count}} calculation(s) in the selection.",
+      "payments": "{{count}} payment(s)",
+      "adjustments": "{{count}} adjustment(s)",
+      "activeRules": "{{count}} currently active rule(s)."
+    },
+    "hints": {
+      "selectCalculation": "Select a calculation to manage its lifecycle.",
+      "chooseCalculation": "Choose a calculation from the list to display its details.",
+      "quickCreation": "Calculate royalties from validated sales in the selected shop, tenant and period."
+    },
+    "empty": {
+      "noCalculation": "No calculation matches the filters.",
+      "noPayment": "No payment is linked to this calculation.",
+      "noAdjustment": "No adjustment for this calculation.",
+      "noSelectedCalculation": "No calculation selected",
+      "noActiveRule": "No active rule."
+    },
+    "messages": {
+      "loadFailed": "Royalty data could not be loaded.",
+      "shopAndTenantRequired": "Select a shop and tenant before creating a calculation.",
+      "calculationSaved": "The royalty calculation was saved.",
+      "calculationSaveFailed": "The royalty calculation could not be saved.",
+      "statusUpdated": "The calculation status was updated.",
+      "statusUpdateFailed": "The status could not be updated.",
+      "paymentAmountRequired": "The payment amount is required.",
+      "paymentExceedsBalance": "The entered amount exceeds the outstanding balance.",
+      "paymentSaved": "The payment was saved.",
+      "paymentSaveFailed": "The payment could not be saved.",
+      "adjustmentFieldsRequired": "The adjustment amount and reason are required.",
+      "adjustmentSaved": "The adjustment was saved.",
+      "adjustmentSaveFailed": "The adjustment could not be saved."
+    },
+    "common": {
+      "unavailable": "Unavailable"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "ligneCalculRedevance": {
+      "home": {
+        "title": "Ligne Calcul Redevances",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ligne Calcul Redevance",
+        "createOrEditLabel": "Create or edit a Ligne Calcul Redevance",
+        "notFound": "No Ligne Calcul Redevances found"
+      },
+      "created": "A new Ligne Calcul Redevance is created with identifier {{ param }}",
+      "updated": "A Ligne Calcul Redevance is updated with identifier {{ param }}",
+      "deleted": "A Ligne Calcul Redevance is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ligne Calcul Redevance {{ id }}?"
+      },
+      "detail": {
+        "title": "Ligne Calcul Redevance"
+      },
+      "id": "ID",
+      "baseCalcul": "Base Calcul",
+      "tauxApplique": "Taux Applique",
+      "montantRedevance": "Montant Redevance",
+      "calcul": "Calcul",
+      "vente": "Vente"
+    }
+  }
+}

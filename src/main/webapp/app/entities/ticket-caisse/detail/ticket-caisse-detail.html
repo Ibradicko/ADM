@@ -1,0 +1,56 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ticketCaisse(); as ticketCaisseRef) {
+      <div>
+        <h2 data-cy="ticketCaisseDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.ticketCaisse.detail.title">Ticket Caisse</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ticketCaisseRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.numero">Numero</span></dt>
+          <dd>
+            <span>{{ ticketCaisseRef.numero }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.dateEmission">Date Emission</span></dt>
+          <dd>
+            <span>{{ ticketCaisseRef.dateEmission | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.nombreImpressions">Nombre Impressions</span></dt>
+          <dd>
+            <span>{{ ticketCaisseRef.nombreImpressions }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.contenu">Contenu</span></dt>
+          <dd>
+            <span>{{ ticketCaisseRef.contenu }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.vente">Vente</span></dt>
+          <dd>
+            @if (ticketCaisse()!.vente) {
+              <div>
+                <a [routerLink]="['/vente', ticketCaisse()!.vente?.id, 'view']">{{ ticketCaisseRef.vente?.numeroTicket }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ticket-caisse', ticketCaisseRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

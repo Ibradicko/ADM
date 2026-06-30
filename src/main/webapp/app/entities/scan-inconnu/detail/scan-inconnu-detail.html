@@ -1,0 +1,70 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (scanInconnu(); as scanInconnuRef) {
+      <div>
+        <h2 data-cy="scanInconnuDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.scanInconnu.detail.title">Scan Inconnu</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ scanInconnuRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.codeScanne">Code Scanne</span></dt>
+          <dd>
+            <span>{{ scanInconnuRef.codeScanne }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.ecranOrigine">Ecran Origine</span></dt>
+          <dd>
+            <span>{{ scanInconnuRef.ecranOrigine }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.dateScan">Date Scan</span></dt>
+          <dd>
+            <span>{{ scanInconnuRef.dateScan | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.commentaire">Commentaire</span></dt>
+          <dd>
+            <span>{{ scanInconnuRef.commentaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.resolu">Resolu</span></dt>
+          <dd>
+            <span>{{ scanInconnuRef.resolu }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.boutique">Boutique</span></dt>
+          <dd>
+            @if (scanInconnu()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', scanInconnu()!.boutique?.id, 'view']">{{ scanInconnuRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.produitAffecte">Produit Affecte</span></dt>
+          <dd>
+            @if (scanInconnu()!.produitAffecte) {
+              <div>
+                <a [routerLink]="['/produit', scanInconnu()!.produitAffecte?.id, 'view']">{{
+                  scanInconnuRef.produitAffecte?.designation
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/scan-inconnu', scanInconnuRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

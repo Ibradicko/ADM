@@ -1,0 +1,139 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-etiquette-produit-heading"
+        data-cy="EtiquetteProduitCreateUpdateHeading"
+        jhiTranslate="admSupervisionVentesApp.etiquetteProduit.home.createOrEditLabel"
+      >
+        Create or edit a Etiquette Produit
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let quantiteRef = editForm.get('quantite')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_quantite" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.quantite">Quantite</label>
+          <input type="number" class="form-control" name="quantite" id="field_quantite" data-cy="quantite" formControlName="quantite" />
+          @if (quantiteRef.invalid && (quantiteRef.dirty || quantiteRef.touched)) {
+            <div>
+              @if (editForm.get('quantite')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('quantite')?.errors?.min) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '1' }"
+                  >This field should be at least 1.</small
+                >
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('quantite')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let imprimeeRef = editForm.get('imprimee')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_imprimee" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.imprimee">Imprimee</label>
+          <input type="checkbox" class="form-check" name="imprimee" id="field_imprimee" data-cy="imprimee" formControlName="imprimee" />
+          @if (imprimeeRef.invalid && (imprimeeRef.dirty || imprimeeRef.touched)) {
+            <div>
+              @if (editForm.get('imprimee')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dateImpression" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.dateImpression"
+            >Date Impression</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_dateImpression"
+              data-cy="dateImpression"
+              type="datetime-local"
+              class="form-control"
+              name="dateImpression"
+              formControlName="dateImpression"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_produit" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.produit">Produit</label>
+          <select
+            class="form-control"
+            id="field_produit"
+            data-cy="produit"
+            name="produit"
+            formControlName="produit"
+            [compareWith]="compareProduit"
+          >
+            @if (!editForm.get('produit')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (produitOption of produitsSharedCollection(); track $index) {
+              <option [ngValue]="produitOption">{{ produitOption.designation }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['produit'])!.invalid && (editForm.get(['produit'])!.dirty || editForm.get(['produit'])!.touched)) {
+          <div>
+            @if (editForm.get(['produit'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_lot" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.lot">Lot</label>
+          <select class="form-control" id="field_lot" data-cy="lot" name="lot" formControlName="lot" [compareWith]="compareLotEtiquettes">
+            @if (!editForm.get('lot')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (lotEtiquettesOption of lotEtiquettesesSharedCollection(); track $index) {
+              <option [ngValue]="lotEtiquettesOption">{{ lotEtiquettesOption.reference }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['lot'])!.invalid && (editForm.get(['lot'])!.dirty || editForm.get(['lot'])!.touched)) {
+          <div>
+            @if (editForm.get(['lot'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

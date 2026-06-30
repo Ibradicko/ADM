@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (paiementVente(); as paiementVenteRef) {
+      <div>
+        <h2 data-cy="paiementVenteDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.paiementVente.detail.title">Paiement Vente</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ paiementVenteRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementVente.montant">Montant</span></dt>
+          <dd>
+            <span>{{ paiementVenteRef.montant }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementVente.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutPaiement.' + (paiementVenteRef.statut ?? 'null')">{{
+              { null: '', EN_ATTENTE: 'EN_ATTENTE', PARTIEL: 'PARTIEL', PAYE: 'PAYE', ANNULE: 'ANNULE' }[paiementVenteRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementVente.referencePaiement">Reference Paiement</span></dt>
+          <dd>
+            <span>{{ paiementVenteRef.referencePaiement }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementVente.datePaiement">Date Paiement</span></dt>
+          <dd>
+            <span>{{ paiementVenteRef.datePaiement | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementVente.vente">Vente</span></dt>
+          <dd>
+            @if (paiementVente()!.vente) {
+              <div>
+                <a [routerLink]="['/vente', paiementVente()!.vente?.id, 'view']">{{ paiementVenteRef.vente?.numeroTicket }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementVente.modePaiement">Mode Paiement</span></dt>
+          <dd>
+            @if (paiementVente()!.modePaiement) {
+              <div>
+                <a [routerLink]="['/mode-paiement-ref', paiementVente()!.modePaiement?.id, 'view']">{{
+                  paiementVenteRef.modePaiement?.libelle
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/paiement-vente', paiementVenteRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

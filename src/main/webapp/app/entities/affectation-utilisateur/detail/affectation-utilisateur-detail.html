@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (affectationUtilisateur(); as affectationUtilisateurRef) {
+      <div>
+        <h2 data-cy="affectationUtilisateurDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.detail.title">Affectation Utilisateur</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ affectationUtilisateurRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateDebut">Date Debut</span></dt>
+          <dd>
+            <span>{{ affectationUtilisateurRef.dateDebut | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateFin">Date Fin</span></dt>
+          <dd>
+            <span>{{ affectationUtilisateurRef.dateFin | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.actif">Actif</span></dt>
+          <dd>
+            <span>{{ affectationUtilisateurRef.actif }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.user">User</span></dt>
+          <dd>
+            <span>{{ affectationUtilisateurRef.user?.login }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.boutique">Boutique</span></dt>
+          <dd>
+            @if (affectationUtilisateur()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', affectationUtilisateur()!.boutique?.id, 'view']">{{
+                  affectationUtilisateurRef.boutique?.nom
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.profil">Profil</span></dt>
+          <dd>
+            @if (affectationUtilisateur()!.profil) {
+              <div>
+                <a [routerLink]="['/profil-metier', affectationUtilisateur()!.profil?.id, 'view']">{{
+                  affectationUtilisateurRef.profil?.code
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/affectation-utilisateur', affectationUtilisateurRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

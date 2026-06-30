@@ -1,0 +1,31 @@
+{
+  "admSupervisionVentesApp": {
+    "inventaireStock": {
+      "home": {
+        "title": "Inventaire Stocks",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Inventaire Stock",
+        "createOrEditLabel": "Create or edit a Inventaire Stock",
+        "notFound": "No Inventaire Stocks found"
+      },
+      "created": "A new Inventaire Stock is created with identifier {{ param }}",
+      "updated": "A Inventaire Stock is updated with identifier {{ param }}",
+      "deleted": "A Inventaire Stock is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Inventaire Stock {{ id }}?"
+      },
+      "detail": {
+        "title": "Inventaire Stock"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "typeInventaire": "Type Inventaire",
+      "statut": "Statut",
+      "dateDebut": "Date Debut",
+      "dateFin": "Date Fin",
+      "boutique": "Boutique",
+      "depot": "Depot",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

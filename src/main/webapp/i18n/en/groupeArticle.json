@@ -1,0 +1,27 @@
+{
+  "admSupervisionVentesApp": {
+    "groupeArticle": {
+      "home": {
+        "title": "Groupe Articles",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Groupe Article",
+        "createOrEditLabel": "Create or edit a Groupe Article",
+        "notFound": "No Groupe Articles found"
+      },
+      "created": "A new Groupe Article is created with identifier {{ param }}",
+      "updated": "A Groupe Article is updated with identifier {{ param }}",
+      "deleted": "A Groupe Article is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Groupe Article {{ id }}?"
+      },
+      "detail": {
+        "title": "Groupe Article"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libelle",
+      "statut": "Statut",
+      "boutique": "Boutique"
+    }
+  }
+}

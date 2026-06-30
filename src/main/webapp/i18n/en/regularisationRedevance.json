@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "regularisationRedevance": {
+      "home": {
+        "title": "Regularisation Redevances",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Regularisation Redevance",
+        "createOrEditLabel": "Create or edit a Regularisation Redevance",
+        "notFound": "No Regularisation Redevances found"
+      },
+      "created": "A new Regularisation Redevance is created with identifier {{ param }}",
+      "updated": "A Regularisation Redevance is updated with identifier {{ param }}",
+      "deleted": "A Regularisation Redevance is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Regularisation Redevance {{ id }}?"
+      },
+      "detail": {
+        "title": "Regularisation Redevance"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "montant": "Montant",
+      "motif": "Motif",
+      "dateRegularisation": "Date Regularisation",
+      "calcul": "Calcul"
+    }
+  }
+}

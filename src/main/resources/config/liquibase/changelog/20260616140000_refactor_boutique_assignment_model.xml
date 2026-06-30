@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20260616140000-1" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="boutique" columnName="email"/>
+        </preConditions>
+        <dropColumn tableName="boutique" columnName="email"/>
+    </changeSet>
+
+    <changeSet id="20260616140000-2" author="codex">
+        <sql>
+            DELETE FROM affectation_utilisateur
+            WHERE profil_id IN (SELECT id FROM profil_metier WHERE code = 'AGENT_STOCK');
+
+            DELETE FROM rel_profil_metier__permissions
+            WHERE profil_metier_id IN (SELECT id FROM profil_metier WHERE code = 'AGENT_STOCK');
+
+            DELETE FROM profil_metier
+            WHERE code = 'AGENT_STOCK';
+        </sql>
+    </changeSet>
+</databaseChangeLog>

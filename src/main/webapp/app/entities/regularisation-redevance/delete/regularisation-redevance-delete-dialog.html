@@ -1,0 +1,30 @@
+@if (regularisationRedevance) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(regularisationRedevance.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="regularisationRedevanceDeleteDialogHeading" jhiTranslate="entity.delete.title">
+        Confirm delete operation
+      </h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p
+        id="jhi-delete-regularisationRedevance-heading"
+        jhiTranslate="admSupervisionVentesApp.regularisationRedevance.delete.question"
+        [translateValues]="{ id: regularisationRedevance.id }"
+      >
+        Are you sure you want to delete Regularisation Redevance {{ regularisationRedevance.id }}?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+
+      <button id="jhi-confirm-delete-regularisationRedevance" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span jhiTranslate="entity.action.delete">Delete</span>
+      </button>
+    </div>
+  </form>
+}

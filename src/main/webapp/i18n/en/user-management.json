@@ -1,4 +1,15 @@
 {
+  "admSupervisionVentesApp": {
+    "adminUser": {
+      "login": "Login du gerant",
+      "firstName": "Prenom du gerant",
+      "lastName": "Nom du gerant",
+      "email": "Email du gerant",
+      "activated": "Compte actif",
+      "langKey": "Langue",
+      "authorities": "Roles techniques"
+    }
+  },
   "userManagement": {
     "home": {
       "title": "Users",

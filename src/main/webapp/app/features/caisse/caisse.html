@@ -1,0 +1,858 @@
+<section class="adm-page adm-caisse">
+  <div class="adm-page-header">
+    <div>
+      <h1 jhiTranslate="caisse.title">Poste caisse</h1>
+      <p jhiTranslate="caisse.subtitle">Encaissement rapide par scan, ajout au panier, multi-paiement et suivi SAV des tickets.</p>
+    </div>
+
+    <div class="adm-page-header__actions">
+      @if (permissionsUi.peutVoirArchivesTechniques()) {
+        <a class="adm-button adm-button--ghost" [routerLink]="['/vente']" jhiTranslate="caisse.actions.rawHistory">Historique brut</a>
+      }
+    </div>
+  </div>
+
+  @if (message(); as messageRef) {
+    <div
+      class="adm-inline-alert"
+      [class.adm-inline-alert--danger]="messageRef.type === 'danger'"
+      [class.adm-inline-alert--success]="messageRef.type === 'success'"
+      [class.adm-inline-alert--info]="messageRef.type === 'info'"
+    >
+      {{ messageRef.key | translate: messageRef.params }}
+      @if (scanInconnuAffectable()) {
+        <a class="adm-button adm-button--ghost" [routerLink]="['/produit']">
+          {{ 'caisse.actions.assignBarcode' | translate }}
+        </a>
+      }
+    </div>
+  }
+
+  @if (compteSansIdentifiant()) {
+    <div class="adm-inline-alert adm-inline-alert--danger" jhiTranslate="caisse.messages.accountWithoutId">
+      Le compte connecte n expose pas d identifiant utilisateur exploitable. Le ticket ne pourra pas etre valide tant que ce point n est pas
+      corrige.
+    </div>
+  }
+
+  @if (!permissionsUi.peutLireVentes()) {
+    <div class="adm-empty-state">
+      <strong jhiTranslate="caisse.accessDenied.title">Acces limite</strong>
+      <p jhiTranslate="caisse.accessDenied.text">Votre profil ne permet pas encore d utiliser le poste caisse.</p>
+    </div>
+  } @else {
+    <div class="adm-pos-tabs" role="tablist">
+      <button type="button" class="adm-pos-tab" [class.adm-pos-tab--active]="activeTab() === 'caisse'" (click)="activeTab.set('caisse')">
+        <fa-icon icon="cash-register" />
+        <span jhiTranslate="caisse.tabs.caisse">Caisse</span>
+      </button>
+      @if (peutVoirHistoriqueSav()) {
+        <button
+          type="button"
+          class="adm-pos-tab"
+          [class.adm-pos-tab--active]="activeTab() === 'historique'"
+          (click)="activeTab.set('historique')"
+        >
+          <fa-icon icon="search" />
+          <span jhiTranslate="caisse.tabs.historique">Historique &amp; SAV</span>
+          @if (venteSelectionneeId()) {
+            <span class="adm-pill adm-pill--dark">{{ venteSelectionnee()?.numeroTicket ?? '--' }}</span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (activeTab() === 'caisse') {
+      <div class="adm-pos-context">
+        <label class="adm-field">
+          <span jhiTranslate="caisse.fields.shopRequired">Boutique *</span>
+          <select class="adm-select" [ngModel]="boutiqueId()" (ngModelChange)="selectionnerBoutique($event ? +$event : null)">
+            <option [ngValue]="null" jhiTranslate="caisse.fields.select">Selectionner</option>
+            @for (boutique of boutiques(); track boutique.id) {
+              <option [value]="boutique.id">{{ boutique.nom }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="adm-field">
+          <span jhiTranslate="caisse.fields.tenantRequired">Locataire *</span>
+          <select class="adm-select" [ngModel]="locataireId()" (ngModelChange)="locataireId.set($event ? +$event : null)">
+            <option [ngValue]="null" jhiTranslate="caisse.fields.select">Selectionner</option>
+            @for (locataire of locatairesDisponibles(); track locataire.id) {
+              <option [value]="locataire.id">{{ locataire.nom }}</option>
+            }
+          </select>
+        </label>
+
+        <details class="adm-field">
+          <summary>{{ 'caisse.saleContext.moreInfo' | translate }}</summary>
+          <div class="adm-form-grid mt-3">
+            <label class="adm-field">
+              <span jhiTranslate="caisse.fields.passengerReference">Reference passager</span>
+              <input class="adm-input" type="text" [ngModel]="referencePassager()" (ngModelChange)="referencePassager.set($event)" />
+            </label>
+            <label class="adm-field">
+              <span jhiTranslate="caisse.fields.boardingPass">Carte d embarquement</span>
+              <input class="adm-input" type="text" [ngModel]="referenceCarte()" (ngModelChange)="referenceCarte.set($event)" />
+            </label>
+            <label class="adm-field adm-field--full">
+              <span jhiTranslate="caisse.fields.ticketComment">Commentaire de ticket</span>
+              <textarea
+                class="adm-input adm-input--textarea"
+                rows="2"
+                [ngModel]="commentaire()"
+                (ngModelChange)="commentaire.set($event)"
+              ></textarea>
+            </label>
+          </div>
+        </details>
+      </div>
+
+      <div class="adm-stats-grid adm-stats-grid--compact">
+        <article class="adm-stat-card">
+          <span jhiTranslate="caisse.stats.cartItems">Articles panier</span>
+          <strong>{{ panier().length }}</strong>
+        </article>
+        <article class="adm-stat-card">
+          <span jhiTranslate="caisse.stats.subtotal">Sous-total</span>
+          <strong>{{ formatMontant(sousTotal()) }}</strong>
+        </article>
+        <article class="adm-stat-card">
+          <span jhiTranslate="caisse.stats.enteredPayments">Paiements saisis</span>
+          <strong>{{ formatMontant(totalPaiements()) }}</strong>
+        </article>
+        <article class="adm-stat-card">
+          <span jhiTranslate="caisse.stats.remaining">Reste a payer</span>
+          <strong>{{ formatMontant(resteAPayer()) }}</strong>
+        </article>
+      </div>
+
+      <div class="adm-pos-layout">
+        <div class="adm-pos-main">
+          <article class="adm-card adm-caisse-panel">
+            <div class="adm-caisse-scan-row">
+              <label class="adm-search adm-search--panel adm-caisse-scan-input">
+                <fa-icon icon="barcode" />
+                <input
+                  type="text"
+                  [ngModel]="scanInput()"
+                  (ngModelChange)="scanInput.set($event)"
+                  (keyup.enter)="traiterScan()"
+                  [placeholder]="'caisse.placeholders.scanCode' | translate"
+                />
+              </label>
+
+              <button type="button" class="adm-button adm-button--primary" (click)="traiterScan()" jhiTranslate="caisse.actions.addByScan">
+                Ajouter par scan
+              </button>
+            </div>
+
+            <label class="adm-search adm-search--panel mt-3">
+              <fa-icon icon="search" />
+              <input
+                type="search"
+                [ngModel]="rechercheProduit()"
+                (ngModelChange)="rechercheProduit.set($event)"
+                [placeholder]="'caisse.placeholders.searchProduct' | translate"
+              />
+            </label>
+          </article>
+
+          <div class="adm-pos-categories">
+            <button
+              type="button"
+              class="adm-pos-category"
+              [class.adm-pos-category--active]="categorieActive() === null"
+              (click)="categorieActive.set(null)"
+            >
+              {{ 'caisse.categories.all' | translate }}
+            </button>
+            @for (categorie of categories(); track categorie.id) {
+              <button
+                type="button"
+                class="adm-pos-category"
+                [class.adm-pos-category--active]="categorieActive() === categorie.id"
+                (click)="categorieActive.set(categorie.id)"
+              >
+                {{ categorie.libelle }}
+              </button>
+            }
+          </div>
+
+          @if (produitsGrille().length === 0) {
+            <div class="adm-empty-inline" jhiTranslate="caisse.empty.noProductMatch">
+              Aucun produit actif ne correspond a la recherche en cours.
+            </div>
+          } @else {
+            <div class="adm-pos-grid">
+              @for (produit of produitsGrille(); track produit.id) {
+                <button type="button" class="adm-pos-tile" (click)="ajouterProduitDepuisRecherche(produit)">
+                  <div>
+                    <strong>{{ formatValeur(produit.designation) }}</strong>
+                    <small>{{ formatValeur(produit.codeInterne) }}</small>
+                  </div>
+                  <span class="adm-pos-tile__price">{{ formatMontant(produit.prixVente) }}</span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="adm-pos-sidebar">
+          <article class="adm-card adm-caisse-panel">
+            <div class="adm-card__header">
+              <div>
+                <h2 jhiTranslate="caisse.currentTicket.title">Ticket courant</h2>
+              </div>
+              <span
+                class="adm-pill adm-pill--primary"
+                jhiTranslate="caisse.currentTicket.lineCount"
+                [translateValues]="{ count: panier().length }"
+                >{{ panier().length }} lignes</span
+              >
+            </div>
+
+            @if (panier().length === 0) {
+              <div class="adm-empty-state">
+                <strong jhiTranslate="caisse.currentTicket.emptyTitle">Le panier est vide</strong>
+                <p jhiTranslate="caisse.currentTicket.emptyText">
+                  Scannez un produit ou ajoutez-le depuis la grille pour commencer la vente.
+                </p>
+              </div>
+            } @else {
+              <div class="adm-caisse-cart">
+                @for (ligne of panier(); track ligne.produit.id) {
+                  <div class="adm-caisse-cart-row">
+                    <div class="adm-caisse-cart-row__info">
+                      <strong>{{ formatValeur(ligne.produit.designation) }}</strong>
+                      <small>
+                        {{ formatValeur(ligne.produit.codeInterne) }}
+                        @if (ligne.codeBarresScanne) {
+                          - {{ 'caisse.scan.short' | translate }} {{ ligne.codeBarresScanne }}
+                        }
+                      </small>
+                    </div>
+
+                    <div class="adm-caisse-cart-row__qty">
+                      <button type="button" class="adm-icon-button" (click)="decrementerQuantite(ligne.produit.id)">
+                        <fa-icon icon="times" />
+                      </button>
+                      <span>{{ ligne.quantite }}</span>
+                      <button type="button" class="adm-icon-button" (click)="incrementerQuantite(ligne.produit.id)">
+                        <fa-icon icon="plus" />
+                      </button>
+                    </div>
+
+                    <div class="adm-caisse-cart-row__amount">
+                      <strong>{{ formatMontant((ligne.produit.prixVente ?? 0) * ligne.quantite) }}</strong>
+                      <button
+                        type="button"
+                        class="adm-link-button"
+                        (click)="retirerProduit(ligne.produit.id)"
+                        jhiTranslate="caisse.actions.remove"
+                      >
+                        Retirer
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="adm-caisse-totaux">
+              <div>
+                <span jhiTranslate="caisse.stats.subtotal">Sous-total</span>
+                <strong>{{ formatMontant(sousTotal()) }}</strong>
+              </div>
+              <div>
+                <span jhiTranslate="caisse.stats.discount">Remise</span>
+                <strong>{{ formatMontant(totalRemise()) }}</strong>
+              </div>
+              <div>
+                <span jhiTranslate="caisse.stats.netTotal">Total net</span>
+                <strong>{{ formatMontant(totalNet()) }}</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="adm-card adm-caisse-panel">
+            <div class="adm-card__header">
+              <div>
+                <h2 jhiTranslate="caisse.payments.title">Paiements</h2>
+              </div>
+
+              @if (permissionsUi.peutGererVentes()) {
+                <button
+                  type="button"
+                  class="adm-button adm-button--ghost"
+                  (click)="ajouterPaiement()"
+                  jhiTranslate="caisse.actions.addPaymentMode"
+                >
+                  Ajouter un mode
+                </button>
+              }
+            </div>
+
+            <div class="adm-caisse-paiements">
+              @for (paiement of paiements(); track paiement.uid) {
+                <div class="adm-caisse-paiement-row">
+                  <label class="adm-field">
+                    <span jhiTranslate="caisse.fields.paymentMode">Mode</span>
+                    <select
+                      class="adm-select"
+                      [ngModel]="paiement.modePaiementId"
+                      (ngModelChange)="mettreAJourPaiement(paiement.uid, 'modePaiementId', $event ? +$event : null)"
+                    >
+                      <option [ngValue]="null" jhiTranslate="caisse.fields.select">Selectionner</option>
+                      @for (mode of modesPaiementActifs(); track mode.id) {
+                        <option [value]="mode.id">{{ mode.libelle }}</option>
+                      }
+                    </select>
+                  </label>
+
+                  <label class="adm-field">
+                    <span jhiTranslate="caisse.fields.amount">Montant</span>
+                    <input
+                      class="adm-input"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      [ngModel]="paiement.montant"
+                      (ngModelChange)="mettreAJourPaiement(paiement.uid, 'montant', $event === '' ? null : +$event)"
+                      placeholder="0"
+                    />
+                    <button type="button" class="adm-link-button mt-1" (click)="solderPaiement(paiement.uid)">Solder le reste</button>
+                  </label>
+
+                  <label class="adm-field">
+                    <span jhiTranslate="caisse.fields.reference">Reference</span>
+                    <input
+                      class="adm-input"
+                      type="text"
+                      [ngModel]="paiement.reference"
+                      (ngModelChange)="mettreAJourPaiement(paiement.uid, 'reference', $event)"
+                      [placeholder]="'caisse.placeholders.paymentReference' | translate"
+                    />
+                  </label>
+
+                  <div class="adm-caisse-paiement-row__actions">
+                    <button type="button" class="adm-icon-button adm-icon-button--danger" (click)="supprimerPaiement(paiement.uid)">
+                      <fa-icon icon="trash-alt" />
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="adm-caisse-totaux adm-caisse-totaux--paiement">
+              <div>
+                <span jhiTranslate="caisse.stats.enteredTotal">Total saisi</span>
+                <strong>{{ formatMontant(totalPaiements()) }}</strong>
+              </div>
+              <div>
+                <span jhiTranslate="caisse.stats.remaining">Reste a payer</span>
+                <strong [class.text-danger]="resteAPayer() > 0">{{ formatMontant(resteAPayer()) }}</strong>
+              </div>
+            </div>
+
+            @if (permissionsUi.peutGererVentes()) {
+              <button
+                type="button"
+                class="adm-button adm-button--primary adm-button--lg adm-pos-validate"
+                (click)="ouvrirValidationTicket()"
+                [disabled]="!peutValider() || enregistrement()"
+              >
+                <fa-icon [icon]="enregistrement() ? 'sync' : 'cash-register'" [animation]="enregistrement() ? 'spin' : undefined" />
+                <span>{{ (enregistrement() ? 'caisse.actions.validating' : 'caisse.actions.validateTicket') | translate }}</span>
+              </button>
+            }
+          </article>
+
+          @if (ticketGenere(); as ticket) {
+            <article class="adm-card adm-caisse-panel">
+              <div class="adm-card__header">
+                <div>
+                  <h2 jhiTranslate="caisse.generatedTicket.title">Dernier ticket genere</h2>
+                </div>
+              </div>
+              <div class="adm-caisse-ticket">
+                <div class="adm-caisse-ticket__meta">
+                  <strong>{{ ticket.numero }}</strong>
+                  <small>{{ ticket.dateEmission?.format('DD/MM/YYYY HH:mm') ?? '--' }}</small>
+                </div>
+                <pre>{{ ticket.contenu }}</pre>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+
+    @if (activeTab() === 'historique' && peutVoirHistoriqueSav()) {
+      <article class="adm-card adm-card--table">
+        <div class="adm-card__header">
+          <div>
+            <h2 jhiTranslate="caisse.history.title">Historique, retours et annulations</h2>
+            <p jhiTranslate="caisse.history.subtitle">
+              Selectionnez une vente pour consulter son detail, reimprimer le ticket ou traiter un SAV.
+            </p>
+          </div>
+        </div>
+
+        <div class="adm-toolbar">
+          <label class="adm-search adm-search--panel">
+            <fa-icon icon="search" />
+            <input
+              type="search"
+              [ngModel]="rechercheHistorique()"
+              (ngModelChange)="rechercheHistorique.set($event)"
+              [placeholder]="'caisse.placeholders.searchHistory' | translate"
+            />
+          </label>
+
+          <div class="adm-toolbar__filters">
+            <label class="adm-field">
+              <span jhiTranslate="caisse.fields.status">Statut</span>
+              <select class="adm-select" [ngModel]="statutHistorique()" (ngModelChange)="statutHistorique.set($event)">
+                <option value="TOUS" jhiTranslate="caisse.statuses.sale.TOUS">Tous</option>
+                <option value="VALIDEE" jhiTranslate="caisse.statuses.sale.VALIDEE">Validee</option>
+                <option value="BROUILLON" jhiTranslate="caisse.statuses.sale.BROUILLON">Brouillon</option>
+                <option value="ANNULEE" jhiTranslate="caisse.statuses.sale.ANNULEE">Annulee</option>
+                <option value="RETOURNEE" jhiTranslate="caisse.statuses.sale.RETOURNEE">Retournee</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="adm-form-layout">
+          <div class="adm-form-layout__main">
+            <div class="adm-table-wrapper">
+              <table class="adm-data-table">
+                <thead>
+                  <tr>
+                    <th jhiTranslate="caisse.history.columns.ticket">Ticket</th>
+                    <th jhiTranslate="caisse.history.columns.date">Date</th>
+                    <th jhiTranslate="caisse.history.columns.shop">Boutique</th>
+                    <th jhiTranslate="caisse.history.columns.tenant">Locataire</th>
+                    <th jhiTranslate="caisse.history.columns.netTotal">Total net</th>
+                    <th jhiTranslate="caisse.history.columns.status">Statut</th>
+                    <th jhiTranslate="caisse.history.columns.actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (vente of ventesHistoriqueFiltrees(); track vente.id) {
+                    <tr [class.adm-data-table__row--selected]="vente.id === venteSelectionneeId()">
+                      <td class="adm-code">{{ vente.numeroTicket ?? '--' }}</td>
+                      <td>{{ vente.dateHeure?.format('DD/MM/YYYY HH:mm') ?? '--' }}</td>
+                      <td>{{ vente.boutique?.nom ?? '--' }}</td>
+                      <td>{{ vente.locataire?.nom ?? '--' }}</td>
+                      <td>{{ formatMontant(vente.montantNet) }}</td>
+                      <td>
+                        <span
+                          class="adm-pill"
+                          [class.adm-pill--success]="vente.statut === 'VALIDEE'"
+                          [class.adm-pill--warning]="vente.statut === 'BROUILLON'"
+                          [class.adm-pill--danger]="vente.statut === 'ANNULEE' || vente.statut === 'RETOURNEE'"
+                        >
+                          {{ statutVenteLabelKey(vente.statut) | translate }}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="adm-inline-actions">
+                          <button
+                            type="button"
+                            class="adm-link-button"
+                            (click)="selectionnerVenteHistorique(vente.id)"
+                            jhiTranslate="entity.action.open"
+                          >
+                            Ouvrir
+                          </button>
+                          <button
+                            type="button"
+                            class="adm-link-button"
+                            (click)="reimprimerTicketSelectionne()"
+                            [disabled]="
+                              !permissionsUi.peutGererVentes() ||
+                              vente.id !== venteSelectionneeId() ||
+                              actionHistorique() === 'reimpression'
+                            "
+                          >
+                            {{ 'caisse.actions.reprint' | translate }}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="adm-form-layout__aside">
+            @if (venteSelectionnee(); as venteDetail) {
+              <article class="adm-card">
+                <div class="adm-card__header">
+                  <div>
+                    <h2 jhiTranslate="caisse.ticketDetail.title">Detail ticket</h2>
+                    <p>{{ venteDetail.numeroTicket ?? '--' }} - {{ venteDetail.dateHeure?.format('DD/MM/YYYY HH:mm') ?? '--' }}</p>
+                  </div>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="venteDetail.statut === 'VALIDEE'"
+                    [class.adm-pill--warning]="venteDetail.statut === 'BROUILLON'"
+                    [class.adm-pill--danger]="venteDetail.statut === 'ANNULEE' || venteDetail.statut === 'RETOURNEE'"
+                  >
+                    {{ statutVenteLabelKey(venteDetail.statut) | translate }}
+                  </span>
+                </div>
+
+                <div class="adm-detail-grid">
+                  <div class="adm-detail-block">
+                    <span class="adm-detail-block__label" jhiTranslate="caisse.fields.shop">Boutique</span>
+                    <strong>{{ venteDetail.boutique?.nom ?? '--' }}</strong>
+                  </div>
+                  <div class="adm-detail-block">
+                    <span class="adm-detail-block__label" jhiTranslate="caisse.fields.tenant">Locataire</span>
+                    <strong>{{ venteDetail.locataire?.nom ?? '--' }}</strong>
+                  </div>
+                  <div class="adm-detail-block">
+                    <span class="adm-detail-block__label" jhiTranslate="caisse.fields.netAmount">Montant net</span>
+                    <strong>{{ formatMontant(venteDetail.montantNet) }}</strong>
+                  </div>
+                  <div class="adm-detail-block">
+                    <span class="adm-detail-block__label" jhiTranslate="caisse.fields.seller">Vendeur</span>
+                    <strong>{{ venteDetail.vendeur?.login ?? '--' }}</strong>
+                  </div>
+                </div>
+
+                <div class="adm-action-stack">
+                  <button
+                    type="button"
+                    class="adm-button adm-button--ghost adm-button--block"
+                    (click)="reimprimerTicketSelectionne()"
+                    [disabled]="!permissionsUi.peutGererVentes() || actionHistorique() === 'reimpression'"
+                  >
+                    {{ (actionHistorique() === 'reimpression' ? 'caisse.actions.reprinting' : 'caisse.actions.reprintTicket') | translate }}
+                  </button>
+                  <button type="button" class="adm-button adm-button--ghost adm-button--block" (click)="ouvrirModalTicket()">
+                    {{ 'caisse.actions.viewTicketLarge' | translate }}
+                  </button>
+                  <button
+                    type="button"
+                    class="adm-button adm-button--ghost adm-button--block"
+                    (click)="retournerVenteSelectionnee()"
+                    [disabled]="!permissionsUi.peutGererVentes() || !peutRetourSelection() || actionHistorique() === 'retour'"
+                  >
+                    {{ (actionHistorique() === 'retour' ? 'caisse.actions.processing' : 'caisse.actions.registerReturn') | translate }}
+                  </button>
+                  <button
+                    type="button"
+                    class="adm-button adm-button--primary adm-button--block"
+                    (click)="annulerVenteSelectionnee()"
+                    [disabled]="!permissionsUi.peutGererVentes() || !peutAnnulerSelection() || actionHistorique() === 'annulation'"
+                  >
+                    {{ (actionHistorique() === 'annulation' ? 'caisse.actions.cancelling' : 'caisse.actions.cancelSale') | translate }}
+                  </button>
+                </div>
+              </article>
+
+              <article class="adm-card">
+                <div class="adm-card__header">
+                  <div>
+                    <h2 jhiTranslate="caisse.linesPayments.title">Lignes et paiements</h2>
+                    <p jhiTranslate="caisse.linesPayments.subtitle">Resume detaille des articles et du reglement.</p>
+                  </div>
+                </div>
+
+                <div class="adm-list-panel">
+                  @for (ligne of lignesVenteSelectionnee(); track ligne.id) {
+                    <div class="adm-list-panel__row">
+                      <div>
+                        <strong>{{ ligne.produit?.designation ?? '--' }}</strong>
+                        <small>{{ 'caisse.fields.quantity' | translate }} {{ ligne.quantite ?? 0 }}</small>
+                      </div>
+                      <div class="text-end">
+                        <strong>{{ formatMontant(ligne.montantLigne) }}</strong>
+                        <small>{{ ligne.codeBarresScanne ?? ('caisse.scan.noScan' | translate) }}</small>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="adm-list-panel">
+                  @for (paiement of paiementsVenteSelectionnee(); track paiement.id) {
+                    <div class="adm-list-panel__row">
+                      <div>
+                        <strong>{{ paiement.modePaiement?.libelle ?? '--' }}</strong>
+                        <small>{{ paiement.referencePaiement ?? ('caisse.empty.noReference' | translate) }}</small>
+                      </div>
+                      <div class="text-end">
+                        <strong>{{ formatMontant(paiement.montant) }}</strong>
+                        <small>{{ statutPaiementLabelKey(paiement.statut) | translate }}</small>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </article>
+
+              @if (operationsVenteSelectionnee().length > 0) {
+                <article class="adm-card">
+                  <div class="adm-card__header">
+                    <div>
+                      <h2 jhiTranslate="caisse.corrections.title">Corrections enregistrees</h2>
+                      <p jhiTranslate="caisse.corrections.subtitle">Historique des retours, annulations et ajustements.</p>
+                    </div>
+                  </div>
+
+                  <div class="adm-list-panel">
+                    @for (operation of operationsVenteSelectionnee(); track operation.id) {
+                      <div class="adm-list-panel__row">
+                        <div>
+                          <strong>{{ operation.typeOperation ?? '--' }}</strong>
+                          <small>{{ operation.motif ?? '--' }}</small>
+                        </div>
+                        <div class="text-end">
+                          <strong>{{ formatMontant(operation.montantImpact) }}</strong>
+                          <small>{{ operation.dateOperation?.format('DD/MM/YYYY HH:mm') ?? '--' }}</small>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+
+              @if (ticketVenteSelectionnee(); as ticketSelectionne) {
+                <article class="adm-card">
+                  <div class="adm-card__header">
+                    <div>
+                      <h2 jhiTranslate="caisse.ticketPreview.title">Apercu ticket</h2>
+                      <p jhiTranslate="caisse.ticketPreview.subtitle">Version la plus recente de ce ticket.</p>
+                    </div>
+                  </div>
+
+                  <div class="adm-caisse-ticket">
+                    <div class="adm-caisse-ticket__meta">
+                      <strong>{{ ticketSelectionne.numero }}</strong>
+                      <small>{{ ticketSelectionne.dateEmission?.format('DD/MM/YYYY HH:mm') ?? '--' }}</small>
+                    </div>
+                    <pre>{{ ticketSelectionne.contenu }}</pre>
+                  </div>
+                </article>
+              }
+            } @else {
+              <div class="adm-empty-state">
+                <strong jhiTranslate="caisse.empty.noSelectedSaleTitle">Aucune vente selectionnee</strong>
+                <p jhiTranslate="caisse.empty.noSelectedSaleText">
+                  Choisissez un ticket dans l historique pour afficher son detail et lancer les actions SAV.
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+      </article>
+    }
+  }
+
+  @if (modalActif() === 'validation-ticket') {
+    <div class="adm-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="validation-ticket-title">
+      <div class="adm-modal-shell adm-modal-shell--wide">
+        <div class="adm-modal">
+          <div class="adm-modal__header">
+            <div>
+              <h2 id="validation-ticket-title" jhiTranslate="caisse.validation.title">Validation du ticket</h2>
+              <p jhiTranslate="caisse.validation.subtitle">Controle rapide avant enregistrement definitif de la vente.</p>
+            </div>
+            <button type="button" class="adm-icon-button" (click)="fermerModal()" [attr.aria-label]="'entity.action.close' | translate">
+              <fa-icon icon="times" />
+            </button>
+          </div>
+
+          <div class="adm-modal__body">
+            <div class="adm-review-grid">
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.fields.shop">Boutique</span>
+                <strong>{{ boutiqueSelectionnee()?.nom ?? '--' }}</strong>
+              </div>
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.fields.tenant">Locataire</span>
+                <strong>{{ locataireSelectionne()?.nom ?? '--' }}</strong>
+              </div>
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.fields.items">Articles</span>
+                <strong>{{ panier().length }}</strong>
+              </div>
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.stats.netTotal">Total net</span>
+                <strong>{{ formatMontant(totalNet()) }}</strong>
+              </div>
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.payments.title">Paiements</span>
+                <strong>{{ formatMontant(totalPaiements()) }}</strong>
+              </div>
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.stats.remainingShort">Reste</span>
+                <strong>{{ formatMontant(resteAPayer()) }}</strong>
+              </div>
+            </div>
+
+            <div class="adm-table-wrapper adm-table-wrapper--compact">
+              <table class="adm-data-table">
+                <thead>
+                  <tr>
+                    <th jhiTranslate="caisse.fields.product">Produit</th>
+                    <th jhiTranslate="caisse.fields.quantity">Quantite</th>
+                    <th jhiTranslate="caisse.fields.amount">Montant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (ligne of panier(); track ligne.produit.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ formatValeur(ligne.produit.designation) }}</strong>
+                        <small class="d-block text-muted">{{ formatValeur(ligne.produit.codeInterne) }}</small>
+                      </td>
+                      <td>{{ ligne.quantite }}</td>
+                      <td>{{ formatMontant((ligne.produit.prixVente ?? 0) * ligne.quantite) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="adm-inline-alert adm-inline-alert--info">
+              {{ 'caisse.validation.warning' | translate }}
+            </div>
+          </div>
+
+          <div class="adm-modal__footer">
+            <button type="button" class="adm-button adm-button--ghost" (click)="fermerModal()" jhiTranslate="entity.action.cancel">
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="adm-button adm-button--primary"
+              (click)="confirmerValidationTicket()"
+              [disabled]="enregistrement()"
+            >
+              {{ (enregistrement() ? 'caisse.actions.validatingShort' : 'caisse.actions.confirmValidation') | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (modalActif() === 'operation-historique') {
+    <div class="adm-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="operation-ticket-title">
+      <div class="adm-modal-shell">
+        <div class="adm-modal">
+          <div class="adm-modal__header">
+            <div>
+              <h2 id="operation-ticket-title">
+                {{
+                  (operationHistoriqueModal() === 'ANNULATION' ? 'caisse.actions.cancelSale' : 'caisse.actions.registerReturn') | translate
+                }}
+              </h2>
+              <p>{{ venteSelectionnee()?.numeroTicket ?? '--' }} - {{ 'caisse.operation.sensitiveLogged' | translate }}</p>
+            </div>
+            <button type="button" class="adm-icon-button" (click)="fermerModal()" [attr.aria-label]="'entity.action.close' | translate">
+              <fa-icon icon="times" />
+            </button>
+          </div>
+
+          <div class="adm-modal__body">
+            <div class="adm-review-grid adm-review-grid--two">
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.fields.netAmount">Montant net</span>
+                <strong>{{ formatMontant(venteSelectionnee()?.montantNet) }}</strong>
+              </div>
+              <div class="adm-review-item">
+                <span jhiTranslate="caisse.fields.currentStatus">Statut actuel</span>
+                <strong>{{ statutVenteLabelKey(venteSelectionnee()?.statut) | translate }}</strong>
+              </div>
+            </div>
+
+            <label class="adm-field">
+              <span jhiTranslate="caisse.fields.requiredReason">Motif obligatoire</span>
+              <textarea
+                class="adm-input adm-input--textarea"
+                rows="4"
+                [ngModel]="motifOperationHistorique()"
+                (ngModelChange)="motifOperationHistorique.set($event)"
+                [placeholder]="'caisse.placeholders.auditReason' | translate"
+              ></textarea>
+            </label>
+
+            <div class="adm-inline-alert adm-inline-alert--warning">
+              {{ 'caisse.operation.warning' | translate }}
+            </div>
+          </div>
+
+          <div class="adm-modal__footer">
+            <button type="button" class="adm-button adm-button--ghost" (click)="fermerModal()" jhiTranslate="entity.action.cancel">
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="adm-button adm-button--primary"
+              (click)="confirmerOperationHistorique()"
+              [disabled]="!!actionHistorique()"
+              jhiTranslate="caisse.actions.confirm"
+            >
+              Confirmer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (modalActif() === 'apercu-ticket') {
+    <div class="adm-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="ticket-preview-title">
+      <div class="adm-modal-shell adm-modal-shell--wide">
+        <div class="adm-modal">
+          <div class="adm-modal__header">
+            <div>
+              <h2 id="ticket-preview-title" jhiTranslate="caisse.ticketPreview.modalTitle">Apercu du ticket</h2>
+              <p>{{ venteSelectionnee()?.numeroTicket ?? '--' }}</p>
+            </div>
+            <button type="button" class="adm-icon-button" (click)="fermerModal()" [attr.aria-label]="'entity.action.close' | translate">
+              <fa-icon icon="times" />
+            </button>
+          </div>
+
+          <div class="adm-modal__body">
+            @if (ticketVenteSelectionnee(); as ticketSelectionne) {
+              <div class="adm-caisse-ticket adm-caisse-ticket--large">
+                <div class="adm-caisse-ticket__meta">
+                  <strong>{{ ticketSelectionne.numero }}</strong>
+                  <small>{{ ticketSelectionne.dateEmission?.format('DD/MM/YYYY HH:mm') ?? '--' }}</small>
+                </div>
+                <pre>{{ ticketSelectionne.contenu }}</pre>
+              </div>
+            } @else {
+              <div class="adm-empty-state">
+                <strong jhiTranslate="caisse.empty.noTicketTitle">Aucun ticket disponible</strong>
+                <p jhiTranslate="caisse.empty.noTicketText">Lancez une reimpression pour regenerer le ticket de cette vente.</p>
+              </div>
+            }
+          </div>
+
+          <div class="adm-modal__footer">
+            <button type="button" class="adm-button adm-button--ghost" (click)="fermerModal()" jhiTranslate="entity.action.close">
+              Fermer
+            </button>
+            <button
+              type="button"
+              class="adm-button adm-button--primary"
+              (click)="reimprimerTicketSelectionne()"
+              [disabled]="actionHistorique() === 'reimpression'"
+            >
+              {{ (actionHistorique() === 'reimpression' ? 'caisse.actions.reprinting' : 'caisse.actions.reprint') | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</section>

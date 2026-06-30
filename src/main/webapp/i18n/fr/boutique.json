@@ -1,0 +1,33 @@
+{
+  "admSupervisionVentesApp": {
+    "boutique": {
+      "home": {
+        "title": "Boutiques",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Creer une nouvelle boutique",
+        "createOrEditLabel": "Creer ou modifier une boutique",
+        "notFound": "Aucune boutique trouvee"
+      },
+      "created": "Une nouvelle boutique est creee avec l'identifiant {{ param }}",
+      "createdWithNewManager": "La boutique {{ param }} est creee. Un compte gerant a ete cree et devra changer son mot de passe a la premiere connexion.",
+      "createdWithExistingManager": "La boutique {{ param }} est creee et rattachee au compte gerant existant.",
+      "updated": "La boutique {{ param }} est mise a jour.",
+      "deleted": "La boutique {{ param }} est supprimee.",
+      "delete": {
+        "question": "Voulez-vous vraiment supprimer la boutique {{ id }} ?"
+      },
+      "detail": {
+        "title": "Boutique"
+      },
+      "id": "ID",
+      "code": "Code",
+      "nom": "Nom",
+      "type": "Type",
+      "emplacement": "Emplacement",
+      "telephone": "Telephone",
+      "email": "Email",
+      "statut": "Statut",
+      "dateCreation": "Date de creation"
+    }
+  }
+}

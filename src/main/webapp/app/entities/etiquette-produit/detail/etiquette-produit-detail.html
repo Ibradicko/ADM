@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (etiquetteProduit(); as etiquetteProduitRef) {
+      <div>
+        <h2 data-cy="etiquetteProduitDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.detail.title">Etiquette Produit</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ etiquetteProduitRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.quantite">Quantite</span></dt>
+          <dd>
+            <span>{{ etiquetteProduitRef.quantite }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.imprimee">Imprimee</span></dt>
+          <dd>
+            <span>{{ etiquetteProduitRef.imprimee }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.dateImpression">Date Impression</span></dt>
+          <dd>
+            <span>{{ etiquetteProduitRef.dateImpression | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.produit">Produit</span></dt>
+          <dd>
+            @if (etiquetteProduit()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', etiquetteProduit()!.produit?.id, 'view']">{{ etiquetteProduitRef.produit?.designation }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.lot">Lot</span></dt>
+          <dd>
+            @if (etiquetteProduit()!.lot) {
+              <div>
+                <a [routerLink]="['/lot-etiquettes', etiquetteProduit()!.lot?.id, 'view']">{{ etiquetteProduitRef.lot?.reference }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/etiquette-produit', etiquetteProduitRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

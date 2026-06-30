@@ -1,0 +1,153 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="ScanInconnuHeading">
+    <div>
+      <h1>Scans inconnus</h1>
+      <p>Suivi des codes non reconnus et resolution par boutique, ecran d'origine ou produit rattache.</p>
+    </div>
+
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+
+      <a class="adm-button adm-button--primary" [routerLink]="['/scan-inconnu/new']">
+        <fa-icon icon="plus" />
+        <span>Nouveau scan</span>
+      </a>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="adm-stats-grid adm-stats-grid--compact">
+    <article class="adm-stat-card">
+      <span>Total scans</span>
+      <strong>{{ scanInconnus().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>A traiter</span>
+      <strong>{{ totalOuverts() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Resolus</span>
+      <strong>{{ totalResolus() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Boutiques impactees</span>
+      <strong>{{ boutiquesDisponibles().length }}</strong>
+    </article>
+  </div>
+
+  <section class="adm-toolbar" aria-label="Filtres scans inconnus">
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Rechercher un code, une boutique, un commentaire..."
+      />
+    </label>
+
+    <div class="adm-toolbar__filters">
+      <label class="adm-field">
+        <span>Resolution</span>
+        <select class="adm-select" [ngModel]="selectedResolution()" (ngModelChange)="selectedResolution.set($event)">
+          <option value="ALL">Tous</option>
+          <option value="OPEN">A traiter</option>
+          <option value="DONE">Resolus</option>
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span>Boutique</span>
+        <select class="adm-select" [ngModel]="selectedBoutique()" (ngModelChange)="selectedBoutique.set($event)">
+          <option value="ALL">Toutes</option>
+          @for (boutique of boutiquesDisponibles(); track boutique.id) {
+            <option [value]="boutique.id">{{ boutique.nom }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span>Ecran</span>
+        <select class="adm-select" [ngModel]="selectedOrigin()" (ngModelChange)="selectedOrigin.set($event)">
+          <option value="ALL">Tous</option>
+          @for (origine of originesDisponibles(); track origine) {
+            <option [value]="origine">{{ origine }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="button" class="adm-button adm-button--ghost" (click)="reinitialiserFiltres()">Reinitialiser</button>
+    </div>
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Journal des scans</h2>
+        <p>Codes a resoudre et contexte de capture pour accelerer le traitement catalogue.</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ scansFiltres().length }} affiches</span>
+    </div>
+
+    @if (scansFiltres().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun scan inconnu ne correspond aux criteres selectionnes</strong>
+        <p>Essayez un autre filtre ou rechargez les donnees si un scan vient d'etre remonte.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="codeScanne">Code scanne <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="ecranOrigine">Ecran <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateScan">Date scan <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="produitAffecte.designation">Produit affecte <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="resolu">Etat <fa-icon icon="sort" /></th>
+              <th scope="col">Commentaire</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (scanInconnu of scansFiltres(); track trackId(scanInconnu); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ formatValeur(scanInconnu.codeScanne) }}</span>
+                </td>
+                <td>{{ formatValeur(scanInconnu.ecranOrigine) }}</td>
+                <td>{{ scanInconnu.dateScan | formatMediumDatetime }}</td>
+                <td>{{ formatValeur(scanInconnu.boutique?.nom) }}</td>
+                <td>{{ formatValeur(scanInconnu.produitAffecte?.designation) }}</td>
+                <td>
+                  <span class="adm-pill" [class.adm-pill--success]="scanInconnu.resolu" [class.adm-pill--warning]="!scanInconnu.resolu">
+                    {{ scanInconnu.resolu ? 'Resolue' : 'A traiter' }}
+                  </span>
+                </td>
+                <td>{{ formatValeur(scanInconnu.commentaire) }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/scan-inconnu', scanInconnu.id, 'view']" class="adm-icon-button" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    <a [routerLink]="['/scan-inconnu', scanInconnu.id, 'edit']" class="adm-icon-button" title="Modifier">
+                      <fa-icon icon="pencil-alt" />
+                    </a>
+                    <button type="button" class="adm-icon-button adm-icon-button--danger" title="Supprimer" (click)="delete(scanInconnu)">
+                      <fa-icon icon="times" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

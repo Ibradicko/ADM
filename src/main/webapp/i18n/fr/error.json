@@ -1,0 +1,14 @@
+{
+  "error": {
+    "title": "Page d'erreur",
+    "http": {
+      "400": "Requete incorrecte.",
+      "403": "Vous n'etes pas autorise a acceder a cette page.",
+      "404": "La page demandee n'existe pas.",
+      "405": "La methode HTTP utilisee n'est pas autorisee pour cette URL.",
+      "500": "Erreur interne du serveur."
+    },
+    "concurrencyFailure": "Un autre utilisateur a modifie ces donnees en meme temps. Vos modifications ont ete rejetees.",
+    "validation": "Erreur de validation cote serveur."
+  }
+}

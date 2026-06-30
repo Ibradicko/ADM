@@ -1,0 +1,52 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (parametreCodeBarres(); as parametreCodeBarresRef) {
+      <div>
+        <h2 data-cy="parametreCodeBarresDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.detail.title">Parametre Code Barres</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ parametreCodeBarresRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.formatParDefaut">Format Par Defaut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypeCodeBarres.' + (parametreCodeBarresRef.formatParDefaut ?? 'null')">{{
+              { null: '', EAN13: 'EAN13', EAN8: 'EAN8', CODE128: 'CODE128', QR_CODE: 'QR_CODE', INTERNE: 'INTERNE' }[
+                parametreCodeBarresRef.formatParDefaut ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.prefixe">Prefixe</span></dt>
+          <dd>
+            <span>{{ parametreCodeBarresRef.prefixe }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.longueur">Longueur</span></dt>
+          <dd>
+            <span>{{ parametreCodeBarresRef.longueur }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.actif">Actif</span></dt>
+          <dd>
+            <span>{{ parametreCodeBarresRef.actif }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/parametre-code-barres', parametreCodeBarresRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -4,7 +4,10 @@ import static com.adm.supervision.security.SecurityUtils.AUTHORITIES_CLAIM;
 import static com.adm.supervision.security.SecurityUtils.JWT_ALGORITHM;
 import static com.adm.supervision.security.SecurityUtils.USER_ID_CLAIM;
 
+import com.adm.supervision.domain.enumeration.TypeActionAudit;
+import com.adm.supervision.repository.UserRepository;
 import com.adm.supervision.security.DomainUserDetailsService.UserWithId;
+import com.adm.supervision.service.JournalAuditService;
 import com.adm.supervision.web.rest.vm.LoginVM;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
@@ -48,9 +51,20 @@ public class AuthenticateController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public AuthenticateController(JwtEncoder jwtEncoder, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    private final JournalAuditService journalAuditService;
+
+    private final UserRepository userRepository;
+
+    public AuthenticateController(
+        JwtEncoder jwtEncoder,
+        AuthenticationManagerBuilder authenticationManagerBuilder,
+        JournalAuditService journalAuditService,
+        UserRepository userRepository
+    ) {
         this.jwtEncoder = jwtEncoder;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.journalAuditService = journalAuditService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/authenticate")
@@ -59,6 +73,11 @@ public class AuthenticateController {
 
         var authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        userRepository
+            .findOneByLogin(authentication.getName())
+            .ifPresent(user ->
+                journalAuditService.logAction(TypeActionAudit.CONNEXION, "User", user.getLogin(), "Connexion reussie", null, null)
+            );
         String jwt = this.createToken(authentication, loginVM.isRememberMe());
         var httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);

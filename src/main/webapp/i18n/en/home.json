@@ -1,19 +1,160 @@
 {
   "home": {
-    "title": "Welcome, Java Hipster!",
-    "subtitle": "This is your homepage",
-    "logged": {
-      "message": "You are logged in as user \"{{username}}\"."
+    "title": "Dashboard",
+    "dashboard": {
+      "messages": {
+        "loadError": "The dashboard could not be loaded correctly. Check the connection and the assigned permissions."
+      },
+      "hero": {
+        "eyebrow": "Business steering",
+        "title": "ADM dashboard",
+        "description": "Track sales, stock and royalties for the scope authorized by your profile.",
+        "quickActions": "Quick actions"
+      },
+      "tenant": {
+        "eyebrow": "Tenant area",
+        "title": "Tenant dashboard",
+        "description": "Manage your shops, monitor turnover and keep a clear view of your royalties.",
+        "activeShops": "active shop(s)",
+        "shopsTitle": "My shops",
+        "shopsSubtitle": "Active contracts and points of sale linked to your account.",
+        "noShops": "No active shop is linked to your account.",
+        "performanceTitle": "Performance by shop",
+        "performanceSubtitle": "Sales and royalty summary over the selected period.",
+        "noPerformanceTitle": "No shop performance",
+        "noPerformanceText": "No sale or royalty is available over the selected period.",
+        "contract": "Contract {{contract}}",
+        "noContract": "No contract entered",
+        "columns": {
+          "shop": "Shop",
+          "netSales": "Net turnover",
+          "grossSales": "Gross turnover",
+          "validatedSales": "Validated sales",
+          "pendingRoyalties": "Remaining royalties"
+        },
+        "status": {
+          "ACTIF": "Active",
+          "INACTIF": "Inactive",
+          "SUSPENDU": "Suspended",
+          "UNKNOWN": "No status"
+        }
+      },
+      "boutique": {
+        "eyebrow": "Shop area",
+        "title": "Shop dashboard",
+        "description": "Track your shop's sales, stock and royalties over the selected period."
+      },
+      "vendeur": {
+        "eyebrow": "Sales counter",
+        "title": "Cashier dashboard",
+        "description": "A simple overview of today's activity to start checking out quickly.",
+        "todayPill": "Today's sales",
+        "ctaTitle": "Ready to check out?",
+        "ctaText": "Open the cash register to start a new sale.",
+        "recentSalesTitle": "My latest sales",
+        "recentSalesSubtitle": "Tickets recorded today.",
+        "noSalesText": "Open the cash register to record your first sale of the day."
+      },
+      "royaltyByGroup": {
+        "title": "Royalty by article group",
+        "subtitle": "Effective rate applied (royalty rules, product rate or default rate) over the selected period.",
+        "emptyTitle": "No royalty over the period",
+        "emptyText": "No validated sale generates a royalty on this scope.",
+        "columns": {
+          "group": "Article group",
+          "revenue": "Turnover",
+          "rate": "Effective rate",
+          "amount": "Royalty"
+        }
+      },
+      "filters": {
+        "startDate": "Start period",
+        "endDate": "End period",
+        "shop": "Shop",
+        "allShops": "All shops",
+        "tenant": "Tenant",
+        "allTenants": "All tenants",
+        "globalScope": "Global scope"
+      },
+      "actions": {
+        "refresh": "Refresh dashboard",
+        "refreshing": "Refreshing...",
+        "reportingCenter": "Reporting center",
+        "viewAll": "View all",
+        "export": "Export",
+        "openStock": "Open stock module"
+      },
+      "metrics": {
+        "grossSales": "Gross turnover",
+        "netSales": "Net turnover",
+        "validatedSales": "Validated sales",
+        "activeShops": "Active shops",
+        "pendingRoyalties": "Pending royalties"
+      },
+      "charts": {
+        "netSalesEvolution": {
+          "title": "Net turnover trend",
+          "subtitle": "Selected period"
+        },
+        "grossDaily": {
+          "title": "Daily gross amount",
+          "subtitle": "Gross turnover by day"
+        }
+      },
+      "rankings": {
+        "shopSales": {
+          "title": "Turnover by shop",
+          "subtitle": "Point of sale performance over the period."
+        },
+        "tenantSales": {
+          "title": "Turnover by tenant",
+          "subtitle": "Tenant performance over the period."
+        }
+      },
+      "topProducts": {
+        "title": "Top products",
+        "subtitle": "Best real sales over the selected period.",
+        "columns": {
+          "rank": "No.",
+          "product": "Product",
+          "shop": "Shop",
+          "sales": "Sales",
+          "revenue": "Turnover",
+          "weight": "Weight"
+        }
+      },
+      "stockAlerts": {
+        "title": "Stock alerts",
+        "subtitle": "Products detected below threshold by supervision endpoints.",
+        "emptyTitle": "No stock alert",
+        "emptyText": "No visible product is currently below the alert threshold.",
+        "columns": {
+          "product": "Product",
+          "shop": "Shop",
+          "depot": "Depot",
+          "theoreticalStock": "Theoretical stock",
+          "threshold": "Threshold"
+        }
+      },
+      "fallbacks": {
+        "unknownShop": "Unspecified shop",
+        "unknownBoutique": "Unspecified shop",
+        "unknownTenant": "Unspecified tenant",
+        "unknownProduct": "Unspecified product",
+        "unknownGroup": "Ungrouped"
+      },
+      "empty": {
+        "noSalesTitle": "No sales over the period",
+        "noSalesText": "Adjust filters or check your viewing permissions.",
+        "noGrossTitle": "No daily amount",
+        "noRanking": "No data to rank for this period.",
+        "noTopProducts": "No product sold over this period."
+      },
+      "boutiqueCount": "{{count}} shop(s)"
     },
-    "question": "If you have any questions on JHipster:",
-    "link": {
-      "homepage": "JHipster homepage",
-      "stackoverflow": "JHipster on Stack Overflow",
-      "bugtracker": "JHipster bug tracker",
-      "chat": "JHipster public chat room",
-      "follow": "follow @jhipster on Twitter"
-    },
-    "like": "If you like JHipster, don't forget to give us a star on",
-    "github": "GitHub"
+    "guest": {
+      "title": "Supervise your shops, sales, stock and royalties in one interface.",
+      "description": "Sign in to access the management dashboard and steering screens."
+    }
   }
 }

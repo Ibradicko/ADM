@@ -1,0 +1,31 @@
+id;code;type;principal;genere_par_systeme;actif;date_affectation;produit_id
+1;legend;INTERNE;true;true;true;2026-05-05T07:17:21;1
+2;millet when mid;QR_CODE;false;false;false;2026-05-04T18:25:57;2
+3;lest;QR_CODE;false;true;true;2026-05-05T08:09:26;3
+4;metabolite doting;QR_CODE;false;false;true;2026-05-04T19:26:23;4
+5;pink eek convection;INTERNE;false;true;true;2026-05-04T11:32:30;5
+6;disclosure confusion;EAN13;false;false;true;2026-05-04T20:15:35;6
+7;priesthood sans;EAN13;true;false;false;2026-05-05T04:03:24;7
+8;place gosh cautiously;INTERNE;true;true;false;2026-05-04T13:51:41;8
+9;searchingly;CODE128;true;true;true;2026-05-05T06:00:53;9
+10;catalog;INTERNE;false;false;false;2026-05-05T04:17:46;10
+11;how;INTERNE;true;false;false;2026-05-04T15:29:56;11
+12;tousle;EAN8;false;true;false;2026-05-04T12:26:08;12
+13;upon atrium;INTERNE;true;true;true;2026-05-05T05:30:50;13
+14;helpfully lazy;INTERNE;true;false;true;2026-05-05T02:26:56;14
+15;orderly unto;CODE128;false;false;false;2026-05-04T21:23:56;15
+16;because since;CODE128;false;true;false;2026-05-04T20:49:06;16
+17;yum hence hence;QR_CODE;false;false;false;2026-05-04T17:05:36;17
+18;furthermore mmm;CODE128;true;false;true;2026-05-04T12:14:03;18
+19;yippee boo;CODE128;false;true;false;2026-05-04T13:42:56;19
+20;rear;QR_CODE;true;true;false;2026-05-05T04:04:23;20
+21;hubris drat;EAN8;true;true;true;2026-05-04T18:59:14;21
+22;summarise silently;QR_CODE;true;false;false;2026-05-05T00:56:42;22
+23;jittery sheepishly fragrant;CODE128;false;true;true;2026-05-04T16:56:00;23
+24;underneath;CODE128;true;true;false;2026-05-05T01:58:30;24
+25;hmph first aw;EAN13;true;true;false;2026-05-04T14:10:27;25
+26;behind;QR_CODE;true;false;true;2026-05-05T04:11:59;26
+27;via;INTERNE;true;false;false;2026-05-05T03:00:37;27
+28;gee;CODE128;false;true;true;2026-05-04T19:52:21;28
+29;er;CODE128;true;true;false;2026-05-04T13:39:55;29
+30;government surprise;EAN8;false;true;true;2026-05-04T12:56:21;30

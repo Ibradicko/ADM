@@ -1,0 +1,12 @@
+{
+  "admSupervisionVentesApp": {
+    "StatutVente": {
+      "null": "",
+      "BROUILLON": "Brouillon",
+      "VALIDEE": "Validee",
+      "ANNULEE": "Annulee",
+      "RETOURNEE": "Retournee",
+      "AJUSTEE": "Ajustee"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "admSupervisionVentesApp": {
+    "StatutRedevance": {
+      "null": "",
+      "CALCULEE": "CALCULEE",
+      "VALIDEE": "VALIDEE",
+      "REGULARISEE": "REGULARISEE",
+      "PARTIELLEMENT_PAYEE": "PARTIELLEMENT_PAYEE",
+      "PAYEE": "PAYEE",
+      "ANNULEE": "ANNULEE"
+    }
+  }
+}

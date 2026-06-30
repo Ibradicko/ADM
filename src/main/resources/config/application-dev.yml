@@ -21,6 +21,12 @@ logging:
     com.adm.supervision: DEBUG
 
 spring:
+  docker:
+    compose:
+      # PostgreSQL is started explicitly with `npm run docker:db:up`.
+      # Keeping Spring Boot Docker Compose enabled makes backend startup fail
+      # when Docker Desktop is installed but its Linux engine is not ready.
+      enabled: false
   devtools:
     restart:
       enabled: true
@@ -32,7 +38,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/admSupervisionVentes
+    url: jdbc:postgresql://localhost:5433/admSupervisionVentes
     hikari:
       poolName: Hikari
       auto-commit: false

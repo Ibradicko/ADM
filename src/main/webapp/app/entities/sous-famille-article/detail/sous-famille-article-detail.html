@@ -1,0 +1,56 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (sousFamilleArticle(); as sousFamilleArticleRef) {
+      <div>
+        <h2 data-cy="sousFamilleArticleDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.sousFamilleArticle.detail.title">Sous Famille Article</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ sousFamilleArticleRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.sousFamilleArticle.code">Code</span></dt>
+          <dd>
+            <span>{{ sousFamilleArticleRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.sousFamilleArticle.libelle">Libelle</span></dt>
+          <dd>
+            <span>{{ sousFamilleArticleRef.libelle }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.sousFamilleArticle.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutGeneral.' + (sousFamilleArticleRef.statut ?? 'null')">{{
+              { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[sousFamilleArticleRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.sousFamilleArticle.familleArticle">Famille Article</span></dt>
+          <dd>
+            @if (sousFamilleArticle()!.familleArticle) {
+              <div>
+                <a [routerLink]="['/famille-article', sousFamilleArticle()!.familleArticle?.id, 'view']">{{
+                  sousFamilleArticleRef.familleArticle?.libelle
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/sous-famille-article', sousFamilleArticleRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

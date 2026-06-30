@@ -1,0 +1,82 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (rapportExport(); as rapportExportRef) {
+      <div>
+        <h2 data-cy="rapportExportDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.rapportExport.detail.title">Rapport Export</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.reference">Reference</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.typeRapport">Type Rapport</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.typeRapport }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.format">Format</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.FormatExport.' + (rapportExportRef.format ?? 'null')">{{
+              { null: '', PDF: 'PDF', EXCEL: 'EXCEL' }[rapportExportRef.format ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.periodeDebut">Periode Debut</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.periodeDebut | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.periodeFin">Periode Fin</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.periodeFin | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.cheminFichier">Chemin Fichier</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.cheminFichier }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.dateGeneration">Date Generation</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.dateGeneration | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.boutique">Boutique</span></dt>
+          <dd>
+            @if (rapportExport()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', rapportExport()!.boutique?.id, 'view']">{{ rapportExportRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.locataire">Locataire</span></dt>
+          <dd>
+            @if (rapportExport()!.locataire) {
+              <div>
+                <a [routerLink]="['/locataire', rapportExport()!.locataire?.id, 'view']">{{ rapportExportRef.locataire?.nom }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.rapportExport.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ rapportExportRef.utilisateur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/rapport-export', rapportExportRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

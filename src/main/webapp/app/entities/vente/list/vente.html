@@ -1,0 +1,148 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="VenteHeading">
+    <div>
+      <h1>Registre des ventes</h1>
+      <p>Suivi des transactions caisse — brouillons et ventes validées par boutique</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutGererVentes()) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/vente/new']">
+          <fa-icon icon="plus" />
+          <span>Nouvelle vente</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <section class="adm-toolbar" aria-label="Filtres ventes">
+    <jhi-filter [filters]="filters" />
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des ventes</h2>
+        <p>Ventes accessibles selon votre périmètre boutique</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ totalItems() }} vente(s)</span>
+    </div>
+
+    @if (ventes().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucune vente trouvée</strong>
+        <p>Ajustez les filtres ou créez une nouvelle vente brouillon pour commencer.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="numeroTicket">N° Ticket <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateHeure">Date / Heure <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="locataire.nom">Locataire <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="vendeur.login">Vendeur <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="montantNet" class="text-end">Montant net <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (vente of ventes(); track trackId(vente); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <a [routerLink]="['/vente', vente.id, 'view']" class="adm-link">
+                    <span class="adm-code">{{ vente.numeroTicket ?? '#' + vente.id }}</span>
+                  </a>
+                </td>
+                <td>{{ vente.dateHeure | formatMediumDatetime }}</td>
+                <td>
+                  @if (vente.boutique) {
+                    <div class="adm-table-title">
+                      <strong>{{ vente.boutique.nom }}</strong>
+                      <small>{{ vente.boutique.code }}</small>
+                    </div>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>
+                  @if (vente.locataire) {
+                    <span>{{ vente.locataire.nom }}</span>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>{{ vente.vendeur?.login ?? '—' }}</td>
+                <td class="text-end">
+                  <strong>{{ vente.montantNet != null ? (vente.montantNet | number: '1.0-0') + ' FCFA' : '—' }}</strong>
+                  @if (vente.montantRemise && vente.montantRemise > 0) {
+                    <br /><small class="adm-text--muted">Remise : -{{ vente.montantRemise | number: '1.0-0' }}</small>
+                  }
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--info]="vente.statut === 'BROUILLON'"
+                    [class.adm-pill--success]="vente.statut === 'VALIDEE'"
+                    [class.adm-pill--danger]="vente.statut === 'ANNULEE'"
+                    [class.adm-pill--warning]="vente.statut === 'RETOURNEE' || vente.statut === 'AJUSTEE'"
+                  >
+                    {{
+                      { BROUILLON: 'Brouillon', VALIDEE: 'Validée', ANNULEE: 'Annulée', RETOURNEE: 'Retournée', AJUSTEE: 'Ajustée' }[
+                        vente.statut ?? 'BROUILLON'
+                      ] ?? vente.statut
+                    }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/vente', vente.id, 'view']" class="adm-icon-button" data-cy="entityDetailsButton" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (vente.statut === 'BROUILLON' && permissionsUi.peutGererVentes()) {
+                      <a [routerLink]="['/vente', vente.id, 'edit']" class="adm-icon-button" data-cy="entityEditButton" title="Modifier">
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(vente)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (ventes().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

@@ -1,0 +1,119 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="ProfilMetierHeading">
+    <div>
+      <h1>Profils métier</h1>
+      <p>Rôles et permissions — définition des accès par profil utilisateur</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/profil-metier/new']">
+          <fa-icon icon="plus" />
+          <span>Nouveau profil</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des profils métier</h2>
+        <p>Profils associés aux utilisateurs via les affectations boutique</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ profilMetiers().length }} profil(s)</span>
+    </div>
+
+    @if (profilMetiers().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun profil métier configuré</strong>
+        <p>Créez des profils pour définir les droits des utilisateurs.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="libelle">Libellé <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+              <th scope="col">Permissions</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pm of profilMetiers(); track trackId(pm); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ pm.code ?? '—' }}</span>
+                </td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ pm.libelle ?? '—' }}</strong>
+                    @if (pm.description) {
+                      <small>{{ pm.description }}</small>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="pm.statut === 'ACTIF'"
+                    [class.adm-pill--warning]="pm.statut === 'INACTIF'"
+                    [class.adm-pill--danger]="pm.statut === 'SUSPENDU'"
+                  >
+                    {{ statutLabels[pm.statut ?? ''] ?? pm.statut ?? '—' }}
+                  </span>
+                </td>
+                <td>
+                  @for (perm of pm.permissionses; track $index; let last = $last) {
+                    <a
+                      [routerLink]="['/permission-metier', perm.id, 'view']"
+                      class="adm-pill adm-pill--info"
+                      style="margin: 1px; display: inline-block; text-decoration: none"
+                      >{{ perm.code }}</a
+                    >{{ last ? '' : ' ' }}
+                  } @empty {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/profil-metier', pm.id, 'view']" class="adm-icon-button" data-cy="entityDetailsButton" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+                      <a
+                        [routerLink]="['/profil-metier', pm.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(pm)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

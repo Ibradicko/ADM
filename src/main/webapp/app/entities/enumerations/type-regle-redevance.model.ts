@@ -1,0 +1,9 @@
+export enum TypeRegleRedevance {
+  BOUTIQUE = 'BOUTIQUE',
+
+  LOCATAIRE = 'LOCATAIRE',
+
+  GROUPE_ARTICLE = 'GROUPE_ARTICLE',
+
+  PRODUIT = 'PRODUIT',
+}

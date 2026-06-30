@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (regularisationRedevance(); as regularisationRedevanceRef) {
+      <div>
+        <h2 data-cy="regularisationRedevanceDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.detail.title">Regularisation Redevance</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ regularisationRedevanceRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.reference">Reference</span></dt>
+          <dd>
+            <span>{{ regularisationRedevanceRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.montant">Montant</span></dt>
+          <dd>
+            <span>{{ regularisationRedevanceRef.montant }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.motif">Motif</span></dt>
+          <dd>
+            <span>{{ regularisationRedevanceRef.motif }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.dateRegularisation">Date Regularisation</span></dt>
+          <dd>
+            <span>{{ regularisationRedevanceRef.dateRegularisation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.calcul">Calcul</span></dt>
+          <dd>
+            @if (regularisationRedevance()!.calcul) {
+              <div>
+                <a [routerLink]="['/calcul-redevance', regularisationRedevance()!.calcul?.id, 'view']">{{
+                  regularisationRedevanceRef.calcul?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/regularisation-redevance', regularisationRedevanceRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

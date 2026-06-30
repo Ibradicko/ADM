@@ -1,0 +1,145 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="HistoriqueCodeBarresHeading">
+    <div>
+      <h1>Historique codes-barres</h1>
+      <p>Traque des changements de code, de l'origine du mouvement et du produit concerne.</p>
+    </div>
+
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+
+      <a class="adm-button adm-button--primary" [routerLink]="['/historique-code-barres/new']">
+        <fa-icon icon="plus" />
+        <span>Nouveau mouvement</span>
+      </a>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="adm-stats-grid adm-stats-grid--compact">
+    <article class="adm-stat-card">
+      <span>Total evenements</span>
+      <strong>{{ historiqueCodeBarreses().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Aujourd'hui</span>
+      <strong>{{ totalAujourdhui() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Avec ancien code</span>
+      <strong>{{ totalAvecAncienCode() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Utilisateurs impliques</span>
+      <strong>{{ utilisateursDisponibles().length }}</strong>
+    </article>
+  </div>
+
+  <section class="adm-toolbar" aria-label="Filtres historique code-barres">
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Rechercher un code, un motif, un produit ou un utilisateur..."
+      />
+    </label>
+
+    <div class="adm-toolbar__filters">
+      <label class="adm-field">
+        <span>Utilisateur</span>
+        <select class="adm-select" [ngModel]="selectedUtilisateur()" (ngModelChange)="selectedUtilisateur.set($event)">
+          <option value="ALL">Tous</option>
+          @for (login of utilisateursDisponibles(); track login) {
+            <option [value]="login">{{ login }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span>Produit</span>
+        <select class="adm-select" [ngModel]="selectedProduit()" (ngModelChange)="selectedProduit.set($event)">
+          <option value="ALL">Tous</option>
+          @for (produit of produitsDisponibles(); track produit.id) {
+            <option [value]="produit.id">{{ produit.designation }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="button" class="adm-button adm-button--ghost" (click)="reinitialiserFiltres()">Reinitialiser</button>
+    </div>
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Journal des changements</h2>
+        <p>Vue des remplacements, reaffectations et actions manuelles sur les codes-barres.</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ historiqueFiltre().length }} affiches</span>
+    </div>
+
+    @if (historiqueFiltre().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun historique ne correspond aux criteres selectionnes</strong>
+        <p>Essayez une recherche plus large ou verifiez si les changements ont bien ete synchronises.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="ancienCode">Ancien code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="nouveauCode">Nouveau code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="motif">Motif <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateChangement">Date <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="produit.designation">Produit <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="utilisateur.login">Utilisateur <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (historiqueCodeBarres of historiqueFiltre(); track trackId(historiqueCodeBarres); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ formatValeur(historiqueCodeBarres.ancienCode) }}</span>
+                </td>
+                <td>
+                  <span class="adm-code">{{ formatValeur(historiqueCodeBarres.nouveauCode) }}</span>
+                </td>
+                <td>{{ formatValeur(historiqueCodeBarres.motif) }}</td>
+                <td>{{ historiqueCodeBarres.dateChangement | formatMediumDatetime }}</td>
+                <td>{{ formatValeur(historiqueCodeBarres.produit?.designation) }}</td>
+                <td>{{ formatValeur(historiqueCodeBarres.utilisateur?.login) }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/historique-code-barres', historiqueCodeBarres.id, 'view']" class="adm-icon-button" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    <a [routerLink]="['/historique-code-barres', historiqueCodeBarres.id, 'edit']" class="adm-icon-button" title="Modifier">
+                      <fa-icon icon="pencil-alt" />
+                    </a>
+                    <button
+                      type="button"
+                      class="adm-icon-button adm-icon-button--danger"
+                      title="Supprimer"
+                      (click)="delete(historiqueCodeBarres)"
+                    >
+                      <fa-icon icon="times" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

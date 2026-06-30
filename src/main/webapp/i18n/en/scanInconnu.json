@@ -1,0 +1,30 @@
+{
+  "admSupervisionVentesApp": {
+    "scanInconnu": {
+      "home": {
+        "title": "Scan Inconnus",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Scan Inconnu",
+        "createOrEditLabel": "Create or edit a Scan Inconnu",
+        "notFound": "No Scan Inconnus found"
+      },
+      "created": "A new Scan Inconnu is created with identifier {{ param }}",
+      "updated": "A Scan Inconnu is updated with identifier {{ param }}",
+      "deleted": "A Scan Inconnu is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Scan Inconnu {{ id }}?"
+      },
+      "detail": {
+        "title": "Scan Inconnu"
+      },
+      "id": "ID",
+      "codeScanne": "Code Scanne",
+      "ecranOrigine": "Ecran Origine",
+      "dateScan": "Date Scan",
+      "commentaire": "Commentaire",
+      "resolu": "Resolu",
+      "boutique": "Boutique",
+      "produitAffecte": "Produit Affecte"
+    }
+  }
+}

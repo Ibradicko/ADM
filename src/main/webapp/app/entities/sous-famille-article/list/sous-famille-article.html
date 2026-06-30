@@ -1,0 +1,121 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="SousFamilleArticleHeading">
+    <div>
+      <h1>Sous-familles d'articles</h1>
+      <p>Classement par sous-famille — paramètre global du catalogue</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+        <a
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="adm-button adm-button--primary"
+          [routerLink]="['/sous-famille-article/new']"
+        >
+          <fa-icon icon="plus" />
+          <span>Nouvelle sous-famille</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des sous-familles d'articles</h2>
+        <p>Catégories secondaires du catalogue produits</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ sousFamilleArticles().length }} sous-famille(s)</span>
+    </div>
+
+    @if (sousFamilleArticles().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucune sous-famille d'articles</strong>
+        <p>Créez la première sous-famille pour affiner l'organisation de votre catalogue.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="libelle">Libellé <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="familleArticle.libelle">Famille article <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sousFamilleArticle of sousFamilleArticles(); track trackId(sousFamilleArticle); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ sousFamilleArticle.code ?? '--' }}</span>
+                </td>
+                <td>
+                  <strong>{{ sousFamilleArticle.libelle ?? '--' }}</strong>
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="sousFamilleArticle.statut === 'ACTIF'"
+                    [class.adm-pill--warning]="sousFamilleArticle.statut === 'INACTIF'"
+                    [class.adm-pill--danger]="sousFamilleArticle.statut === 'SUSPENDU'"
+                  >
+                    {{ { ACTIF: 'Actif', INACTIF: 'Inactif', SUSPENDU: 'Suspendu' }[sousFamilleArticle.statut ?? 'INACTIF'] ?? '--' }}
+                  </span>
+                </td>
+                <td>
+                  @if (sousFamilleArticle.familleArticle) {
+                    <a [routerLink]="['/famille-article', sousFamilleArticle.familleArticle.id, 'view']" class="adm-link">
+                      {{ sousFamilleArticle.familleArticle.libelle }}
+                    </a>
+                  } @else {
+                    <span class="adm-text--muted">--</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/sous-famille-article', sousFamilleArticle.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+                      <a
+                        [routerLink]="['/sous-famille-article', sousFamilleArticle.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(sousFamilleArticle)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

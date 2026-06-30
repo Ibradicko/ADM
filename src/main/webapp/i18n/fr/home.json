@@ -1,0 +1,160 @@
+{
+  "home": {
+    "title": "Tableau de bord",
+    "dashboard": {
+      "messages": {
+        "loadError": "Le dashboard n'a pas pu etre charge correctement. Verifiez la connexion et les droits associes."
+      },
+      "hero": {
+        "eyebrow": "Pilotage commercial",
+        "title": "Tableau de bord ADM",
+        "description": "Suivez les ventes, les stocks et les redevances sur le perimetre autorise pour votre profil.",
+        "quickActions": "Actions rapides"
+      },
+      "tenant": {
+        "eyebrow": "Espace locataire",
+        "title": "Tableau de bord locataire",
+        "description": "Pilotez vos boutiques, suivez votre chiffre d'affaires et gardez une vue claire sur vos redevances.",
+        "activeShops": "boutique(s) active(s)",
+        "shopsTitle": "Mes boutiques",
+        "shopsSubtitle": "Contrats actifs et points de vente rattaches a votre compte.",
+        "noShops": "Aucune boutique active n'est rattachee a votre compte.",
+        "performanceTitle": "Performance par boutique",
+        "performanceSubtitle": "Synthese des ventes et redevances sur la periode selectionnee.",
+        "noPerformanceTitle": "Aucune performance boutique",
+        "noPerformanceText": "Aucune vente ou redevance n'est disponible sur la periode selectionnee.",
+        "contract": "Contrat {{contract}}",
+        "noContract": "Contrat non renseigne",
+        "columns": {
+          "shop": "Boutique",
+          "netSales": "CA net",
+          "grossSales": "CA brut",
+          "validatedSales": "Ventes validees",
+          "pendingRoyalties": "Redevances restantes"
+        },
+        "status": {
+          "ACTIF": "Actif",
+          "INACTIF": "Inactif",
+          "SUSPENDU": "Suspendu",
+          "UNKNOWN": "Statut non renseigne"
+        }
+      },
+      "boutique": {
+        "eyebrow": "Espace boutique",
+        "title": "Tableau de bord boutique",
+        "description": "Suivez les ventes, le stock et les redevances de votre boutique sur la periode selectionnee."
+      },
+      "vendeur": {
+        "eyebrow": "Poste de vente",
+        "title": "Tableau de bord vendeur",
+        "description": "Un apercu simple de votre activite du jour pour demarrer rapidement vos encaissements.",
+        "todayPill": "Ventes du jour",
+        "ctaTitle": "Pret a encaisser ?",
+        "ctaText": "Ouvrez le poste de caisse pour demarrer une nouvelle vente.",
+        "recentSalesTitle": "Mes dernieres ventes",
+        "recentSalesSubtitle": "Tickets enregistres aujourd'hui.",
+        "noSalesText": "Ouvrez la caisse pour enregistrer votre premiere vente du jour."
+      },
+      "royaltyByGroup": {
+        "title": "Redevance par groupe d'article",
+        "subtitle": "Taux effectif applique (regles de redevance, taux produit ou taux par defaut) sur la periode selectionnee.",
+        "emptyTitle": "Aucune redevance sur la periode",
+        "emptyText": "Aucune vente validee ne genere de redevance sur ce perimetre.",
+        "columns": {
+          "group": "Groupe d'article",
+          "revenue": "CA",
+          "rate": "Taux effectif",
+          "amount": "Redevance"
+        }
+      },
+      "filters": {
+        "startDate": "Periode debut",
+        "endDate": "Periode fin",
+        "shop": "Boutique",
+        "allShops": "Toutes les boutiques",
+        "tenant": "Locataire",
+        "allTenants": "Tous les locataires",
+        "globalScope": "Perimetre global"
+      },
+      "actions": {
+        "refresh": "Actualiser le dashboard",
+        "refreshing": "Actualisation...",
+        "reportingCenter": "Centre de reporting",
+        "viewAll": "Voir tout",
+        "export": "Exporter",
+        "openStock": "Ouvrir le module stock"
+      },
+      "metrics": {
+        "grossSales": "Chiffre d'affaires brut",
+        "netSales": "Chiffre d'affaires net",
+        "validatedSales": "Ventes validees",
+        "activeShops": "Boutiques actives",
+        "pendingRoyalties": "Redevances en attente"
+      },
+      "charts": {
+        "netSalesEvolution": {
+          "title": "Evolution du chiffre d'affaires net",
+          "subtitle": "Periode selectionnee"
+        },
+        "grossDaily": {
+          "title": "Montant brut journalier",
+          "subtitle": "Repartition du chiffre d'affaires brut par jour"
+        }
+      },
+      "rankings": {
+        "shopSales": {
+          "title": "CA par boutique",
+          "subtitle": "Performance des points de vente sur la periode."
+        },
+        "tenantSales": {
+          "title": "CA par locataire",
+          "subtitle": "Performance des enseignes sur la periode."
+        }
+      },
+      "topProducts": {
+        "title": "Top produits",
+        "subtitle": "Meilleures ventes reelles sur la periode selectionnee.",
+        "columns": {
+          "rank": "No",
+          "product": "Produit",
+          "shop": "Boutique",
+          "sales": "Ventes",
+          "revenue": "CA",
+          "weight": "Poids"
+        }
+      },
+      "stockAlerts": {
+        "title": "Alertes stock",
+        "subtitle": "Produits detectes sous seuil par les endpoints de supervision.",
+        "emptyTitle": "Aucune alerte stock",
+        "emptyText": "Aucun produit visible n'est actuellement sous le seuil d'alerte.",
+        "columns": {
+          "product": "Produit",
+          "shop": "Boutique",
+          "depot": "Depot",
+          "theoreticalStock": "Stock theorique",
+          "threshold": "Seuil"
+        }
+      },
+      "fallbacks": {
+        "unknownShop": "Boutique non renseignee",
+        "unknownBoutique": "Boutique non renseignee",
+        "unknownTenant": "Locataire non renseigne",
+        "unknownProduct": "Produit non renseigne",
+        "unknownGroup": "Hors groupe"
+      },
+      "empty": {
+        "noSalesTitle": "Aucune vente sur la periode",
+        "noSalesText": "Ajustez les filtres ou verifiez les droits de consultation.",
+        "noGrossTitle": "Aucun montant journalier",
+        "noRanking": "Aucune donnee a classer pour cette periode.",
+        "noTopProducts": "Aucun produit vendu sur cette periode."
+      },
+      "boutiqueCount": "{{count}} boutique(s)"
+    },
+    "guest": {
+      "title": "Supervisez vos boutiques, ventes, stocks et redevances dans une seule interface.",
+      "description": "Connectez-vous pour acceder au dashboard administrateur et aux ecrans de pilotage."
+    }
+  }
+}

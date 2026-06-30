@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "etiquetteProduit": {
+      "home": {
+        "title": "Etiquette Produits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Etiquette Produit",
+        "createOrEditLabel": "Create or edit a Etiquette Produit",
+        "notFound": "No Etiquette Produits found"
+      },
+      "created": "A new Etiquette Produit is created with identifier {{ param }}",
+      "updated": "A Etiquette Produit is updated with identifier {{ param }}",
+      "deleted": "A Etiquette Produit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Etiquette Produit {{ id }}?"
+      },
+      "detail": {
+        "title": "Etiquette Produit"
+      },
+      "id": "ID",
+      "quantite": "Quantite",
+      "imprimee": "Imprimee",
+      "dateImpression": "Date Impression",
+      "produit": "Produit",
+      "lot": "Lot"
+    }
+  }
+}

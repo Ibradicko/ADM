@@ -1,0 +1,27 @@
+{
+  "admSupervisionVentesApp": {
+    "parametreGlobal": {
+      "home": {
+        "title": "Parametre Globals",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Parametre Global",
+        "createOrEditLabel": "Create or edit a Parametre Global",
+        "notFound": "No Parametre Globals found"
+      },
+      "created": "A new Parametre Global is created with identifier {{ param }}",
+      "updated": "A Parametre Global is updated with identifier {{ param }}",
+      "deleted": "A Parametre Global is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Parametre Global {{ id }}?"
+      },
+      "detail": {
+        "title": "Parametre Global"
+      },
+      "id": "ID",
+      "code": "Code",
+      "valeur": "Valeur",
+      "description": "Description",
+      "actif": "Actif"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+@if (locataire) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(locataire.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="locataireDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p
+        id="jhi-delete-locataire-heading"
+        jhiTranslate="admSupervisionVentesApp.locataire.delete.question"
+        [translateValues]="{ id: locataire.id }"
+      >
+        Are you sure you want to delete Locataire {{ locataire.id }}?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+
+      <button id="jhi-confirm-delete-locataire" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span jhiTranslate="entity.action.delete">Delete</span>
+      </button>
+    </div>
+  </form>
+}

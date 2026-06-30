@@ -1,0 +1,156 @@
+{
+  "stockOperations": {
+    "title": "Opérations de stock",
+    "subtitle": "Supervision des stocks, réceptions, inventaires, transferts et mouvements correctifs.",
+    "access": {
+      "title": "Accès limité",
+      "description": "Votre profil ne permet pas de consulter les opérations de stock."
+    },
+    "tabs": {
+      "stock": "Stock",
+      "receptions": "Réceptions",
+      "inventories": "Inventaires",
+      "transfers": "Transferts"
+    },
+    "common": {
+      "all": "Tous",
+      "allFeminine": "Toutes",
+      "select": "Sélectionner"
+    },
+    "scope": {
+      "allShops": "Périmètre ADM : toutes les boutiques autorisées",
+      "myShop": "Périmètre manager : votre boutique uniquement",
+      "myShops": "Périmètre manager : vos boutiques uniquement",
+      "visibleCount": "boutique(s) visible(s)",
+      "filteredCount": "boutique(s) dans le filtre actif"
+    },
+    "kpis": {
+      "stockLines": "Lignes de stock",
+      "stockAlerts": "Alertes de stock",
+      "recentMovements": "Mouvements récents",
+      "activeWarehouses": "Dépôts actifs"
+    },
+    "fields": {
+      "action": "Action",
+      "barcode": "Code-barres",
+      "comment": "Commentaire",
+      "counted": "Comptée",
+      "countedQuantity": "Quantité comptée",
+      "date": "Date",
+      "destination": "Destination",
+      "destinationWarehouse": "Dépôt de destination",
+      "lastMovement": "Dernier mouvement",
+      "movement": "Mouvement",
+      "origin": "Origine",
+      "originWarehouse": "Dépôt d'origine",
+      "product": "Article",
+      "quantity": "Quantité",
+      "reason": "Motif",
+      "received": "Reçue",
+      "receivedQuantity": "Quantité reçue",
+      "reference": "Référence",
+      "scannedCode": "Code scanné",
+      "shop": "Boutique",
+      "status": "Statut",
+      "supplier": "Fournisseur",
+      "theoretical": "Théorique",
+      "theoreticalQuantity": "Quantité théorique",
+      "threshold": "Seuil",
+      "variance": "Écart",
+      "warehouse": "Dépôt"
+    },
+    "placeholders": {
+      "searchStock": "Rechercher un article ou un dépôt",
+      "reverseReason": "Expliquer pourquoi le mouvement doit être reversé"
+    },
+    "actions": {
+      "closeInventory": "Clôturer l'inventaire",
+      "closing": "Clôture...",
+      "newInventory": "Nouvel inventaire",
+      "newReception": "Nouvelle réception",
+      "newTransfer": "Nouveau transfert",
+      "open": "Ouvrir",
+      "processing": "Traitement...",
+      "reverseMovement": "Reverser le mouvement",
+      "saveCount": "Enregistrer le comptage",
+      "saveLine": "Enregistrer la ligne",
+      "saving": "Enregistrement...",
+      "scanning": "Scan en cours...",
+      "startInventory": "Démarrer l'inventaire",
+      "starting": "Démarrage...",
+      "validateReception": "Valider la réception",
+      "validateTransfer": "Valider le transfert",
+      "validating": "Validation..."
+    },
+    "stock": {
+      "title": "Stocks disponibles",
+      "description": "Vue globale des niveaux de stock par article et dépôt.",
+      "empty": "Aucune ligne de stock dans le périmètre boutique courant."
+    },
+    "alerts": {
+      "title": "Alertes prioritaires",
+      "description": "Articles sous le seuil détectés par le serveur.",
+      "empty": "Aucune alerte visible."
+    },
+    "reverse": {
+      "title": "Reversement de mouvement",
+      "description": "Annulation contrôlée d'un mouvement récent si nécessaire."
+    },
+    "receptions": {
+      "title": "Réceptions ouvertes",
+      "description": "Sélectionnez une réception pour scanner puis valider les articles reçus.",
+      "empty": "Aucune réception dans le périmètre boutique courant.",
+      "linesTitle": "Lignes de réception",
+      "linesDescription": "Détail des quantités scannées pour la réception sélectionnée.",
+      "emptyLines": "Aucune ligne chargée pour la réception courante.",
+      "scanTitle": "Scan de réception",
+      "scanDescription": "Saisie guidée des articles reçus.",
+      "validateTitle": "Valider la réception",
+      "validateDescription": "Choisissez le dépôt dans lequel le stock doit être ajouté."
+    },
+    "inventories": {
+      "title": "Inventaires",
+      "description": "Démarrage, comptage et clôture des inventaires en cours.",
+      "empty": "Aucun inventaire dans le périmètre boutique courant.",
+      "linesTitle": "Lignes d'inventaire",
+      "linesDescription": "Écart entre les quantités théoriques et comptées pour l'inventaire sélectionné.",
+      "emptyLines": "Aucune ligne d'inventaire chargée.",
+      "scanTitle": "Démarrer / scanner",
+      "scanDescription": "Démarrez l'inventaire puis saisissez les quantités comptées.",
+      "closeTitle": "Clôture de l'inventaire",
+      "closeDescription": "Choisissez d'appliquer ou non les ajustements générés par les écarts constatés.",
+      "applyAdjustments": "Appliquer automatiquement les ajustements de stock"
+    },
+    "transfers": {
+      "title": "Transferts",
+      "description": "Suivi des transferts inter-boutiques et inter-dépôts.",
+      "empty": "Aucun transfert dans le périmètre boutique courant.",
+      "linesTitle": "Lignes de transfert",
+      "linesDescription": "Articles inclus dans le transfert sélectionné.",
+      "emptyLines": "Aucune ligne chargée pour le transfert courant.",
+      "scanTitle": "Scanner le transfert",
+      "scanDescription": "Scannez les articles de la boutique source avant validation.",
+      "validateTitle": "Valider le transfert",
+      "validateDescription": "Sélectionnez les dépôts source et destination utilisés par le workflow."
+    },
+    "messages": {
+      "selectReceptionForScan": "Sélectionnez une réception avant de scanner un article.",
+      "receptionLineAdded": "La ligne de réception a été ajoutée.",
+      "selectReceptionAndDepot": "Sélectionnez une réception et un dépôt de destination.",
+      "receptionValidated": "La réception a été validée et le stock mis à jour.",
+      "selectInventoryToStart": "Sélectionnez un inventaire à démarrer.",
+      "inventoryStarted": "L'inventaire a été démarré.",
+      "selectInventoryForCount": "Sélectionnez un inventaire avant de saisir un comptage.",
+      "inventoryCountSaved": "Le comptage d'inventaire a été enregistré.",
+      "selectInventoryToClose": "Sélectionnez un inventaire à clôturer.",
+      "inventoryClosed": "L'inventaire a été clôturé.",
+      "selectTransferForScan": "Sélectionnez un transfert avant de scanner un article.",
+      "transferLineAdded": "La ligne de transfert a été ajoutée.",
+      "selectTransferAndDepots": "Choisissez le transfert et les dépôts concernés.",
+      "transferValidated": "Le transfert a été validé.",
+      "selectMovementToReverse": "Sélectionnez un mouvement à reverser.",
+      "movementReversed": "Le mouvement a été reversé.",
+      "actionFailed": "L'action demandée n'a pas pu être exécutée. Vérifiez les informations saisies puis réessayez."
+    }
+  }
+}

@@ -1,0 +1,97 @@
+<div>
+  <h2 id="page-heading" data-cy="LotEtiquettesHeading">
+    <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.home.title">Lot Etiquettes</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-lot-etiquettes"
+        [routerLink]="['/lot-etiquettes/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.home.createLabel">Create a new Lot Etiquettes</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (lotEtiquetteses().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.home.notFound">No Lot Etiquettes found</span>
+    </div>
+  } @else {
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="reference">
+              <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.reference">Reference</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="dateGeneration">
+              <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.dateGeneration">Date Generation</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="formatImpression">
+              <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.formatImpression">Format Impression</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="nombreEtiquettes">
+              <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.nombreEtiquettes">Nombre Etiquettes</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (lotEtiquettes of lotEtiquetteses(); track trackId(lotEtiquettes); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+              <td>
+                <a [routerLink]="['/lot-etiquettes', lotEtiquettes.id, 'view']">{{ lotEtiquettes.id }}</a>
+              </td>
+              <td>{{ lotEtiquettes.reference }}</td>
+              <td>{{ lotEtiquettes.dateGeneration | formatMediumDatetime }}</td>
+              <td>{{ lotEtiquettes.formatImpression }}</td>
+              <td>{{ lotEtiquettes.nombreEtiquettes }}</td>
+              <td class="text-end">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/lot-etiquettes', lotEtiquettes.id, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
+                    <fa-icon icon="eye" />
+                  </a>
+                  <a
+                    [routerLink]="['/lot-etiquettes', lotEtiquettes.id, 'edit']"
+                    class="adm-icon-button"
+                    data-cy="entityEditButton"
+                    title="Modifier"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                  </a>
+                  <button
+                    type="button"
+                    (click)="delete(lotEtiquettes)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    title="Supprimer"
+                  >
+                    <fa-icon icon="times" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

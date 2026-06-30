@@ -1,0 +1,159 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="MouvementStockHeading">
+    <div>
+      <h1>Mouvements de stock</h1>
+      <p>Entrées, sorties et ajustements — traçabilité des flux par boutique</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutGererStock()) {
+        <a
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="adm-button adm-button--primary"
+          [routerLink]="['/mouvement-stock/new']"
+        >
+          <fa-icon icon="plus" />
+          <span>Nouveau mouvement</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <section class="adm-toolbar" aria-label="Filtres mouvements">
+    <jhi-filter [filters]="filters" />
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des mouvements de stock</h2>
+        <p>Flux validés et en attente par boutique et utilisateur</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ totalItems() }} mouvement(s)</span>
+    </div>
+
+    @if (mouvementStocks().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun mouvement de stock trouvé</strong>
+        <p>Ajustez les filtres pour rechercher des mouvements spécifiques.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="reference">Référence <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="typeMouvement">Type <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateMouvement">Date <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="motif">Motif <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="utilisateur.login">Utilisateur <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ms of mouvementStocks(); track trackId(ms); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <a [routerLink]="['/mouvement-stock', ms.id, 'view']" class="adm-link">
+                    <span class="adm-code">{{ ms.reference ?? '#' + ms.id }}</span>
+                  </a>
+                </td>
+                <td>
+                  @if (ms.boutique) {
+                    <div class="adm-table-title">
+                      <strong>{{ ms.boutique.nom }}</strong>
+                      <small>{{ ms.boutique.code }}</small>
+                    </div>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="ms.typeMouvement === 'ENTREE'"
+                    [class.adm-pill--danger]="ms.typeMouvement === 'SORTIE' || ms.typeMouvement === 'PERTE'"
+                    [class.adm-pill--warning]="ms.typeMouvement === 'AJUSTEMENT' || ms.typeMouvement === 'INVENTAIRE'"
+                    [class.adm-pill--info]="
+                      ms.typeMouvement === 'TRANSFERT' || ms.typeMouvement === 'VENTE' || ms.typeMouvement === 'RETOUR_CLIENT'
+                    "
+                  >
+                    {{ typeMouvementLabels[ms.typeMouvement ?? ''] ?? ms.typeMouvement ?? '—' }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--warning]="ms.statut === 'BROUILLON'"
+                    [class.adm-pill--success]="ms.statut === 'VALIDE'"
+                    [class.adm-pill--danger]="ms.statut === 'ANNULE'"
+                  >
+                    {{ statutLabels[ms.statut ?? ''] ?? ms.statut ?? '—' }}
+                  </span>
+                </td>
+                <td>{{ ms.dateMouvement | formatMediumDatetime }}</td>
+                <td>{{ ms.motif ?? '—' }}</td>
+                <td>{{ ms.utilisateur?.login ?? '—' }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/mouvement-stock', ms.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutGererStock()) {
+                      <a
+                        [routerLink]="['/mouvement-stock', ms.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(ms)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (mouvementStocks().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

@@ -33,7 +33,7 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/admSupervisionVentes
+    url: jdbc:postgresql://localhost:5433/admSupervisionVentes
     hikari:
       poolName: Hikari
       auto-commit: false

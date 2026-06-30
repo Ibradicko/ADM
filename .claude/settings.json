@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(xargs grep -l \"groupe_article\")",
+      "Bash(nohup ./mvnw -q -Dskip.installnodenpm=true -Dskip.npm=true -Dmaven.test.skip=true -Dspring-boot.run.profiles=dev spring-boot:run)",
+      "Bash(echo \"PID:$!\")",
+      "Read(//tmp/**)",
+      "Bash(break)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/management/health)",
+      "Bash(curl -s http://localhost:8080/management/health)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/api/dashboard/redevances-par-groupe-article)",
+      "Bash(xargs grep -l \"new Dropdown\\\\|Bootstrap\\\\|ngbDropdown\")",
+      "Bash(netstat -ano)",
+      "PowerShell(Stop-Process -Id 2136,21900,22320 -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Process -Id 2136,21900,22320 -ErrorAction SilentlyContinue)",
+      "Bash(powershell -NoProfile -Command \"try { Get-Process -Id 2136,21900,22320 -ErrorAction Stop } catch { Write-Output 'all gone' }\")",
+      "Bash(xargs -I{} sh -c 'echo ==={}===; cat {}')",
+      "Bash(nohup ./mvnw.cmd -Dskip.installnodenpm=true -Dskip.npm=true -Dmaven.test.skip=true -Dspring-boot.run.profiles=dev spring-boot:run)",
+      "Bash(echo \"backend PID: $!\")",
+      "Bash(curl -s -o /dev/null -w \"backend health:%{http_code}\\\\n\" http://localhost:8080/management/health --max-time 3)",
+      "Bash(awk -F'\\(' '{print $1}')"
+    ]
+  }
+}

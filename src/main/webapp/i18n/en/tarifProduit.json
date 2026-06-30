@@ -1,0 +1,29 @@
+{
+  "admSupervisionVentesApp": {
+    "tarifProduit": {
+      "home": {
+        "title": "Tarif Produits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Tarif Produit",
+        "createOrEditLabel": "Create or edit a Tarif Produit",
+        "notFound": "No Tarif Produits found"
+      },
+      "created": "A new Tarif Produit is created with identifier {{ param }}",
+      "updated": "A Tarif Produit is updated with identifier {{ param }}",
+      "deleted": "A Tarif Produit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Tarif Produit {{ id }}?"
+      },
+      "detail": {
+        "title": "Tarif Produit"
+      },
+      "id": "ID",
+      "montant": "Montant",
+      "typePrix": "Type Prix",
+      "dateDebut": "Date Debut",
+      "dateFin": "Date Fin",
+      "actif": "Actif",
+      "produit": "Produit"
+    }
+  }
+}

@@ -1,0 +1,148 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="RegleRedevanceHeading">
+    <div>
+      <h1>Règles de redevance</h1>
+      <p>Taux et conditions de calcul des redevances par boutique, locataire et article</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutGererRedevances()) {
+        <a
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="adm-button adm-button--primary"
+          [routerLink]="['/regle-redevance/new']"
+        >
+          <fa-icon icon="plus" />
+          <span>Nouvelle règle</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <section class="adm-toolbar" aria-label="Filtres règles">
+    <jhi-filter [filters]="filters" />
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des règles de redevance</h2>
+        <p>Taux appliqués selon le type (boutique, locataire, groupe, produit)</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ totalItems() }} règle(s)</span>
+    </div>
+
+    @if (regleRedevances().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucune règle de redevance configurée</strong>
+        <p>Créez des règles pour automatiser le calcul des redevances mensuelles.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="typeRegle">Type <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="locataire.nom">Locataire <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="taux" class="text-end">Taux % <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="priorite">Priorité <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateDebut">Période <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="actif">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (rr of regleRedevances(); track trackId(rr); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <a [routerLink]="['/regle-redevance', rr.id, 'view']" class="adm-link">
+                    <span class="adm-code">{{ rr.code ?? '#' + rr.id }}</span>
+                  </a>
+                </td>
+                <td>
+                  <span class="adm-pill adm-pill--info">
+                    {{ typeRegleLabels[rr.typeRegle ?? ''] ?? rr.typeRegle ?? '—' }}
+                  </span>
+                </td>
+                <td>{{ rr.boutique?.nom ?? '—' }}</td>
+                <td>{{ rr.locataire?.nom ?? '—' }}</td>
+                <td class="text-end">
+                  <strong>{{ rr.taux != null ? (rr.taux | number: '1.2-2') + ' %' : '—' }}</strong>
+                </td>
+                <td>{{ rr.priorite ?? '—' }}</td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ rr.dateDebut | formatMediumDate }}</strong>
+                    @if (rr.dateFin) {
+                      <small>au {{ rr.dateFin | formatMediumDate }}</small>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <span class="adm-pill" [class.adm-pill--success]="rr.actif" [class.adm-pill--danger]="!rr.actif">
+                    {{ rr.actif ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/regle-redevance', rr.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutGererRedevances()) {
+                      <a
+                        [routerLink]="['/regle-redevance', rr.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(rr)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (regleRedevances().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

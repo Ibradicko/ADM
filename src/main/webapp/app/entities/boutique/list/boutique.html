@@ -1,0 +1,217 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="BoutiqueHeading">
+    <div>
+      <h1>{{ permissionsUi.peutGererBoutiques() ? 'Gestion des boutiques et locataires' : 'Ma boutique' }}</h1>
+      <p>
+        {{
+          permissionsUi.peutGererBoutiques() ? 'Configuration et suivi des points de vente' : 'Suivi operationnel de votre point de vente'
+        }}
+      </p>
+    </div>
+
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+
+      @if (permissionsUi.peutGererBoutiques()) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/boutique/new']">
+          <fa-icon icon="plus" />
+          <span>Nouvelle boutique</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="adm-stats-grid adm-stats-grid--compact">
+    <article class="adm-stat-card">
+      <span>Total boutiques</span>
+      <strong>{{ totalItems() || boutiques().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Boutiques actives</span>
+      <strong>{{ activeCount() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Points Duty Free</span>
+      <strong>{{ dutyFreeCount() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span>Points service</span>
+      <strong>{{ serviceCount() }}</strong>
+    </article>
+  </div>
+
+  <section class="adm-toolbar" aria-label="Filtres boutiques">
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input type="search" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Rechercher une boutique..." />
+    </label>
+
+    <div class="adm-toolbar__filters">
+      <label class="adm-field">
+        <span>Type</span>
+        <select class="adm-select" [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)">
+          <option value="ALL">Tous les types</option>
+          <option value="DUTY_FREE">Duty Free</option>
+          <option value="RESTAURATION">Restauration</option>
+          <option value="COMMERCE">Commerce</option>
+          <option value="SERVICE">Service</option>
+          <option value="AUTRE">Autre</option>
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span>Statut</span>
+        <select class="adm-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+          <option value="ALL">Tous les statuts</option>
+          <option value="ACTIF">Active</option>
+          <option value="INACTIF">Inactive</option>
+          <option value="SUSPENDU">Suspendue</option>
+        </select>
+      </label>
+
+      <button type="button" class="adm-button adm-button--ghost" (click)="clearFilters()">Reinitialiser</button>
+    </div>
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des boutiques</h2>
+        <p>Vue operationnelle des points de vente, contacts et statuts d'exploitation</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ filteredBoutiques().length }} affichees</span>
+    </div>
+
+    @if (filteredBoutiques().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucune boutique ne correspond aux criteres actuels</strong>
+        <p>
+          {{
+            permissionsUi.peutGererBoutiques()
+              ? 'Affinez votre recherche ou creez une nouvelle boutique pour continuer.'
+              : 'Aucune boutique active ne vous est affectee.'
+          }}
+        </p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="nom">Nom de la boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="type">Type <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="emplacement">Emplacement <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="telephone">Telephone <fa-icon icon="sort" /></th>
+              <th scope="col">Locataire actuel</th>
+              <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateCreation">Creee le <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (boutique of filteredBoutiques(); track trackId(boutique); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ formatValue(boutique.code) }}</span>
+                </td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValue(boutique.nom) }}</strong>
+                    <small>#{{ boutique.id }}</small>
+                  </div>
+                </td>
+                <td>{{ formatType(boutique.type) }}</td>
+                <td>{{ formatValue(boutique.emplacement) }}</td>
+                <td>{{ formatValue(boutique.telephone) }}</td>
+                <td>
+                  @if (activeExploitationByBoutiqueId().get(boutique.id); as exploitation) {
+                    <div class="adm-table-title">
+                      <strong>{{ formatValue(exploitation.locataire?.nom) }}</strong>
+                      <small>{{ exploitation.locataire?.code }} &middot; {{ exploitation.numeroContrat ?? 'Sans contrat' }}</small>
+                    </div>
+                  } @else {
+                    <span class="adm-pill adm-pill--warning">Non affectee</span>
+                  }
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="boutique.statut === 'ACTIF'"
+                    [class.adm-pill--warning]="boutique.statut === 'INACTIF'"
+                    [class.adm-pill--danger]="boutique.statut === 'SUSPENDU'"
+                  >
+                    {{ formatStatus(boutique.statut) }}
+                  </span>
+                </td>
+                <td>{{ boutique.dateCreation | formatMediumDatetime }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a [routerLink]="['/boutique', boutique.id, 'view']" class="adm-icon-button" data-cy="entityDetailsButton" title="Voir">
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutModifierBoutiques()) {
+                      <button
+                        type="button"
+                        (click)="assign(boutique)"
+                        class="adm-button adm-button--ghost"
+                        data-cy="entityAssignButton"
+                        [title]="
+                          activeExploitationByBoutiqueId().has(boutique.id) ? 'Reaffecter a un autre locataire' : 'Affecter un locataire'
+                        "
+                      >
+                        <fa-icon [icon]="activeExploitationByBoutiqueId().has(boutique.id) ? 'user-check' : 'user-plus'" />
+                        <span>{{ activeExploitationByBoutiqueId().has(boutique.id) ? 'Reaffecter' : 'Affecter' }}</span>
+                      </button>
+                      <a
+                        [routerLink]="['/boutique', boutique.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                    }
+                    @if (permissionsUi.peutCreerBoutiques()) {
+                      <button
+                        type="button"
+                        (click)="delete(boutique)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (boutiques().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

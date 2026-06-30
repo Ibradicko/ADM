@@ -1,0 +1,10 @@
+{
+  "admSupervisionVentesApp": {
+    "StatutMouvementStock": {
+      "null": "",
+      "BROUILLON": "BROUILLON",
+      "VALIDE": "VALIDE",
+      "ANNULE": "ANNULE"
+    }
+  }
+}

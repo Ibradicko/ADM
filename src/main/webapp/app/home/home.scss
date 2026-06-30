@@ -1,23 +1,131 @@
-/* ==========================================================================
-Main page styles
-========================================================================== */
-
-.hipster {
-  display: inline-block;
-  width: 347px;
-  height: 497px;
-  background: url('../../content/images/jhipster_family_member_0.svg') no-repeat center top;
-  background-size: contain;
+:host {
+  display: block;
 }
 
-/* wait autoprefixer update to allow simple generation of high pixel density media query */
-@media only screen and (-webkit-min-device-pixel-ratio: 2),
-  only screen and (-moz-min-device-pixel-ratio: 2),
-  only screen and (-o-min-device-pixel-ratio: 2/1),
-  only screen and (min-resolution: 192dpi),
-  only screen and (min-resolution: 2dppx) {
-  .hipster {
-    background: url('../../content/images/jhipster_family_member_0.svg') no-repeat center top;
-    background-size: contain;
-  }
+.adm-dashboard-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1.75rem 1.85rem;
+  border-radius: 1.4rem;
+  background: linear-gradient(135deg, var(--adm-sidebar) 0%, #14305c 55%, #1d4ed8 130%);
+  color: #fff;
+  box-shadow: var(--adm-shadow);
+}
+
+.adm-dashboard-hero__content {
+  max-width: 42rem;
+}
+
+.adm-dashboard-hero__content .adm-page__eyebrow {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.adm-dashboard-hero__content h1 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.adm-dashboard-hero__content p {
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 0;
+}
+
+.adm-dashboard-hero__meta {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.adm-dashboard-hero__meta span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.adm-dashboard-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-content: flex-start;
+}
+
+.adm-dashboard-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.adm-dashboard-action:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.adm-dashboard-action--primary {
+  background: #fff;
+  color: var(--adm-sidebar);
+  border-color: transparent;
+}
+
+.adm-dashboard-action--primary:hover {
+  background: #f1f5f9;
+  color: var(--adm-sidebar);
+}
+
+.adm-button--lg {
+  padding: 1rem 1.6rem;
+  font-size: 1.05rem;
+  border-radius: 1rem;
+}
+
+.adm-stat-card--primary strong {
+  color: var(--adm-primary);
+}
+
+.adm-stat-card--success strong {
+  color: var(--adm-success);
+}
+
+.adm-stat-card--warning strong {
+  color: var(--adm-warning);
+}
+
+.adm-stat-card--neutral strong {
+  color: var(--adm-text);
+}
+
+.adm-dashboard-vendeur-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.adm-dashboard-vendeur-cta h2 {
+  margin-bottom: 0.35rem;
+}
+
+.adm-dashboard-vendeur-cta p {
+  margin-bottom: 0;
+  color: var(--adm-text-soft);
 }

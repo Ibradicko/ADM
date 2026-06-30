@@ -142,13 +142,13 @@
 
                 @if (passwordRef?.errors?.minlength) {
                   <small class="form-text text-danger" jhiTranslate="global.messages.validate.newpassword.minlength"
-                    >Your password is required to be at least 4 characters.</small
+                    >Your password is required to be at least 8 characters.</small
                   >
                 }
 
                 @if (passwordRef?.errors?.maxlength) {
                   <small class="form-text text-danger" jhiTranslate="global.messages.validate.newpassword.maxlength"
-                    >Your password cannot be longer than 50 characters.</small
+                    >Your password cannot be longer than 100 characters.</small
                   >
                 }
               </div>
@@ -182,13 +182,13 @@
 
                 @if (confirmPasswordRef?.errors?.minlength) {
                   <small class="form-text text-danger" jhiTranslate="global.messages.validate.confirmpassword.minlength"
-                    >Your confirmation password is required to be at least 4 characters.</small
+                    >Your confirmation password is required to be at least 8 characters.</small
                   >
                 }
 
                 @if (confirmPasswordRef?.errors?.maxlength) {
                   <small class="form-text text-danger" jhiTranslate="global.messages.validate.confirmpassword.maxlength"
-                    >Your confirmation password cannot be longer than 50 characters.</small
+                    >Your confirmation password cannot be longer than 100 characters.</small
                   >
                 }
               </div>

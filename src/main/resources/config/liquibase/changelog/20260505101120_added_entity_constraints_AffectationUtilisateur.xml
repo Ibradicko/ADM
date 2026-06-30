@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity AffectationUtilisateur.
+    -->
+    <changeSet id="20260505101120-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="affectation_utilisateur"
+                                 constraintName="fk_affectation_utilisateur__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="boutique_id"
+                                 baseTableName="affectation_utilisateur"
+                                 constraintName="fk_affectation_utilisateur__boutique_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="boutique"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="profil_id"
+                                 baseTableName="affectation_utilisateur"
+                                 constraintName="fk_affectation_utilisateur__profil_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="profil_metier"
+                                 />
+    </changeSet>
+</databaseChangeLog>

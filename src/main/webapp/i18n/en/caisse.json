@@ -1,0 +1,220 @@
+{
+  "caisse": {
+    "title": "Cash desk",
+    "subtitle": "Fast checkout by scan, cart entry, split payment and ticket after-sales tracking.",
+    "common": {
+      "notAvailable": "--"
+    },
+    "accessDenied": {
+      "title": "Limited access",
+      "text": "Your profile is not allowed to use the cash desk yet."
+    },
+    "actions": {
+      "rawHistory": "Raw history",
+      "validateTicket": "Validate ticket",
+      "validating": "Validation in progress...",
+      "validatingShort": "Validating...",
+      "addByScan": "Add by scan",
+      "assignBarcode": "Assign barcode",
+      "remove": "Remove",
+      "addPaymentMode": "Add payment mode",
+      "reprint": "Reprint",
+      "reprinting": "Reprinting...",
+      "reprintTicket": "Reprint ticket",
+      "viewTicketLarge": "View ticket large",
+      "registerReturn": "Register return",
+      "processing": "Processing...",
+      "cancelSale": "Cancel sale",
+      "cancelling": "Cancelling...",
+      "confirmValidation": "Confirm validation",
+      "confirm": "Confirm"
+    },
+    "stats": {
+      "cartItems": "Cart items",
+      "subtotal": "Subtotal",
+      "enteredPayments": "Entered payments",
+      "enteredTotal": "Entered total",
+      "remaining": "Remaining amount",
+      "remainingShort": "Remaining",
+      "discount": "Discount",
+      "netTotal": "Net total"
+    },
+    "saleContext": {
+      "title": "Sale context",
+      "subtitle": "Select the shop, tenant and travel references.",
+      "moreInfo": "Additional information"
+    },
+    "tabs": {
+      "caisse": "Checkout",
+      "historique": "History & after-sales"
+    },
+    "categories": {
+      "all": "All categories"
+    },
+    "fields": {
+      "shop": "Shop",
+      "shopRequired": "Shop *",
+      "tenant": "Tenant",
+      "tenantRequired": "Tenant *",
+      "select": "Select",
+      "passengerReference": "Passenger reference",
+      "boardingPass": "Boarding pass",
+      "ticketComment": "Ticket comment",
+      "paymentMode": "Mode",
+      "amount": "Amount",
+      "reference": "Reference",
+      "status": "Status",
+      "netAmount": "Net amount",
+      "seller": "Seller",
+      "quantity": "Quantity",
+      "items": "Items",
+      "product": "Product",
+      "currentStatus": "Current status",
+      "requiredReason": "Required reason"
+    },
+    "placeholders": {
+      "passengerReference": "Customer or passenger number",
+      "boardingPass": "Boarding reference",
+      "ticketComment": "Useful information to keep on the sale",
+      "scanCode": "Scan a barcode or enter a manual code",
+      "searchProduct": "Search for a product by code, designation or family",
+      "paymentReference": "Number, transaction, cheque...",
+      "searchHistory": "Search by ticket, shop, tenant or seller",
+      "auditReason": "Explain the reason for audit"
+    },
+    "scan": {
+      "title": "Priority scan",
+      "subtitle": "Scan a code or add an item through search if needed.",
+      "mode": "Scan mode",
+      "short": "scan",
+      "noScan": "No scan",
+      "unknownComment": "Unrecognized scan from the cash desk"
+    },
+    "empty": {
+      "noProductMatch": "No active product matches the current search.",
+      "noRecentSale": "No recent sale available.",
+      "noGeneratedTicket": "No ticket generated in this session yet.",
+      "noReference": "No reference",
+      "noSelectedSaleTitle": "No sale selected",
+      "noSelectedSaleText": "Choose a ticket in the history to display its details and run after-sales actions.",
+      "noTicketTitle": "No ticket available",
+      "noTicketText": "Run a reprint to regenerate the ticket for this sale."
+    },
+    "recentSales": {
+      "title": "Latest sales",
+      "subtitle": "Quick view of recent tickets in the application."
+    },
+    "currentTicket": {
+      "title": "Current ticket",
+      "subtitle": "Current sale cart with quantities and instant totals.",
+      "lineCount": "{{count}} line(s)",
+      "emptyTitle": "The cart is empty",
+      "emptyText": "Scan a product or add it from search to start the sale."
+    },
+    "payments": {
+      "title": "Payments",
+      "subtitle": "Split the settlement across one or more payment modes."
+    },
+    "generatedTicket": {
+      "title": "Last generated ticket",
+      "subtitle": "Text preview of the cash ticket just issued."
+    },
+    "history": {
+      "title": "History, returns and cancellations",
+      "subtitle": "Select a sale to view details, reprint the ticket or process after-sales service.",
+      "columns": {
+        "ticket": "Ticket",
+        "date": "Date",
+        "shop": "Shop",
+        "tenant": "Tenant",
+        "netTotal": "Net total",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "ticketDetail": {
+      "title": "Ticket details"
+    },
+    "linesPayments": {
+      "title": "Lines and payments",
+      "subtitle": "Detailed summary of items and settlement."
+    },
+    "corrections": {
+      "title": "Registered corrections",
+      "subtitle": "History of returns, cancellations and adjustments."
+    },
+    "ticketPreview": {
+      "title": "Ticket preview",
+      "subtitle": "Most recent version of this ticket.",
+      "modalTitle": "Ticket preview"
+    },
+    "validation": {
+      "title": "Ticket validation",
+      "subtitle": "Quick check before final sale registration.",
+      "warning": "This action creates the sale, its lines, payments and ticket. Any later correction must go through a traced operation."
+    },
+    "operation": {
+      "sensitiveLogged": "sensitive logged operation.",
+      "warning": "The sale status and its payments will be updated. The action will appear in the correction history."
+    },
+    "defaults": {
+      "operatorCancellation": "Operator cancellation",
+      "customerReturn": "Customer return"
+    },
+    "statuses": {
+      "sale": {
+        "TOUS": "All",
+        "BROUILLON": "Draft",
+        "VALIDEE": "Validated",
+        "ANNULEE": "Cancelled",
+        "RETOURNEE": "Returned",
+        "AJUSTEE": "Adjusted"
+      },
+      "payment": {
+        "PAYE": "Paid",
+        "ANNULE": "Cancelled",
+        "PARTIEL": "Partial",
+        "EN_ATTENTE": "Pending",
+        "REMBOURSE": "Refunded"
+      }
+    },
+    "ticket": {
+      "title": "ADM Manage - Cash ticket",
+      "number": "Number",
+      "date": "Date",
+      "shop": "Shop",
+      "tenant": "Tenant",
+      "seller": "Seller",
+      "items": "Items",
+      "payments": "Payments",
+      "netTotal": "Net total",
+      "product": "Product",
+      "payment": "Payment"
+    },
+    "messages": {
+      "accountWithoutId": "The connected account does not expose a usable user identifier. The ticket cannot be validated until this is corrected.",
+      "selectShopBeforeScan": "Select a shop before scanning.",
+      "productAdded": "{{product}} has been added to the ticket.",
+      "ticketIncomplete": "The ticket cannot be validated until required information and payment are complete.",
+      "saleValidated": "Sale {{ticket}} has been registered and the cash ticket has been generated.",
+      "partialSaleError": "Sale {{ticket}} was partially created, but a ticket or payment step failed. Check the data before resuming.",
+      "finalizeError": "The sale could not be finalized. Check the entered data and try again.",
+      "completeBeforeValidate": "Complete the sale context, cart and payments before validating the ticket.",
+      "selectSaleForPreview": "Select a sale to display the ticket large.",
+      "selectSaleBeforeAction": "Select a sale before launching this action.",
+      "saleCannotBeCancelled": "This sale can no longer be cancelled.",
+      "onlyValidatedCanReturn": "Only validated sales can be returned.",
+      "reasonRequired": "A reason is required to trace this operation.",
+      "selectSaleBeforeReprint": "Select a sale before launching a reprint.",
+      "ticketReprinted": "The ticket has been regenerated and the reprint has been registered.",
+      "reprintError": "Ticket reprint failed.",
+      "saleCancelled": "The sale has been cancelled successfully.",
+      "saleReturned": "The sale return has been registered.",
+      "operationError": "The operation could not be finalized.",
+      "multipleBarcodeMatches": "Several products match this code for the current selection. Manually choose the right item.",
+      "multipleProductMatches": "The search returns several products. Select the one to add to the cart.",
+      "unknownScanSaved": "Code {{code}} was not recognized. An unknown scan was saved; contact an authorized manager.",
+      "unknownScanAssignable": "Code {{code}} was not recognized. You can now assign it to a product."
+    }
+  }
+}

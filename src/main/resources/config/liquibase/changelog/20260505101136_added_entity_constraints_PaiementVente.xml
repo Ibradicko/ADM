@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity PaiementVente.
+    -->
+    <changeSet id="20260505101136-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="vente_id"
+                                 baseTableName="paiement_vente"
+                                 constraintName="fk_paiement_vente__vente_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="vente"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="mode_paiement_id"
+                                 baseTableName="paiement_vente"
+                                 constraintName="fk_paiement_vente__mode_paiement_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="mode_paiement_ref"
+                                 />
+    </changeSet>
+</databaseChangeLog>

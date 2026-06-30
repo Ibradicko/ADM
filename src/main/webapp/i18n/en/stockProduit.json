@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "stockProduit": {
+      "home": {
+        "title": "Stock Produits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Stock Produit",
+        "createOrEditLabel": "Create or edit a Stock Produit",
+        "notFound": "No Stock Produits found"
+      },
+      "created": "A new Stock Produit is created with identifier {{ param }}",
+      "updated": "A Stock Produit is updated with identifier {{ param }}",
+      "deleted": "A Stock Produit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Stock Produit {{ id }}?"
+      },
+      "detail": {
+        "title": "Stock Produit"
+      },
+      "id": "ID",
+      "quantiteTheorique": "Quantite Theorique",
+      "stockAlerte": "Stock Alerte",
+      "dateDernierMouvement": "Date Dernier Mouvement",
+      "produit": "Produit",
+      "depot": "Depot"
+    }
+  }
+}

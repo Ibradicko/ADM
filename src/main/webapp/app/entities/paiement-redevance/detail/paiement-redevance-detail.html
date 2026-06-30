@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (paiementRedevance(); as paiementRedevanceRef) {
+      <div>
+        <h2 data-cy="paiementRedevanceDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.paiementRedevance.detail.title">Paiement Redevance</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ paiementRedevanceRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementRedevance.reference">Reference</span></dt>
+          <dd>
+            <span>{{ paiementRedevanceRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementRedevance.montant">Montant</span></dt>
+          <dd>
+            <span>{{ paiementRedevanceRef.montant }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementRedevance.datePaiement">Date Paiement</span></dt>
+          <dd>
+            <span>{{ paiementRedevanceRef.datePaiement | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementRedevance.modePaiement">Mode Paiement</span></dt>
+          <dd>
+            <span>{{ paiementRedevanceRef.modePaiement }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementRedevance.commentaire">Commentaire</span></dt>
+          <dd>
+            <span>{{ paiementRedevanceRef.commentaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.paiementRedevance.calcul">Calcul</span></dt>
+          <dd>
+            @if (paiementRedevance()!.calcul) {
+              <div>
+                <a [routerLink]="['/calcul-redevance', paiementRedevance()!.calcul?.id, 'view']">{{
+                  paiementRedevanceRef.calcul?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/paiement-redevance', paiementRedevanceRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

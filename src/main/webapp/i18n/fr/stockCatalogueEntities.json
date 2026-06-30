@@ -1,0 +1,363 @@
+{
+  "admSupervisionVentesApp": {
+    "produit": {
+      "home": {
+        "title": "Produits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un produit",
+        "createOrEditLabel": "Créer ou modifier un produit",
+        "notFound": "Aucun produit trouvé"
+      },
+      "created": "Le produit {{ param }} a été créé",
+      "updated": "Le produit {{ param }} a été modifié",
+      "deleted": "Le produit {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du produit {{ id }} ?" },
+      "detail": { "title": "Produit" },
+      "id": "ID",
+      "codeInterne": "Code interne",
+      "designation": "Désignation",
+      "description": "Description",
+      "typePrix": "Type de prix",
+      "prixVente": "Prix de vente",
+      "tauxRedevanceApplicable": "Taux de redevance applicable",
+      "statut": "Statut",
+      "dateCreation": "Date de création",
+      "boutique": "Boutique",
+      "groupeArticle": "Groupe d'articles",
+      "familleArticle": "Famille d'articles",
+      "sousFamilleArticle": "Sous-famille d'articles",
+      "uniteMesure": "Unité de mesure"
+    },
+    "stockProduit": {
+      "home": {
+        "title": "Stocks produits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un stock produit",
+        "createOrEditLabel": "Créer ou modifier un stock produit",
+        "notFound": "Aucun stock produit trouvé"
+      },
+      "created": "Le stock produit {{ param }} a été créé",
+      "updated": "Le stock produit {{ param }} a été modifié",
+      "deleted": "Le stock produit {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du stock produit {{ id }} ?" },
+      "detail": { "title": "Stock produit" },
+      "id": "ID",
+      "quantiteTheorique": "Quantité théorique",
+      "stockAlerte": "Seuil d'alerte",
+      "dateDernierMouvement": "Date du dernier mouvement",
+      "produit": "Produit",
+      "depot": "Dépôt"
+    },
+    "mouvementStock": {
+      "home": {
+        "title": "Mouvements de stock",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un mouvement de stock",
+        "createOrEditLabel": "Créer ou modifier un mouvement de stock",
+        "notFound": "Aucun mouvement de stock trouvé"
+      },
+      "created": "Le mouvement {{ param }} a été créé",
+      "updated": "Le mouvement {{ param }} a été modifié",
+      "deleted": "Le mouvement {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du mouvement {{ id }} ?" },
+      "detail": { "title": "Mouvement de stock" },
+      "id": "ID",
+      "reference": "Référence",
+      "typeMouvement": "Type de mouvement",
+      "statut": "Statut",
+      "dateMouvement": "Date du mouvement",
+      "motif": "Motif",
+      "boutique": "Boutique",
+      "utilisateur": "Utilisateur"
+    },
+    "ligneMouvementStock": {
+      "home": {
+        "title": "Lignes de mouvement",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une ligne de mouvement",
+        "createOrEditLabel": "Créer ou modifier une ligne de mouvement",
+        "notFound": "Aucune ligne de mouvement trouvée"
+      },
+      "created": "La ligne {{ param }} a été créée",
+      "updated": "La ligne {{ param }} a été modifiée",
+      "deleted": "La ligne {{ param }} a été supprimée",
+      "delete": { "question": "Confirmez-vous la suppression de la ligne {{ id }} ?" },
+      "detail": { "title": "Ligne de mouvement" },
+      "id": "ID",
+      "quantite": "Quantité",
+      "stockAvant": "Stock avant",
+      "stockApres": "Stock après",
+      "commentaire": "Commentaire",
+      "mouvement": "Mouvement",
+      "produit": "Produit",
+      "depot": "Dépôt"
+    },
+    "receptionProduit": {
+      "home": {
+        "title": "Réceptions produits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une réception",
+        "createOrEditLabel": "Créer ou modifier une réception",
+        "notFound": "Aucune réception trouvée"
+      },
+      "created": "La réception {{ param }} a été créée",
+      "updated": "La réception {{ param }} a été modifiée",
+      "deleted": "La réception {{ param }} a été supprimée",
+      "delete": { "question": "Confirmez-vous la suppression de la réception {{ id }} ?" },
+      "detail": { "title": "Réception produit" },
+      "id": "ID",
+      "reference": "Référence",
+      "dateReception": "Date de réception",
+      "fournisseur": "Fournisseur",
+      "commentaire": "Commentaire",
+      "boutique": "Boutique",
+      "utilisateur": "Utilisateur"
+    },
+    "ligneReceptionProduit": {
+      "home": {
+        "title": "Lignes de réception",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une ligne de réception",
+        "createOrEditLabel": "Créer ou modifier une ligne de réception",
+        "notFound": "Aucune ligne de réception trouvée"
+      },
+      "created": "La ligne {{ param }} a été créée",
+      "updated": "La ligne {{ param }} a été modifiée",
+      "deleted": "La ligne {{ param }} a été supprimée",
+      "delete": { "question": "Confirmez-vous la suppression de la ligne {{ id }} ?" },
+      "detail": { "title": "Ligne de réception" },
+      "id": "ID",
+      "quantiteAttendue": "Quantité attendue",
+      "quantiteRecue": "Quantité reçue",
+      "ecart": "Écart",
+      "codeBarresScanne": "Code-barres scanné",
+      "reception": "Réception",
+      "produit": "Produit"
+    },
+    "inventaireStock": {
+      "home": {
+        "title": "Inventaires de stock",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un inventaire",
+        "createOrEditLabel": "Créer ou modifier un inventaire",
+        "notFound": "Aucun inventaire trouvé"
+      },
+      "created": "L'inventaire {{ param }} a été créé",
+      "updated": "L'inventaire {{ param }} a été modifié",
+      "deleted": "L'inventaire {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression de l'inventaire {{ id }} ?" },
+      "detail": { "title": "Inventaire de stock" },
+      "id": "ID",
+      "reference": "Référence",
+      "typeInventaire": "Type d'inventaire",
+      "statut": "Statut",
+      "dateDebut": "Date de début",
+      "dateFin": "Date de fin",
+      "boutique": "Boutique",
+      "depot": "Dépôt",
+      "utilisateur": "Utilisateur"
+    },
+    "ligneInventaireStock": {
+      "home": {
+        "title": "Lignes d'inventaire",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une ligne d'inventaire",
+        "createOrEditLabel": "Créer ou modifier une ligne d'inventaire",
+        "notFound": "Aucune ligne d'inventaire trouvée"
+      },
+      "created": "La ligne {{ param }} a été créée",
+      "updated": "La ligne {{ param }} a été modifiée",
+      "deleted": "La ligne {{ param }} a été supprimée",
+      "delete": { "question": "Confirmez-vous la suppression de la ligne {{ id }} ?" },
+      "detail": { "title": "Ligne d'inventaire" },
+      "id": "ID",
+      "quantiteTheorique": "Quantité théorique",
+      "quantiteComptee": "Quantité comptée",
+      "ecart": "Écart",
+      "commentaire": "Commentaire",
+      "inventaire": "Inventaire",
+      "produit": "Produit"
+    },
+    "transfertStock": {
+      "home": {
+        "title": "Transferts de stock",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un transfert",
+        "createOrEditLabel": "Créer ou modifier un transfert",
+        "notFound": "Aucun transfert trouvé"
+      },
+      "created": "Le transfert {{ param }} a été créé",
+      "updated": "Le transfert {{ param }} a été modifié",
+      "deleted": "Le transfert {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du transfert {{ id }} ?" },
+      "detail": { "title": "Transfert de stock" },
+      "id": "ID",
+      "reference": "Référence",
+      "dateTransfert": "Date du transfert",
+      "statut": "Statut",
+      "motif": "Motif",
+      "boutiqueOrigine": "Boutique d'origine",
+      "boutiqueDestination": "Boutique de destination",
+      "utilisateur": "Utilisateur"
+    },
+    "ligneTransfertStock": {
+      "home": {
+        "title": "Lignes de transfert",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une ligne de transfert",
+        "createOrEditLabel": "Créer ou modifier une ligne de transfert",
+        "notFound": "Aucune ligne de transfert trouvée"
+      },
+      "created": "La ligne {{ param }} a été créée",
+      "updated": "La ligne {{ param }} a été modifiée",
+      "deleted": "La ligne {{ param }} a été supprimée",
+      "delete": { "question": "Confirmez-vous la suppression de la ligne {{ id }} ?" },
+      "detail": { "title": "Ligne de transfert" },
+      "id": "ID",
+      "quantite": "Quantité",
+      "commentaire": "Commentaire",
+      "transfert": "Transfert",
+      "produit": "Produit"
+    },
+    "codeBarresProduit": {
+      "home": {
+        "title": "Codes-barres produits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un code-barres",
+        "createOrEditLabel": "Créer ou modifier un code-barres",
+        "notFound": "Aucun code-barres trouvé"
+      },
+      "created": "Le code-barres {{ param }} a été créé",
+      "updated": "Le code-barres {{ param }} a été modifié",
+      "deleted": "Le code-barres {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du code-barres {{ id }} ?" },
+      "detail": { "title": "Code-barres produit" },
+      "id": "ID",
+      "code": "Code",
+      "type": "Type",
+      "principal": "Principal",
+      "genereParSysteme": "Généré par le système",
+      "actif": "Actif",
+      "dateAffectation": "Date d'affectation",
+      "produit": "Produit"
+    },
+    "historiqueCodeBarres": {
+      "home": {
+        "title": "Historique des codes-barres",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un historique",
+        "createOrEditLabel": "Créer ou modifier un historique",
+        "notFound": "Aucun historique trouvé"
+      },
+      "created": "L'historique {{ param }} a été créé",
+      "updated": "L'historique {{ param }} a été modifié",
+      "deleted": "L'historique {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression de l'historique {{ id }} ?" },
+      "detail": { "title": "Historique de code-barres" },
+      "id": "ID",
+      "ancienCode": "Ancien code",
+      "nouveauCode": "Nouveau code",
+      "motif": "Motif",
+      "dateChangement": "Date du changement",
+      "produit": "Produit",
+      "utilisateur": "Utilisateur"
+    },
+    "scanInconnu": {
+      "home": {
+        "title": "Scans inconnus",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un scan inconnu",
+        "createOrEditLabel": "Créer ou modifier un scan inconnu",
+        "notFound": "Aucun scan inconnu trouvé"
+      },
+      "created": "Le scan inconnu {{ param }} a été créé",
+      "updated": "Le scan inconnu {{ param }} a été modifié",
+      "deleted": "Le scan inconnu {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du scan inconnu {{ id }} ?" },
+      "detail": { "title": "Scan inconnu" },
+      "id": "ID",
+      "codeScanne": "Code scanné",
+      "ecranOrigine": "Écran d'origine",
+      "dateScan": "Date du scan",
+      "commentaire": "Commentaire",
+      "resolu": "Résolu",
+      "boutique": "Boutique",
+      "produitAffecte": "Produit affecté"
+    },
+    "parametreCodeBarres": {
+      "home": {
+        "title": "Paramètres des codes-barres",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un paramètre",
+        "createOrEditLabel": "Créer ou modifier un paramètre",
+        "notFound": "Aucun paramètre trouvé"
+      },
+      "created": "Le paramètre {{ param }} a été créé",
+      "updated": "Le paramètre {{ param }} a été modifié",
+      "deleted": "Le paramètre {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du paramètre {{ id }} ?" },
+      "detail": { "title": "Paramètre de code-barres" },
+      "id": "ID",
+      "formatParDefaut": "Format par défaut",
+      "prefixe": "Préfixe",
+      "longueur": "Longueur",
+      "actif": "Actif"
+    },
+    "etiquetteProduit": {
+      "home": {
+        "title": "Étiquettes produits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer une étiquette",
+        "createOrEditLabel": "Créer ou modifier une étiquette",
+        "notFound": "Aucune étiquette trouvée"
+      },
+      "created": "L'étiquette {{ param }} a été créée",
+      "updated": "L'étiquette {{ param }} a été modifiée",
+      "deleted": "L'étiquette {{ param }} a été supprimée",
+      "delete": { "question": "Confirmez-vous la suppression de l'étiquette {{ id }} ?" },
+      "detail": { "title": "Étiquette produit" },
+      "id": "ID",
+      "quantite": "Quantité",
+      "imprimee": "Imprimée",
+      "dateImpression": "Date d'impression",
+      "produit": "Produit",
+      "lot": "Lot"
+    },
+    "lotEtiquettes": {
+      "home": {
+        "title": "Lots d'étiquettes",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un lot d'étiquettes",
+        "createOrEditLabel": "Créer ou modifier un lot d'étiquettes",
+        "notFound": "Aucun lot d'étiquettes trouvé"
+      },
+      "created": "Le lot {{ param }} a été créé",
+      "updated": "Le lot {{ param }} a été modifié",
+      "deleted": "Le lot {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du lot {{ id }} ?" },
+      "detail": { "title": "Lot d'étiquettes" },
+      "id": "ID",
+      "reference": "Référence",
+      "dateGeneration": "Date de génération",
+      "formatImpression": "Format d'impression",
+      "nombreEtiquettes": "Nombre d'étiquettes"
+    },
+    "TypeMouvementStock": {
+      "null": "",
+      "ENTREE": "Entrée",
+      "SORTIE": "Sortie",
+      "AJUSTEMENT": "Ajustement",
+      "TRANSFERT": "Transfert",
+      "INVENTAIRE": "Inventaire",
+      "PERTE": "Perte",
+      "RETOUR_CLIENT": "Retour client",
+      "VENTE": "Vente"
+    },
+    "StatutMouvementStock": { "null": "", "BROUILLON": "Brouillon", "VALIDE": "Validé", "ANNULE": "Annulé" },
+    "TypeInventaire": { "null": "", "TOURNANT": "Tournant", "COMPLET": "Complet", "CONTROLE_PONCTUEL": "Contrôle ponctuel" },
+    "StatutInventaire": { "null": "", "PLANIFIE": "Planifié", "EN_COURS": "En cours", "CLOTURE": "Clôturé", "ANNULE": "Annulé" },
+    "TypeCodeBarres": { "null": "", "EAN13": "EAN-13", "EAN8": "EAN-8", "CODE128": "Code 128", "QR_CODE": "QR code", "INTERNE": "Interne" },
+    "TypePrix": { "null": "", "STANDARD": "Standard", "PROMOTION": "Promotion", "CONTRACTUEL": "Contractuel" },
+    "StatutGeneral": { "null": "", "ACTIF": "Actif", "INACTIF": "Inactif", "SUSPENDU": "Suspendu" }
+  }
+}

@@ -1,0 +1,134 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="TarifProduitHeading">
+    <div>
+      <h1 jhiTranslate="admSupervisionVentesApp.tarifProduit.home.title">Tarif Produits</h1>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.tarifProduit.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <a
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="adm-button adm-button--primary jh-create-entity create-tarif-produit"
+        [routerLink]="['/tarif-produit/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.tarifProduit.home.createLabel">Create a new Tarif Produit</span>
+      </a>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (tarifProduits().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <strong jhiTranslate="admSupervisionVentesApp.tarifProduit.home.notFound">No Tarif Produits found</strong>
+    </div>
+  } @else {
+    <article class="adm-card adm-card--table">
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="montant">
+                <span jhiTranslate="admSupervisionVentesApp.tarifProduit.montant">Montant</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="typePrix">
+                <span jhiTranslate="admSupervisionVentesApp.tarifProduit.typePrix">Type Prix</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="dateDebut">
+                <span jhiTranslate="admSupervisionVentesApp.tarifProduit.dateDebut">Date Debut</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="dateFin">
+                <span jhiTranslate="admSupervisionVentesApp.tarifProduit.dateFin">Date Fin</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="actif">
+                <span jhiTranslate="admSupervisionVentesApp.tarifProduit.actif">Actif</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="produit.designation">
+                <span jhiTranslate="admSupervisionVentesApp.tarifProduit.produit">Produit</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" class="text-end"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tarifProduit of tarifProduits(); track trackId(tarifProduit); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <a class="adm-code" [routerLink]="['/tarif-produit', tarifProduit.id, 'view']">{{ tarifProduit.id }}</a>
+                </td>
+                <td>{{ tarifProduit.montant }}</td>
+                <td [jhiTranslate]="'admSupervisionVentesApp.TypePrix.' + (tarifProduit.typePrix ?? 'null')">
+                  {{
+                    { null: '', STANDARD: 'STANDARD', PROMOTION: 'PROMOTION', CONTRACTUEL: 'CONTRACTUEL' }[tarifProduit.typePrix ?? 'null']
+                  }}
+                </td>
+                <td>{{ tarifProduit.dateDebut | formatMediumDate }}</td>
+                <td>{{ tarifProduit.dateFin | formatMediumDate }}</td>
+                <td>{{ tarifProduit.actif }}</td>
+                <td>
+                  @if (tarifProduit.produit) {
+                    <a [routerLink]="['/produit', tarifProduit.produit.id, 'view']">{{ tarifProduit.produit.designation }}</a>
+                  } @else {
+                    <span>—</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/tarif-produit', tarifProduit.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    <a
+                      [routerLink]="['/tarif-produit', tarifProduit.id, 'edit']"
+                      class="adm-icon-button"
+                      data-cy="entityEditButton"
+                      title="Modifier"
+                    >
+                      <fa-icon icon="pencil-alt" />
+                    </a>
+                    <button
+                      type="button"
+                      (click)="delete(tarifProduit)"
+                      class="adm-icon-button adm-icon-button--danger"
+                      data-cy="entityDeleteButton"
+                      title="Supprimer"
+                    >
+                      <fa-icon icon="times" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+
+  @if (tarifProduits().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

@@ -1,0 +1,96 @@
+<div class="adm-modal">
+  <div class="adm-modal__header">
+    <div>
+      <h2 jhiTranslate="productCustom.labelModal.title">Prepare a label batch</h2>
+      <p>{{ produit?.designation }} - {{ produit?.codeInterne || ('productCustom.common.noInternalCode' | translate) }}</p>
+    </div>
+    <button
+      type="button"
+      class="adm-icon-button"
+      (click)="activeModal.dismiss()"
+      [attr.aria-label]="'productCustom.actions.close' | translate"
+    >
+      ×
+    </button>
+  </div>
+
+  <div class="adm-modal__body">
+    @if (erreur()) {
+      <div class="adm-inline-alert adm-inline-alert--danger">{{ erreur() | translate }}</div>
+    }
+
+    <div class="adm-form-grid">
+      <label class="adm-field">
+        <span jhiTranslate="productCustom.fields.batchReference">Batch reference</span>
+        <input
+          class="adm-input"
+          [(ngModel)]="formulaire.reference"
+          [placeholder]="'productCustom.placeholders.autoReference' | translate"
+        />
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="productCustom.fields.format">Format</span>
+        <input
+          class="adm-input"
+          [(ngModel)]="formulaire.formatImpression"
+          [placeholder]="'productCustom.placeholders.labelFormat' | translate"
+        />
+      </label>
+    </div>
+
+    <div class="adm-form-grid">
+      <label class="adm-field">
+        <span jhiTranslate="productCustom.fields.labelCount">Number of labels</span>
+        <input class="adm-input" type="number" min="1" [(ngModel)]="formulaire.quantite" />
+      </label>
+    </div>
+
+    <div class="adm-helper-text">
+      <span jhiTranslate="productCustom.labelModal.help">This creates a label batch linked to the product for printing and tracking.</span>
+    </div>
+
+    <div class="adm-subsection">
+      <div class="adm-subsection__header">
+        <h3 jhiTranslate="productCustom.labelModal.history">Linked batch history</h3>
+        <button type="button" class="adm-button adm-button--ghost" (click)="chargerHistorique()" [disabled]="isLoading()">
+          {{ (isLoading() ? 'productCustom.actions.loading' : 'productCustom.actions.refresh') | translate }}
+        </button>
+      </div>
+
+      @if (etiquettes().length === 0) {
+        <div class="adm-empty-inline" jhiTranslate="productCustom.labelModal.empty">No label batch loaded for this product.</div>
+      } @else {
+        <div class="adm-list-panel">
+          @for (etiquette of etiquettes(); track etiquette.id) {
+            <div class="adm-list-panel__row">
+              <div>
+                <strong>{{ etiquette.lot?.reference || ('productCustom.common.batchWithoutReference' | translate) }}</strong>
+                <small
+                  >{{ 'productCustom.labelModal.labelCount' | translate: { count: etiquette.quantite ?? 0 } }} -
+                  {{ etiquette.dateImpression?.format('DD/MM/YYYY HH:mm') || ('productCustom.status.notPrinted' | translate) }}</small
+                >
+              </div>
+              <div>
+                @if (etiquette.imprimee) {
+                  <span class="adm-pill adm-pill--success" jhiTranslate="productCustom.status.printed">Printed</span>
+                } @else {
+                  <span class="adm-pill adm-pill--warning" jhiTranslate="productCustom.status.pending">Pending</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="adm-modal__footer">
+    <button type="button" class="adm-button adm-button--ghost" (click)="activeModal.dismiss()" jhiTranslate="productCustom.actions.cancel">
+      Cancel
+    </button>
+    <button type="button" class="adm-button adm-button--primary" (click)="enregistrer()" [disabled]="isSaving()">
+      {{ (isSaving() ? 'productCustom.actions.preparing' : 'productCustom.actions.createLabelBatch') | translate }}
+    </button>
+  </div>
+</div>

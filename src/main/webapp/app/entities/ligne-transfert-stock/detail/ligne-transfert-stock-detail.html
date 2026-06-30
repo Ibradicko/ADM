@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ligneTransfertStock(); as ligneTransfertStockRef) {
+      <div>
+        <h2 data-cy="ligneTransfertStockDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.detail.title">Ligne Transfert Stock</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ligneTransfertStockRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.quantite">Quantite</span></dt>
+          <dd>
+            <span>{{ ligneTransfertStockRef.quantite }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.commentaire">Commentaire</span></dt>
+          <dd>
+            <span>{{ ligneTransfertStockRef.commentaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.transfert">Transfert</span></dt>
+          <dd>
+            @if (ligneTransfertStock()!.transfert) {
+              <div>
+                <a [routerLink]="['/transfert-stock', ligneTransfertStock()!.transfert?.id, 'view']">{{
+                  ligneTransfertStockRef.transfert?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.produit">Produit</span></dt>
+          <dd>
+            @if (ligneTransfertStock()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', ligneTransfertStock()!.produit?.id, 'view']">{{
+                  ligneTransfertStockRef.produit?.designation
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ligne-transfert-stock', ligneTransfertStockRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

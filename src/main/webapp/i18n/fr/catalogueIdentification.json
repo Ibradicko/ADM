@@ -1,0 +1,146 @@
+{
+  "catalogueIdentification": {
+    "eyebrow": "Catalogue et identification",
+    "title": "Codes-barres et étiquettes",
+    "subtitle": "Recherche de scans, affectation article, résolution des anomalies et suivi des lots d'impression.",
+    "access": {
+      "title": "Accès restreint",
+      "description": "Votre profil ne permet pas d'ouvrir le centre d'identification article."
+    },
+    "tabs": {
+      "search": "Recherche de scan",
+      "barcodes": "Codes-barres",
+      "unknownScans": "Scans inconnus",
+      "labels": "Étiquettes",
+      "history": "Historique"
+    },
+    "kpis": {
+      "identifiedProducts": "Articles identifiés",
+      "activeCodes": "Codes actifs",
+      "openScans": "Scans ouverts",
+      "printBatches": "Lots d'impression"
+    },
+    "common": {
+      "all": "Tous",
+      "allFeminine": "Toutes",
+      "chooseProduct": "Choisir un article",
+      "no": "Non",
+      "noCode": "Sans code",
+      "noShop": "Sans boutique",
+      "productNotProvided": "Article non renseigné",
+      "selectProduct": "Sélectionner un article",
+      "yes": "Oui"
+    },
+    "fields": {
+      "assignedProduct": "Article affecté",
+      "barcode": "Code-barres",
+      "batchReference": "Référence du lot",
+      "code": "Code",
+      "date": "Date",
+      "format": "Format",
+      "globalSearch": "Recherche globale",
+      "newCode": "Nouveau code",
+      "oldCode": "Ancien code",
+      "primary": "Principal",
+      "printFormat": "Format d'impression",
+      "product": "Article",
+      "quantity": "Quantité",
+      "reason": "Motif",
+      "resolution": "Résolution",
+      "scannedCode": "Code scanné",
+      "screen": "Écran",
+      "shop": "Boutique",
+      "status": "État",
+      "systemGenerated": "Généré par le système",
+      "type": "Type",
+      "user": "Utilisateur"
+    },
+    "placeholders": {
+      "enterOrGenerateCode": "Saisir ou générer un code",
+      "generatedIfEmpty": "Générée si vide",
+      "globalSearch": "Article, code, lot, commentaire...",
+      "printFormat": "A6, rouleau, planche...",
+      "scanBarcode": "Scanner ou saisir un code-barres"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "pending": "En attente",
+      "printed": "Imprimé",
+      "resolved": "Résolu",
+      "toProcess": "À traiter"
+    },
+    "actions": {
+      "addBarcode": "Ajouter le code-barres",
+      "createLabelBatch": "Créer le lot d'étiquettes",
+      "fullView": "Vue complète",
+      "generateAutomatically": "Générer automatiquement",
+      "markPrinted": "Marquer comme imprimé",
+      "open": "Ouvrir",
+      "preparing": "Préparation...",
+      "productCatalogue": "Catalogue articles",
+      "refresh": "Actualiser",
+      "refreshing": "Actualisation...",
+      "reset": "Réinitialiser",
+      "resolve": "Résoudre",
+      "saving": "Enregistrement...",
+      "select": "Sélectionner",
+      "view": "Voir"
+    },
+    "search": {
+      "title": "Recherche par scan ou code-barres",
+      "description": "Retrouvez rapidement l'article identifié ou les anomalies associées à un code.",
+      "enterCode": "Saisissez un code pour afficher les correspondances article et les scans à traiter.",
+      "noDirectMatch": "Aucune correspondance directe trouvée dans les codes-barres actifs.",
+      "relatedScansTitle": "Scans associés à ce code",
+      "relatedScansDescription": "Signalements utiles si le scan n'est pas encore correctement rattaché au catalogue.",
+      "noUnknownScan": "Aucun scan inconnu ne correspond à cette saisie."
+    },
+    "barcodes": {
+      "title": "Codes-barres actifs et historiques",
+      "description": "Vue centralisée des identifiants articles par boutique et par type.",
+      "newTitle": "Nouveau code-barres",
+      "newDescription": "Affectation rapide d'un code à un article du catalogue."
+    },
+    "unknownScans": {
+      "title": "Scans inconnus à résoudre",
+      "description": "Traitement des codes non reconnus en caisse ou dans les workflows de stock."
+    },
+    "control": {
+      "title": "Vue de contrôle",
+      "description": "Accès directs aux pages détaillées de suivi et de paramétrage.",
+      "openScans": "{{ count }} scans ouverts",
+      "priorityDescription": "Priorité aux boutiques avec des flux caisse ou stock actifs.",
+      "barcodeSettings": "Paramétrage des codes-barres",
+      "barcodeSettingsDescription": "Formats, préfixes et longueurs de génération."
+    },
+    "labels": {
+      "title": "Lots d'étiquettes",
+      "description": "Préparation, suivi et validation des impressions article.",
+      "prepareTitle": "Préparer un lot",
+      "prepareDescription": "Création d'un lot d'étiquettes rattaché à un article et à un volume d'impression."
+    },
+    "history": {
+      "title": "Historique des changements de code",
+      "description": "Traçabilité des remplacements et corrections liés à l'identification article."
+    },
+    "messages": {
+      "selectProductForBarcode": "Sélectionnez d'abord un article pour générer un code-barres.",
+      "loadFailed": "Le chargement du centre codes-barres et étiquettes a échoué.",
+      "productAndBarcodeRequired": "L'article et le code-barres sont obligatoires.",
+      "productNotFound": "L'article sélectionné est introuvable.",
+      "barcodeAdded": "Le code-barres a été ajouté à l'article.",
+      "barcodeCreationFailed": "La création du code-barres a échoué. Vérifiez son unicité et le paramétrage saisi.",
+      "selectProductForUnknownScan": "Sélectionnez un article avant de marquer ce scan comme résolu.",
+      "resolutionProductNotFound": "L'article choisi pour la résolution est introuvable.",
+      "unknownScanResolved": "Le scan inconnu a été résolu et rattaché à l'article sélectionné.",
+      "unknownScanResolutionFailed": "La résolution du scan inconnu a échoué.",
+      "productAndLabelQuantityRequired": "L'article et la quantité d'étiquettes sont obligatoires.",
+      "labelBatchPrepared": "Le lot d'étiquettes a été préparé.",
+      "labelBatchPreparationFailed": "La préparation du lot d'étiquettes a échoué.",
+      "noLabelsInBatch": "Aucune étiquette article n'est liée à ce lot.",
+      "labelBatchPrinted": "Le lot d'étiquettes a été marqué comme imprimé.",
+      "printUpdateFailed": "La mise à jour de l'impression a échoué."
+    }
+  }
+}

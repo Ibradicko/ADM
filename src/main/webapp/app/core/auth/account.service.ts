@@ -58,6 +58,11 @@ export class AccountService {
             this.translateService.use(account.langKey);
           }
 
+          if (account.mustChangePassword && this.router.routerState.snapshot.url !== '/account/password') {
+            this.router.navigate(['/account/password']);
+            return;
+          }
+
           this.navigateToStoredUrl();
         }),
         shareReplay(),

@@ -1,0 +1,169 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="CalculRedevanceHeading">
+    <div>
+      <h1>Calculs de redevance</h1>
+      <p>Suivi mensuel des montants dus par boutique et locataire</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutGererRedevances()) {
+        <a
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="adm-button adm-button--primary"
+          [routerLink]="['/calcul-redevance/new']"
+        >
+          <fa-icon icon="plus" />
+          <span>Nouveau calcul</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <section class="adm-toolbar" aria-label="Filtres redevances">
+    <jhi-filter [filters]="filters" />
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2>Liste des calculs de redevance</h2>
+        <p>Périodes, montants et statuts de règlement par boutique</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ totalItems() }} calcul(s)</span>
+    </div>
+
+    @if (calculRedevances().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong>Aucun calcul de redevance trouvé</strong>
+        <p>Lancez un calcul mensuel pour commencer le suivi des redevances.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="reference">Référence <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="locataire.nom">Locataire <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="periodeDebut">Période <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="chiffreAffaires" class="text-end">CA <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="montantRedevance" class="text-end">Redevance <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateCalcul">Date calcul <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cr of calculRedevances(); track trackId(cr); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <a [routerLink]="['/calcul-redevance', cr.id, 'view']" class="adm-link">
+                    <span class="adm-code">{{ cr.reference ?? '#' + cr.id }}</span>
+                  </a>
+                </td>
+                <td>
+                  @if (cr.boutique) {
+                    <div class="adm-table-title">
+                      <strong>{{ cr.boutique.nom }}</strong>
+                      <small>{{ cr.boutique.code }}</small>
+                    </div>
+                  } @else {
+                    <span class="adm-text--muted">—</span>
+                  }
+                </td>
+                <td>{{ cr.locataire?.nom ?? '—' }}</td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ cr.periodeDebut | formatMediumDate }}</strong>
+                    <small>au {{ cr.periodeFin | formatMediumDate }}</small>
+                  </div>
+                </td>
+                <td class="text-end">
+                  <strong>{{ cr.chiffreAffaires != null ? (cr.chiffreAffaires | number: '1.0-0') + ' FCFA' : '—' }}</strong>
+                </td>
+                <td class="text-end">
+                  <strong>{{ cr.montantRedevance != null ? (cr.montantRedevance | number: '1.0-0') + ' FCFA' : '—' }}</strong>
+                </td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--info]="cr.statut === 'CALCULEE'"
+                    [class.adm-pill--success]="cr.statut === 'PAYEE'"
+                    [class.adm-pill--warning]="cr.statut === 'PARTIELLEMENT_PAYEE' || cr.statut === 'REGULARISEE'"
+                    [class.adm-pill--danger]="cr.statut === 'ANNULEE'"
+                    [class.adm-pill--primary]="cr.statut === 'VALIDEE'"
+                  >
+                    {{
+                      {
+                        CALCULEE: 'Calculée',
+                        VALIDEE: 'Validée',
+                        REGULARISEE: 'Régularisée',
+                        PARTIELLEMENT_PAYEE: 'Part. payée',
+                        PAYEE: 'Payée',
+                        ANNULEE: 'Annulée',
+                      }[cr.statut ?? 'CALCULEE'] ?? cr.statut
+                    }}
+                  </span>
+                </td>
+                <td>{{ cr.dateCalcul | formatMediumDatetime }}</td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/calcul-redevance', cr.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutGererRedevances()) {
+                      <a
+                        [routerLink]="['/calcul-redevance', cr.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(cr)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (calculRedevances().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

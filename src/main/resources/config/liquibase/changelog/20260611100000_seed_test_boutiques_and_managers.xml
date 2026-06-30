@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <changeSet id="20260611100000-1" author="codex">
+        <comment>Seed ADM test shops and role-scoped manager accounts.</comment>
+        <sql>
+            INSERT INTO boutique (id, code, nom, type, emplacement, telephone, email, statut, date_creation) VALUES
+              (901101, 'ADM-BTK-01', 'Boutique Test Alpha', 'COMMERCE', 'Terminal A - Zone publique', '+221770000101', 'boutique.alpha@test.adm', 'ACTIF', current_timestamp),
+              (901102, 'ADM-BTK-02', 'Boutique Test Beta', 'DUTY_FREE', 'Terminal B - Zone embarquement', '+221770000102', 'boutique.beta@test.adm', 'ACTIF', current_timestamp)
+            ON CONFLICT (code) DO UPDATE SET
+              nom = EXCLUDED.nom,
+              type = EXCLUDED.type,
+              emplacement = EXCLUDED.emplacement,
+              telephone = EXCLUDED.telephone,
+              email = EXCLUDED.email,
+              statut = EXCLUDED.statut;
+
+            INSERT INTO jhi_user (
+              id, login, password_hash, first_name, last_name, email, image_url, activated, lang_key,
+              created_by, last_modified_by, must_change_password
+            ) VALUES
+              (901201, 'manager_adm', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Manager', 'ADM', 'manager.adm@test.adm', null, true, 'fr', 'system', 'system', false),
+              (901202, 'manager_alpha', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Manager', 'Alpha', 'manager.alpha@test.adm', null, true, 'fr', 'system', 'system', false),
+              (901203, 'manager_beta', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Manager', 'Beta', 'manager.beta@test.adm', null, true, 'fr', 'system', 'system', false)
+            ON CONFLICT (login) DO UPDATE SET
+              password_hash = EXCLUDED.password_hash,
+              first_name = EXCLUDED.first_name,
+              last_name = EXCLUDED.last_name,
+              email = EXCLUDED.email,
+              activated = EXCLUDED.activated,
+              lang_key = EXCLUDED.lang_key,
+              must_change_password = EXCLUDED.must_change_password,
+              last_modified_by = EXCLUDED.last_modified_by;
+
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT user_account.id, 'ROLE_USER'
+            FROM jhi_user user_account
+            WHERE user_account.login IN ('manager_adm', 'manager_alpha', 'manager_beta')
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901301, DATE '2026-01-01', null, true, user_account.id, boutique.id, profil.id
+            FROM jhi_user user_account
+            JOIN boutique ON boutique.code = 'ADM-BTK-01'
+            JOIN profil_metier profil ON profil.code = 'MANAGER_ADM'
+            WHERE user_account.login = 'manager_adm'
+            ON CONFLICT (id) DO UPDATE SET
+              date_debut = EXCLUDED.date_debut,
+              date_fin = EXCLUDED.date_fin,
+              actif = EXCLUDED.actif,
+              user_id = EXCLUDED.user_id,
+              boutique_id = EXCLUDED.boutique_id,
+              profil_id = EXCLUDED.profil_id;
+
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901302, DATE '2026-01-01', null, true, user_account.id, boutique.id, profil.id
+            FROM jhi_user user_account
+            JOIN boutique ON boutique.code = 'ADM-BTK-02'
+            JOIN profil_metier profil ON profil.code = 'MANAGER_ADM'
+            WHERE user_account.login = 'manager_adm'
+            ON CONFLICT (id) DO UPDATE SET
+              date_debut = EXCLUDED.date_debut,
+              date_fin = EXCLUDED.date_fin,
+              actif = EXCLUDED.actif,
+              user_id = EXCLUDED.user_id,
+              boutique_id = EXCLUDED.boutique_id,
+              profil_id = EXCLUDED.profil_id;
+
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901303, DATE '2026-01-01', null, true, user_account.id, boutique.id, profil.id
+            FROM jhi_user user_account
+            JOIN boutique ON boutique.code = 'ADM-BTK-01'
+            JOIN profil_metier profil ON profil.code = 'MANAGER_BOUTIQUE'
+            WHERE user_account.login = 'manager_alpha'
+            ON CONFLICT (id) DO UPDATE SET
+              date_debut = EXCLUDED.date_debut,
+              date_fin = EXCLUDED.date_fin,
+              actif = EXCLUDED.actif,
+              user_id = EXCLUDED.user_id,
+              boutique_id = EXCLUDED.boutique_id,
+              profil_id = EXCLUDED.profil_id;
+
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 901304, DATE '2026-01-01', null, true, user_account.id, boutique.id, profil.id
+            FROM jhi_user user_account
+            JOIN boutique ON boutique.code = 'ADM-BTK-02'
+            JOIN profil_metier profil ON profil.code = 'MANAGER_BOUTIQUE'
+            WHERE user_account.login = 'manager_beta'
+            ON CONFLICT (id) DO UPDATE SET
+              date_debut = EXCLUDED.date_debut,
+              date_fin = EXCLUDED.date_fin,
+              actif = EXCLUDED.actif,
+              user_id = EXCLUDED.user_id,
+              boutique_id = EXCLUDED.boutique_id,
+              profil_id = EXCLUDED.profil_id;
+
+            SELECT setval('sequence_generator', GREATEST((SELECT last_value FROM sequence_generator), 902000), true);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

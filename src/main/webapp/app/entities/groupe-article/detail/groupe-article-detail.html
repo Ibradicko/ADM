@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (groupeArticle(); as groupeArticleRef) {
+      <div>
+        <h2 data-cy="groupeArticleDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.groupeArticle.detail.title">Groupe Article</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ groupeArticleRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.code">Code</span></dt>
+          <dd>
+            <span>{{ groupeArticleRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.libelle">Libelle</span></dt>
+          <dd>
+            <span>{{ groupeArticleRef.libelle }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutGeneral.' + (groupeArticleRef.statut ?? 'null')">{{
+              { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[groupeArticleRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.boutique">Boutique</span></dt>
+          <dd>
+            @if (groupeArticle()!.boutique) {
+              <div>
+                <a [routerLink]="['/boutique', groupeArticle()!.boutique?.id, 'view']">{{ groupeArticleRef.boutique?.nom }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/groupe-article', groupeArticleRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

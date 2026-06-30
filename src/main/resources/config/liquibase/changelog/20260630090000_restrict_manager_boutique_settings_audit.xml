@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <changeSet id="20260630090000-1" author="codex">
+        <comment>Restrict MANAGER_BOUTIQUE to its operational scope: drop SETTINGS_READ and AUDIT_READ, reserved to ADMINISTRATEUR/MANAGER_ADM. MANAGER_BOUTIQUE keeps payment-mode read access via SALES_READ/ROYALTY_READ (canReadPaymentSettings).</comment>
+        <sql>
+            DELETE FROM rel_profil_metier__permissions relation
+            USING profil_metier profil, permission_metier permission
+            WHERE relation.profil_metier_id = profil.id
+              AND relation.permissions_id = permission.id
+              AND profil.code = 'MANAGER_BOUTIQUE'
+              AND permission.code IN ('SETTINGS_READ', 'AUDIT_READ');
+        </sql>
+    </changeSet>
+</databaseChangeLog>

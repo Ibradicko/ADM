@@ -1,0 +1,26 @@
+{
+  "reset": {
+    "request": {
+      "title": "Reinitialisation du mot de passe",
+      "form": {
+        "button": "Reinitialiser le mot de passe"
+      },
+      "messages": {
+        "info": "Saisissez l'adresse email associee a votre compte.",
+        "success": "Consultez votre email pour continuer la reinitialisation du mot de passe."
+      }
+    },
+    "finish": {
+      "title": "Reinitialisation du mot de passe",
+      "form": {
+        "button": "Valider le nouveau mot de passe"
+      },
+      "messages": {
+        "info": "Choisissez un nouveau mot de passe.",
+        "success": "<strong>Votre mot de passe a ete reinitialise.</strong> Veuillez ",
+        "keymissing": "La cle de reinitialisation est absente.",
+        "error": "Votre mot de passe n'a pas pu etre reinitialise. Une demande de reinitialisation est valable pendant 24 heures."
+      }
+    }
+  }
+}

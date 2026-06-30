@@ -1,13 +1,9 @@
-<jhi-page-ribbon />
-
-<div>
-  <router-outlet name="navbar" />
-</div>
-
-<div class="container-fluid">
-  <div class="card jh-card">
-    <router-outlet />
+<div class="adm-app-frame" [class.adm-app-frame--public]="!showApplicationShell()">
+  <div [class.adm-app-chrome--hidden]="!showApplicationShell()">
+    <router-outlet name="navbar" />
   </div>
 
-  <jhi-footer />
+  <main class="adm-app-content" [class.adm-app-content--public]="!showApplicationShell()">
+    <router-outlet />
+  </main>
 </div>

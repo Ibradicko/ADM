@@ -1,0 +1,27 @@
+{
+  "admSupervisionVentesApp": {
+    "parametreCodeBarres": {
+      "home": {
+        "title": "Parametre Code Barres",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Parametre Code Barres",
+        "createOrEditLabel": "Create or edit a Parametre Code Barres",
+        "notFound": "No Parametre Code Barres found"
+      },
+      "created": "A new Parametre Code Barres is created with identifier {{ param }}",
+      "updated": "A Parametre Code Barres is updated with identifier {{ param }}",
+      "deleted": "A Parametre Code Barres is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Parametre Code Barres {{ id }}?"
+      },
+      "detail": {
+        "title": "Parametre Code Barres"
+      },
+      "id": "ID",
+      "formatParDefaut": "Format Par Defaut",
+      "prefixe": "Prefixe",
+      "longueur": "Longueur",
+      "actif": "Actif"
+    }
+  }
+}

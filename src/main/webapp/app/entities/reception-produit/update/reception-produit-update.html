@@ -1,0 +1,193 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-reception-produit-heading"
+        data-cy="ReceptionProduitCreateUpdateHeading"
+        jhiTranslate="admSupervisionVentesApp.receptionProduit.home.createOrEditLabel"
+      >
+        Create or edit a Reception Produit
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let referenceRef = editForm.get('reference')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_reference" jhiTranslate="admSupervisionVentesApp.receptionProduit.reference"
+            >Reference</label
+          >
+          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+            <div>
+              @if (editForm.get('reference')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('reference')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+                  >This field cannot be longer than 80 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let dateReceptionRef = editForm.get('dateReception')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateReception" jhiTranslate="admSupervisionVentesApp.receptionProduit.dateReception"
+            >Date Reception</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_dateReception"
+              data-cy="dateReception"
+              type="datetime-local"
+              class="form-control"
+              name="dateReception"
+              formControlName="dateReception"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (dateReceptionRef.invalid && (dateReceptionRef.dirty || dateReceptionRef.touched)) {
+            <div>
+              @if (editForm.get('dateReception')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('dateReception')?.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let fournisseurRef = editForm.get('fournisseur')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_fournisseur" jhiTranslate="admSupervisionVentesApp.receptionProduit.fournisseur"
+            >Fournisseur</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="fournisseur"
+            id="field_fournisseur"
+            data-cy="fournisseur"
+            formControlName="fournisseur"
+          />
+          @if (fournisseurRef.invalid && (fournisseurRef.dirty || fournisseurRef.touched)) {
+            <div>
+              @if (editForm.get('fournisseur')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '150' }"
+                  >This field cannot be longer than 150 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let commentaireRef = editForm.get('commentaire')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_commentaire" jhiTranslate="admSupervisionVentesApp.receptionProduit.commentaire"
+            >Commentaire</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="commentaire"
+            id="field_commentaire"
+            data-cy="commentaire"
+            formControlName="commentaire"
+          />
+          @if (commentaireRef.invalid && (commentaireRef.dirty || commentaireRef.touched)) {
+            <div>
+              @if (editForm.get('commentaire')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+                  >This field cannot be longer than 255 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_boutique" jhiTranslate="admSupervisionVentesApp.receptionProduit.boutique">Boutique</label>
+          <select
+            class="form-control"
+            id="field_boutique"
+            data-cy="boutique"
+            name="boutique"
+            formControlName="boutique"
+            [compareWith]="compareBoutique"
+          >
+            @if (!editForm.get('boutique')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
+              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['boutique'])!.invalid && (editForm.get(['boutique'])!.dirty || editForm.get(['boutique'])!.touched)) {
+          <div>
+            @if (editForm.get(['boutique'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_utilisateur" jhiTranslate="admSupervisionVentesApp.receptionProduit.utilisateur"
+            >Utilisateur</label
+          >
+          <select
+            class="form-control"
+            id="field_utilisateur"
+            data-cy="utilisateur"
+            name="utilisateur"
+            formControlName="utilisateur"
+            [compareWith]="compareUser"
+          >
+            @if (!editForm.get('utilisateur')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
+          <div>
+            @if (editForm.get(['utilisateur'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

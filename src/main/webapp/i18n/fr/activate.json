@@ -1,0 +1,9 @@
+{
+  "activate": {
+    "title": "Activation",
+    "messages": {
+      "success": "<strong>Votre compte utilisateur a ete active.</strong> Veuillez ",
+      "error": "<strong>Votre compte utilisateur n'a pas pu etre active.</strong> Veuillez contacter l'administration."
+    }
+  }
+}

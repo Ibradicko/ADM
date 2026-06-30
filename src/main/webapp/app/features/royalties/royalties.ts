@@ -1,0 +1,504 @@
+import dayjs from 'dayjs/esm';
+
+import { HttpResponse } from '@angular/common/http';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { firstValueFrom } from 'rxjs';
+
+import { UiPermissionService } from 'app/core/services/ui-permission.service';
+import { TranslateDirective } from 'app/shared/language';
+import { IBoutique } from 'app/entities/boutique/boutique.model';
+import { BoutiqueService } from 'app/entities/boutique/service/boutique.service';
+import { ICalculRedevance } from 'app/entities/calcul-redevance/calcul-redevance.model';
+import { CalculRedevanceService } from 'app/entities/calcul-redevance/service/calcul-redevance.service';
+import { StatutRedevance } from 'app/entities/enumerations/statut-redevance.model';
+import { ExploitationBoutiqueService } from 'app/entities/exploitation-boutique/service/exploitation-boutique.service';
+import { ILocataire } from 'app/entities/locataire/locataire.model';
+import { LocataireService } from 'app/entities/locataire/service/locataire.service';
+import { IPaiementRedevance, NewPaiementRedevance } from 'app/entities/paiement-redevance/paiement-redevance.model';
+import { PaiementRedevanceService } from 'app/entities/paiement-redevance/service/paiement-redevance.service';
+import { IRegleRedevance } from 'app/entities/regle-redevance/regle-redevance.model';
+import { RegleRedevanceService } from 'app/entities/regle-redevance/service/regle-redevance.service';
+import { IRegularisationRedevance, NewRegularisationRedevance } from 'app/entities/regularisation-redevance/regularisation-redevance.model';
+import { RegularisationRedevanceService } from 'app/entities/regularisation-redevance/service/regularisation-redevance.service';
+
+interface MessageRedevance {
+  type: 'success' | 'danger' | 'info';
+  key: string;
+}
+
+@Component({
+  selector: 'jhi-royalties',
+  templateUrl: './royalties.html',
+  imports: [FormsModule, RouterLink, TranslateDirective, TranslateModule],
+})
+export default class RoyaltiesComponent implements OnInit {
+  readonly permissionsUi = inject(UiPermissionService);
+
+  readonly boutiques = signal<IBoutique[]>([]);
+  readonly locataires = signal<ILocataire[]>([]);
+  readonly calculs = signal<ICalculRedevance[]>([]);
+  readonly paiements = signal<IPaiementRedevance[]>([]);
+  readonly regularisations = signal<IRegularisationRedevance[]>([]);
+  readonly regles = signal<IRegleRedevance[]>([]);
+  readonly chargement = signal(false);
+  readonly enregistrement = signal(false);
+  readonly message = signal<MessageRedevance | null>(null);
+
+  readonly boutiqueId = signal<number | null>(null);
+  readonly locataireId = signal<number | null>(null);
+  readonly statut = signal<string>('');
+  readonly dateDebut = signal<string>(dayjs().startOf('month').format('YYYY-MM-DD'));
+  readonly dateFin = signal<string>(dayjs().endOf('month').format('YYYY-MM-DD'));
+  readonly recherche = signal('');
+  readonly calculSelectionneId = signal<number | null>(null);
+  readonly statutCible = signal<keyof typeof StatutRedevance>('VALIDEE');
+
+  readonly paiementMontant = signal<number | null>(null);
+  readonly paiementDate = signal<string>(dayjs().format('YYYY-MM-DD'));
+  readonly paiementMode = signal('VIREMENT');
+  readonly paiementCommentaire = signal('');
+  readonly modesPaiement = ['VIREMENT', 'ESPECES', 'CARTE', 'MOBILE_MONEY'];
+
+  readonly regularisationMontant = signal<number | null>(null);
+  readonly regularisationDate = signal<string>(dayjs().format('YYYY-MM-DD'));
+  readonly regularisationMotif = signal('');
+
+  readonly statutsDisponibles = Object.values(StatutRedevance);
+
+  readonly calculsFiltres = computed(() => {
+    const texte = this.recherche().trim().toLowerCase();
+    const debut = this.dateDebut();
+    const fin = this.dateFin();
+
+    return this.calculs().filter(calcul => {
+      if (this.boutiqueId() && calcul.boutique?.id !== this.boutiqueId()) {
+        return false;
+      }
+      if (this.locataireId() && calcul.locataire?.id !== this.locataireId()) {
+        return false;
+      }
+      if (this.statut() && calcul.statut !== this.statut()) {
+        return false;
+      }
+      if (debut && calcul.periodeDebut && calcul.periodeDebut.isBefore(dayjs(debut), 'day')) {
+        return false;
+      }
+      if (fin && calcul.periodeFin && calcul.periodeFin.isAfter(dayjs(fin), 'day')) {
+        return false;
+      }
+      if (!texte) {
+        return true;
+      }
+
+      const haystack = [calcul.reference, calcul.boutique?.nom, calcul.locataire?.nom, calcul.statut]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(texte);
+    });
+  });
+
+  readonly calculSelectionne = computed(
+    () => this.calculs().find(calcul => calcul.id === this.calculSelectionneId()) ?? this.calculsFiltres()[0] ?? null,
+  );
+  readonly paiementsSelectionnes = computed(() =>
+    this.paiements()
+      .filter(paiement => paiement.calcul?.id === this.calculSelectionne()?.id)
+      .sort((a, b) => (b.datePaiement?.valueOf() ?? 0) - (a.datePaiement?.valueOf() ?? 0)),
+  );
+  readonly montantPayeSelectionne = computed(() =>
+    this.paiementsSelectionnes().reduce((total, paiement) => total + (paiement.montant ?? 0), 0),
+  );
+  readonly resteSelectionne = computed(() =>
+    Math.max(0, (this.calculSelectionne()?.montantRedevance ?? 0) - this.montantPayeSelectionne()),
+  );
+  readonly regularisationsSelectionnees = computed(() =>
+    this.regularisations()
+      .filter(regularisation => regularisation.calcul?.id === this.calculSelectionne()?.id)
+      .sort((a, b) => (b.dateRegularisation?.valueOf() ?? 0) - (a.dateRegularisation?.valueOf() ?? 0)),
+  );
+  readonly resume = computed(() => {
+    const calculs = this.calculsFiltres().filter(calcul => calcul.statut !== StatutRedevance.ANNULEE);
+    const ids = new Set(calculs.map(calcul => calcul.id));
+    const paiements = this.paiements().filter(paiement => ids.has(paiement.calcul?.id ?? -1));
+    const regularisations = this.regularisations().filter(regularisation => ids.has(regularisation.calcul?.id ?? -1));
+
+    const chiffreAffaires = calculs.reduce((total, calcul) => total + (calcul.chiffreAffaires ?? 0), 0);
+    const montantDu = calculs.reduce((total, calcul) => total + (calcul.montantRedevance ?? 0), 0);
+    const montantPaye = paiements.reduce((total, paiement) => total + (paiement.montant ?? 0), 0);
+    const montantRegularise = regularisations.reduce((total, regularisation) => total + (regularisation.montant ?? 0), 0);
+
+    return {
+      nombreCalculs: calculs.length,
+      chiffreAffaires,
+      montantDu,
+      montantPaye,
+      montantRegularise,
+      solde: montantDu - montantPaye - montantRegularise,
+    };
+  });
+  readonly reglesActives = computed(() => this.regles().filter(regle => regle.actif));
+  readonly estVueLocataire = computed(() => this.permissionsUi.estLocataire());
+  readonly estVueManagerBoutique = computed(
+    () => this.permissionsUi.estProfilBoutique() && !this.permissionsUi.estAdmin() && !this.permissionsUi.estProfilAdm(),
+  );
+
+  private readonly boutiqueService = inject(BoutiqueService);
+  private readonly exploitationBoutiqueService = inject(ExploitationBoutiqueService);
+  private readonly locataireService = inject(LocataireService);
+  private readonly calculRedevanceService = inject(CalculRedevanceService);
+  private readonly paiementRedevanceService = inject(PaiementRedevanceService);
+  private readonly regularisationRedevanceService = inject(RegularisationRedevanceService);
+  private readonly regleRedevanceService = inject(RegleRedevanceService);
+
+  ngOnInit(): void {
+    void this.initialiser();
+  }
+
+  formatMontant(valeur: number | null | undefined): string {
+    return typeof valeur === 'number' ? `${valeur.toLocaleString('fr-FR')} F CFA` : '--';
+  }
+
+  formatDate(valeur: dayjs.Dayjs | null | undefined, pattern = 'DD/MM/YYYY'): string {
+    return valeur ? valeur.format(pattern) : '--';
+  }
+
+  statutKey(statut: string | null | undefined): string {
+    return statut ? `admSupervisionVentesApp.StatutRedevance.${statut}` : 'royalties.common.unavailable';
+  }
+
+  selectionnerCalcul(id: number): void {
+    this.calculSelectionneId.set(id);
+    const calcul = this.calculs().find(item => item.id === id);
+    this.boutiqueId.set(calcul?.boutique?.id ?? null);
+    if (!this.estVueLocataire()) {
+      this.locataireId.set(calcul?.locataire?.id ?? null);
+    }
+    queueMicrotask(() => this.paiementMontant.set(this.resteSelectionne() || null));
+  }
+
+  solderRedevance(): void {
+    this.paiementMontant.set(this.resteSelectionne() || null);
+  }
+
+  async recharger(): Promise<void> {
+    this.chargement.set(true);
+    this.message.set(null);
+    try {
+      await Promise.all([this.chargerReferentiels(), this.chargerRedevances()]);
+      if (this.calculSelectionne() && !this.calculSelectionneId()) {
+        this.calculSelectionneId.set(this.calculSelectionne()?.id ?? null);
+      }
+    } catch {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.loadFailed',
+      });
+    } finally {
+      this.chargement.set(false);
+    }
+  }
+
+  async creerCalcul(): Promise<void> {
+    if (!this.permissionsUi.peutGererRedevances()) {
+      return;
+    }
+
+    if (!this.boutiqueId() || !this.locataireId()) {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.shopAndTenantRequired',
+      });
+      return;
+    }
+
+    this.enregistrement.set(true);
+    this.message.set(null);
+
+    try {
+      const calcul = await firstValueFrom(
+        this.calculRedevanceService.generate({
+          periodeDebut: this.dateDebut(),
+          periodeFin: this.dateFin(),
+          boutiqueId: this.boutiqueId()!,
+          locataireId: this.locataireId()!,
+        }),
+      );
+      this.calculSelectionneId.set(calcul.id);
+      await this.recharger();
+      this.message.set({
+        type: 'success',
+        key: 'royalties.messages.calculationSaved',
+      });
+    } catch {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.calculationSaveFailed',
+      });
+    } finally {
+      this.enregistrement.set(false);
+    }
+  }
+
+  async mettreAJourStatutCalcul(): Promise<void> {
+    const calcul = this.calculSelectionne();
+    if (!calcul || !this.permissionsUi.peutGererRedevances()) {
+      return;
+    }
+
+    this.enregistrement.set(true);
+    this.message.set(null);
+
+    try {
+      await firstValueFrom(
+        this.calculRedevanceService.partialUpdate({
+          id: calcul.id,
+          statut: this.statutCible(),
+        }),
+      );
+      await this.recharger();
+      this.message.set({
+        type: 'success',
+        key: 'royalties.messages.statusUpdated',
+      });
+    } catch {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.statusUpdateFailed',
+      });
+    } finally {
+      this.enregistrement.set(false);
+    }
+  }
+
+  async enregistrerPaiement(): Promise<void> {
+    const calcul = this.calculSelectionne();
+    if (!calcul || !this.permissionsUi.peutGererRedevances()) {
+      return;
+    }
+    if (!this.paiementMontant() || this.paiementMontant()! <= 0) {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.paymentAmountRequired',
+      });
+      return;
+    }
+    if (this.paiementMontant()! > this.resteSelectionne()) {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.paymentExceedsBalance',
+      });
+      return;
+    }
+
+    this.enregistrement.set(true);
+    this.message.set(null);
+
+    try {
+      const payload: NewPaiementRedevance = {
+        id: null,
+        reference: `PAY-${Date.now()}`,
+        montant: this.paiementMontant(),
+        datePaiement: this.paiementDate() ? dayjs(this.paiementDate()) : dayjs(),
+        modePaiement: this.paiementMode(),
+        commentaire: this.paiementCommentaire(),
+        calcul: { id: calcul.id, reference: calcul.reference ?? null },
+      };
+
+      await firstValueFrom(this.paiementRedevanceService.create(payload));
+      this.paiementMontant.set(null);
+      this.paiementMode.set('VIREMENT');
+      this.paiementCommentaire.set('');
+      await this.recharger();
+      this.paiementMontant.set(this.resteSelectionne() || null);
+      this.message.set({
+        type: 'success',
+        key: 'royalties.messages.paymentSaved',
+      });
+    } catch {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.paymentSaveFailed',
+      });
+    } finally {
+      this.enregistrement.set(false);
+    }
+  }
+
+  async enregistrerRegularisation(): Promise<void> {
+    const calcul = this.calculSelectionne();
+    if (!calcul || !this.permissionsUi.peutGererRedevances()) {
+      return;
+    }
+    if (!this.regularisationMontant() || !this.regularisationMotif().trim()) {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.adjustmentFieldsRequired',
+      });
+      return;
+    }
+
+    this.enregistrement.set(true);
+    this.message.set(null);
+
+    try {
+      const payload: NewRegularisationRedevance = {
+        id: null,
+        reference: `REG-${Date.now()}`,
+        montant: this.regularisationMontant(),
+        motif: this.regularisationMotif().trim(),
+        dateRegularisation: this.regularisationDate() ? dayjs(this.regularisationDate()) : dayjs(),
+        calcul: { id: calcul.id, reference: calcul.reference ?? null },
+      };
+
+      await firstValueFrom(this.regularisationRedevanceService.create(payload));
+      this.regularisationMontant.set(null);
+      this.regularisationMotif.set('');
+      await this.recharger();
+      this.message.set({
+        type: 'success',
+        key: 'royalties.messages.adjustmentSaved',
+      });
+    } catch {
+      this.message.set({
+        type: 'danger',
+        key: 'royalties.messages.adjustmentSaveFailed',
+      });
+    } finally {
+      this.enregistrement.set(false);
+    }
+  }
+
+  private async initialiser(): Promise<void> {
+    await this.recharger();
+  }
+
+  private async chargerReferentiels(): Promise<void> {
+    if (this.estVueLocataire()) {
+      const exploitations = await firstValueFrom(this.exploitationBoutiqueService.findMesExploitations());
+      const boutiques = exploitations
+        .filter(exploitation => exploitation.statut === 'ACTIF' && exploitation.boutique?.id)
+        .map(exploitation => exploitation.boutique as IBoutique);
+
+      this.boutiques.set(boutiques);
+      this.locataires.set([]);
+      this.locataireId.set(null);
+      if (!this.boutiqueId() && boutiques.length === 1) {
+        this.boutiqueId.set(boutiques[0].id);
+      }
+      return;
+    }
+
+    if (this.estVueManagerBoutique()) {
+      const ids = this.permissionsUi.boutiqueIds();
+      const boutiquesResponse = await firstValueFrom(
+        this.boutiqueService.query({
+          ...(ids.length ? { 'id.in': ids.join(',') } : { 'id.equals': -1 }),
+          size: 500,
+          sort: ['nom,asc'],
+        }),
+      );
+      this.boutiques.set(boutiquesResponse.body ?? []);
+      this.locataires.set([]);
+      this.locataireId.set(null);
+      if (!this.boutiqueId() && this.boutiques().length === 1) {
+        this.boutiqueId.set(this.boutiques()[0].id);
+      }
+      return;
+    }
+
+    const [boutiquesResponse, locatairesResponse] = await Promise.all([
+      firstValueFrom(this.boutiqueService.query({ size: 500, sort: ['nom,asc'] })),
+      firstValueFrom(this.locataireService.query({ size: 500, sort: ['nom,asc'] })),
+    ]);
+
+    this.boutiques.set(boutiquesResponse.body ?? []);
+    this.locataires.set(locatairesResponse.body ?? []);
+    if (!this.boutiqueId() && this.boutiques().length === 1) {
+      this.boutiqueId.set(this.boutiques()[0].id);
+    }
+    if (!this.locataireId() && this.locataires().length === 1) {
+      this.locataireId.set(this.locataires()[0].id);
+    }
+  }
+
+  private async chargerRedevances(): Promise<void> {
+    const calculParams: Record<string, unknown> = { size: 1000, sort: ['dateCalcul,desc'] };
+    const paiementParams: Record<string, unknown> = { size: 1000, sort: ['datePaiement,desc'] };
+    const regularisationParams: Record<string, unknown> = { size: 1000, sort: ['dateRegularisation,desc'] };
+    const regleParams: Record<string, unknown> = { size: 1000, sort: ['priorite,asc'] };
+
+    if ((this.estVueLocataire() || this.estVueManagerBoutique()) && this.boutiques().length > 0) {
+      const boutiqueIds = this.boutiques()
+        .map(boutique => boutique.id)
+        .filter((id): id is number => !!id)
+        .join(',');
+      calculParams['boutiqueId.in'] = boutiqueIds;
+      regleParams['boutiqueId.in'] = boutiqueIds;
+    }
+
+    const calculsResponse = await this.queryOptionnelle(
+      () => firstValueFrom(this.calculRedevanceService.query(calculParams)),
+      new HttpResponse<ICalculRedevance[]>({ body: [] }),
+    );
+    const calculs = this.filtrerCalculsBoutique(calculsResponse.body ?? []);
+    const calculIds = new Set(calculs.map(calcul => calcul.id));
+    const calculIdsParam = Array.from(calculIds).join(',');
+
+    if (calculIdsParam) {
+      paiementParams['calculId.in'] = calculIdsParam;
+      regularisationParams['calculId.in'] = calculIdsParam;
+    } else if (this.estVueLocataire() || this.estVueManagerBoutique()) {
+      paiementParams['calculId.equals'] = -1;
+      regularisationParams['calculId.equals'] = -1;
+    }
+
+    const [paiementsResponse, regularisationsResponse, reglesResponse] = await Promise.all([
+      this.queryOptionnelle(
+        () => firstValueFrom(this.paiementRedevanceService.query(paiementParams)),
+        new HttpResponse<IPaiementRedevance[]>({ body: [] }),
+      ),
+      this.queryOptionnelle(
+        () => firstValueFrom(this.regularisationRedevanceService.query(regularisationParams)),
+        new HttpResponse<IRegularisationRedevance[]>({ body: [] }),
+      ),
+      this.estVueLocataire() || this.estVueManagerBoutique()
+        ? Promise.resolve(new HttpResponse<IRegleRedevance[]>({ body: [] }))
+        : firstValueFrom(this.regleRedevanceService.query(regleParams)),
+    ]);
+
+    this.calculs.set(calculs);
+    this.paiements.set((paiementsResponse.body ?? []).filter(paiement => calculIds.has(paiement.calcul?.id ?? -1)));
+    this.regularisations.set((regularisationsResponse.body ?? []).filter(regularisation => calculIds.has(regularisation.calcul?.id ?? -1)));
+    this.regles.set(reglesResponse.body ?? []);
+    if (!this.calculSelectionneId() && this.calculs()[0]) {
+      this.selectionnerCalcul(this.calculs()[0].id);
+    }
+  }
+
+  private filtrerCalculsBoutique(calculs: ICalculRedevance[]): ICalculRedevance[] {
+    if (!this.estVueLocataire() && !this.estVueManagerBoutique()) {
+      return calculs;
+    }
+
+    const boutiqueIds = new Set(
+      this.boutiques()
+        .map(boutique => boutique.id)
+        .filter((id): id is number => !!id),
+    );
+    return calculs.filter(calcul => calcul.boutique?.id && boutiqueIds.has(calcul.boutique.id));
+  }
+
+  private async queryOptionnelle<T>(requete: () => Promise<T>, valeurFallback: T): Promise<T> {
+    try {
+      return await requete();
+    } catch {
+      return valeurFallback;
+    }
+  }
+}

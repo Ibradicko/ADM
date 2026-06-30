@@ -1,0 +1,10 @@
+{
+  "admSupervisionVentesApp": {
+    "TypePrix": {
+      "null": "",
+      "STANDARD": "STANDARD",
+      "PROMOTION": "PROMOTION",
+      "CONTRACTUEL": "CONTRACTUEL"
+    }
+  }
+}

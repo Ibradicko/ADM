@@ -1,0 +1,34 @@
+{
+  "admSupervisionVentesApp": {
+    "regleRedevance": {
+      "home": {
+        "title": "Regle Redevances",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Regle Redevance",
+        "createOrEditLabel": "Create or edit a Regle Redevance",
+        "notFound": "No Regle Redevances found"
+      },
+      "created": "A new Regle Redevance is created with identifier {{ param }}",
+      "updated": "A Regle Redevance is updated with identifier {{ param }}",
+      "deleted": "A Regle Redevance is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Regle Redevance {{ id }}?"
+      },
+      "detail": {
+        "title": "Regle Redevance"
+      },
+      "id": "ID",
+      "code": "Code",
+      "typeRegle": "Type Regle",
+      "taux": "Taux",
+      "dateDebut": "Date Debut",
+      "dateFin": "Date Fin",
+      "priorite": "Priorite",
+      "actif": "Actif",
+      "boutique": "Boutique",
+      "locataire": "Locataire",
+      "groupeArticle": "Groupe Article",
+      "produit": "Produit"
+    }
+  }
+}

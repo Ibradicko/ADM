@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <changeSet id="20260608110000-1" author="codex">
+        <comment>Restore mandatory business reference data after functional data resets.</comment>
+        <sql>
+            INSERT INTO permission_metier (id, code, libelle, module, description) VALUES
+              (900001, 'USER_READ', 'Consulter les utilisateurs', 'UTILISATEURS', 'Lecture des utilisateurs et affectations'),
+              (900002, 'USER_CREATE', 'Creer les utilisateurs', 'UTILISATEURS', 'Creation des comptes et affectations'),
+              (900003, 'USER_UPDATE', 'Modifier les utilisateurs', 'UTILISATEURS', 'Modification des comptes et affectations'),
+              (900004, 'USER_DEACTIVATE', 'Desactiver les utilisateurs', 'UTILISATEURS', 'Desactivation des comptes et affectations'),
+              (900005, 'USER_MANAGE', 'Administrer les utilisateurs', 'UTILISATEURS', 'Gestion complete des utilisateurs'),
+              (900010, 'SALES_READ', 'Consulter les ventes', 'CAISSE', 'Lecture de la caisse, tickets et paiements'),
+              (900011, 'SALES_MANAGE', 'Gerer les ventes', 'CAISSE', 'Creation, validation et correction des ventes'),
+              (900020, 'STOCK_READ', 'Consulter le stock', 'STOCK', 'Lecture des stocks, depots, receptions et inventaires'),
+              (900021, 'STOCK_MANAGE', 'Gerer le stock', 'STOCK', 'Operations de stock, receptions, inventaires et transferts'),
+              (900030, 'REPORTING_READ', 'Consulter le reporting', 'REPORTING', 'Lecture des tableaux de bord et indicateurs'),
+              (900031, 'REPORTING_EXPORT', 'Exporter le reporting', 'REPORTING', 'Generation et consultation des exports'),
+              (900040, 'ROYALTY_READ', 'Consulter les redevances', 'REDEVANCES', 'Lecture des regles et calculs de redevance'),
+              (900041, 'ROYALTY_MANAGE', 'Gerer les redevances', 'REDEVANCES', 'Creation et validation des redevances'),
+              (900050, 'SETTINGS_READ', 'Consulter les parametres', 'PARAMETRES', 'Lecture du parametrage fonctionnel'),
+              (900051, 'SETTINGS_MANAGE', 'Gerer les parametres', 'PARAMETRES', 'Modification du parametrage fonctionnel'),
+              (900060, 'AUDIT_READ', 'Consulter audit et supervision', 'AUDIT', 'Lecture du journal audit et des controles')
+            ON CONFLICT (code) DO UPDATE SET
+              libelle = EXCLUDED.libelle,
+              module = EXCLUDED.module,
+              description = EXCLUDED.description;
+
+            INSERT INTO profil_metier (id, code, libelle, description, statut) VALUES
+              (900101, 'ADMINISTRATEUR', 'Administrateur', 'Acces complet a l application et aux outils techniques', 'ACTIF'),
+              (900102, 'MANAGER_ADM', 'Manager ADM', 'Creation des boutiques, gestion des acces, redevances, reporting et supervision ADM', 'ACTIF'),
+              (900103, 'MANAGER_BOUTIQUE', 'Manager boutique', 'Pilotage operationnel d une boutique: caisse, stock, redevances et reporting', 'ACTIF'),
+              (900104, 'VENDEUR', 'Vendeur', 'Utilisation du poste caisse et consultation des ventes de sa boutique', 'ACTIF')
+            ON CONFLICT (code) DO UPDATE SET
+              libelle = EXCLUDED.libelle,
+              description = EXCLUDED.description,
+              statut = EXCLUDED.statut;
+
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT p.id, pm.id
+            FROM profil_metier p
+            JOIN permission_metier pm ON pm.code IN (
+              'USER_READ', 'USER_CREATE', 'USER_UPDATE', 'USER_DEACTIVATE', 'USER_MANAGE',
+              'SALES_READ', 'SALES_MANAGE',
+              'STOCK_READ', 'STOCK_MANAGE',
+              'REPORTING_READ', 'REPORTING_EXPORT',
+              'ROYALTY_READ', 'ROYALTY_MANAGE',
+              'SETTINGS_READ', 'SETTINGS_MANAGE',
+              'AUDIT_READ'
+            )
+            WHERE p.code = 'ADMINISTRATEUR'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT p.id, pm.id
+            FROM profil_metier p
+            JOIN permission_metier pm ON pm.code IN (
+              'USER_READ', 'USER_CREATE', 'USER_UPDATE', 'USER_DEACTIVATE', 'USER_MANAGE',
+              'SALES_READ',
+              'REPORTING_READ', 'REPORTING_EXPORT',
+              'ROYALTY_READ', 'ROYALTY_MANAGE',
+              'SETTINGS_READ', 'SETTINGS_MANAGE',
+              'AUDIT_READ'
+            )
+            WHERE p.code = 'MANAGER_ADM'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT p.id, pm.id
+            FROM profil_metier p
+            JOIN permission_metier pm ON pm.code IN (
+              'USER_READ', 'USER_CREATE', 'USER_UPDATE', 'USER_DEACTIVATE',
+              'SALES_READ', 'SALES_MANAGE',
+              'STOCK_READ', 'STOCK_MANAGE',
+              'REPORTING_READ',
+              'ROYALTY_READ',
+              'SETTINGS_READ',
+              'AUDIT_READ'
+            )
+            WHERE p.code = 'MANAGER_BOUTIQUE'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO rel_profil_metier__permissions (profil_metier_id, permissions_id)
+            SELECT p.id, pm.id
+            FROM profil_metier p
+            JOIN permission_metier pm ON pm.code IN ('SALES_READ', 'SALES_MANAGE')
+            WHERE p.code = 'VENDEUR'
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO mode_paiement_ref (id, code, libelle, actif) VALUES
+              (900201, 'ESPECES', 'Especes', true),
+              (900202, 'CARTE', 'Carte bancaire', true),
+              (900203, 'VIREMENT', 'Virement', true),
+              (900204, 'MOBILE_MONEY', 'Mobile money', true)
+            ON CONFLICT (code) DO UPDATE SET
+              libelle = EXCLUDED.libelle,
+              actif = EXCLUDED.actif;
+
+            INSERT INTO parametre_global (id, code, valeur, description, actif) VALUES
+              (900301, 'DEVISE_DEFAUT', 'XOF', 'Devise par defaut des ventes et redevances', true),
+              (900302, 'TAUX_REDEVANCE_DEFAUT', '10', 'Taux de redevance applique par defaut si aucune regle prioritaire ne correspond', true),
+              (900303, 'STOCK_ALERTE_DEFAUT', '5', 'Seuil d alerte stock propose par defaut', true),
+              (900304, 'TICKET_PREFIXE', 'ADM', 'Prefixe des tickets de caisse generes', true)
+            ON CONFLICT (code) DO UPDATE SET
+              valeur = EXCLUDED.valeur,
+              description = EXCLUDED.description,
+              actif = EXCLUDED.actif;
+
+            INSERT INTO parametre_code_barres (id, format_par_defaut, prefixe, longueur, actif) VALUES
+              (900401, 'CODE128', 'ADM', 13, true)
+            ON CONFLICT (id) DO UPDATE SET
+              format_par_defaut = EXCLUDED.format_par_defaut,
+              prefixe = EXCLUDED.prefixe,
+              longueur = EXCLUDED.longueur,
+              actif = EXCLUDED.actif;
+
+            SELECT setval('sequence_generator', GREATEST((SELECT last_value FROM sequence_generator), 901000), true);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

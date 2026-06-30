@@ -5,8 +5,21 @@ put Sass variables here:
 eg $input-color: red;
 ****************************/
 // Override Bootstrap variables
-@import 'bootstrap-variables';
+@use 'bootstrap-variables' as bsvars;
 // Import Bootstrap source files from node_modules
-@import 'bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap' with (
+  $enable-rounded: bsvars.$enable-rounded,
+  $enable-shadows: bsvars.$enable-shadows,
+  $enable-gradients: bsvars.$enable-gradients,
+  $enable-transitions: bsvars.$enable-transitions,
+  $enable-grid-classes: bsvars.$enable-grid-classes,
+  $border-radius: bsvars.$border-radius,
+  $border-radius-lg: bsvars.$border-radius-lg,
+  $border-radius-sm: bsvars.$border-radius-sm,
+  $body-bg: bsvars.$body-bg,
+  $font-size-base: bsvars.$font-size-base,
+  $dropdown-link-hover-color: bsvars.$dropdown-link-hover-color,
+  $dropdown-link-hover-bg: bsvars.$dropdown-link-hover-bg
+);
 
 /* jhipster-needle-scss-add-vendor JHipster will add new css style */

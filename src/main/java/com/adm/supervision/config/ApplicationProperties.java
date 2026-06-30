@@ -12,11 +12,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     private final Liquibase liquibase = new Liquibase();
+    private final Reporting reporting = new Reporting();
 
     // jhipster-needle-application-properties-property
 
     public Liquibase getLiquibase() {
         return liquibase;
+    }
+
+    public Reporting getReporting() {
+        return reporting;
     }
 
     // jhipster-needle-application-properties-property-getter
@@ -31,6 +36,19 @@ public class ApplicationProperties {
 
         public void setAsyncStart(Boolean asyncStart) {
             this.asyncStart = asyncStart;
+        }
+    }
+
+    public static class Reporting {
+
+        private String storagePath = "target/generated-reports";
+
+        public String getStoragePath() {
+            return storagePath;
+        }
+
+        public void setStoragePath(String storagePath) {
+            this.storagePath = storagePath;
         }
     }
 

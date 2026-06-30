@@ -1,0 +1,57 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (permissionMetier(); as permissionMetierRef) {
+      <div>
+        <h2 data-cy="permissionMetierDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.permissionMetier.detail.title">Permission Metier</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ permissionMetierRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.code">Code</span></dt>
+          <dd>
+            <span>{{ permissionMetierRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.libelle">Libelle</span></dt>
+          <dd>
+            <span>{{ permissionMetierRef.libelle }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.module">Module</span></dt>
+          <dd>
+            <span>{{ permissionMetierRef.module }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.description">Description</span></dt>
+          <dd>
+            <span>{{ permissionMetierRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.profils">Profils</span></dt>
+          <dd>
+            @for (profils of permissionMetierRef.profilses; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/profil-metier', profils.id, 'view']">{{ profils?.code }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/permission-metier', permissionMetierRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

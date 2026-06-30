@@ -1,0 +1,280 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="ProduitHeading">
+    <div>
+      <h1 jhiTranslate="productCustom.list.title">Product catalogue</h1>
+      <p jhiTranslate="productCustom.list.subtitle">Product, pricing and sales support supervision</p>
+    </div>
+
+    <div class="adm-page-header__actions">
+      <a class="adm-button adm-button--ghost" [routerLink]="['/catalogue-identification']">
+        <fa-icon icon="barcode" />
+        <span jhiTranslate="productCustom.actions.barcodesAndLabels">Barcodes and labels</span>
+      </a>
+
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="productCustom.actions.refresh">Refresh</span>
+      </button>
+
+      @if (permissionsUi.peutGererArticlesBoutique()) {
+        <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/produit/new']">
+          <fa-icon icon="plus" />
+          <span jhiTranslate="productCustom.actions.newProduct">New product</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="adm-stats-grid adm-stats-grid--compact">
+    <article class="adm-stat-card">
+      <span jhiTranslate="productCustom.kpis.totalProducts">Total products</span>
+      <strong>{{ totalItems() || produits().length }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span jhiTranslate="productCustom.kpis.activeProducts">Active products</span>
+      <strong>{{ totalActifs() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span jhiTranslate="productCustom.kpis.promotionalPrices">Promotional prices</span>
+      <strong>{{ totalPromotions() }}</strong>
+    </article>
+    <article class="adm-stat-card">
+      <span jhiTranslate="productCustom.kpis.contractPrices">Contract prices</span>
+      <strong>{{ totalContractuels() }}</strong>
+    </article>
+  </div>
+
+  <section class="adm-toolbar" aria-label="Filtres produits">
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        [placeholder]="'productCustom.placeholders.searchProduct' | translate"
+      />
+    </label>
+
+    <div class="adm-toolbar__filters">
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.produit.typePrix">Price type</span>
+        <select class="adm-select" [ngModel]="selectedTypePrix()" (ngModelChange)="selectedTypePrix.set($event)">
+          <option value="ALL" jhiTranslate="productCustom.common.all">All</option>
+          <option value="STANDARD">{{ 'admSupervisionVentesApp.TypePrix.STANDARD' | translate }}</option>
+          <option value="PROMOTION">{{ 'admSupervisionVentesApp.TypePrix.PROMOTION' | translate }}</option>
+          <option value="CONTRACTUEL">{{ 'admSupervisionVentesApp.TypePrix.CONTRACTUEL' | translate }}</option>
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.produit.statut">Status</span>
+        <select class="adm-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+          <option value="ALL" jhiTranslate="productCustom.common.all">All</option>
+          <option value="ACTIF">{{ 'admSupervisionVentesApp.StatutGeneral.ACTIF' | translate }}</option>
+          <option value="INACTIF">{{ 'admSupervisionVentesApp.StatutGeneral.INACTIF' | translate }}</option>
+          <option value="SUSPENDU">{{ 'admSupervisionVentesApp.StatutGeneral.SUSPENDU' | translate }}</option>
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.produit.boutique">Shop</span>
+        <select class="adm-select" [ngModel]="selectedBoutique()" (ngModelChange)="selectedBoutique.set($event)">
+          <option value="ALL" jhiTranslate="productCustom.common.allFeminine">All</option>
+          @for (boutique of boutiquesDisponibles(); track boutique.id) {
+            <option [value]="boutique.id">{{ boutique.nom }}</option>
+          }
+        </select>
+      </label>
+
+      <button
+        type="button"
+        class="adm-button adm-button--ghost"
+        (click)="reinitialiserFiltres()"
+        jhiTranslate="productCustom.actions.reset"
+      >
+        Reset
+      </button>
+    </div>
+  </section>
+
+  <article class="adm-card adm-card--table">
+    <div class="adm-card__header">
+      <div>
+        <h2 jhiTranslate="productCustom.list.tableTitle">Product list</h2>
+        <p jhiTranslate="productCustom.list.tableSubtitle">Operational view of saleable products and their quick actions</p>
+      </div>
+      <span class="adm-pill adm-pill--primary">{{ 'productCustom.list.displayed' | translate: { count: filteredProduits().length } }}</span>
+    </div>
+
+    @if (filteredProduits().length === 0) {
+      <div class="adm-empty-state" id="no-result">
+        <strong jhiTranslate="productCustom.list.emptyTitle">No product matches the selected criteria</strong>
+        <p jhiTranslate="productCustom.list.emptyDescription">Broaden the filters or create a new product to enrich the catalogue.</p>
+      </div>
+    } @else {
+      <div class="adm-table-wrapper">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="codeInterne">
+                <span jhiTranslate="admSupervisionVentesApp.produit.codeInterne">Internal code</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="designation">
+                <span jhiTranslate="productCustom.fields.product">Product</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="boutique.nom">
+                <span jhiTranslate="admSupervisionVentesApp.produit.boutique">Shop</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="typePrix">
+                <span jhiTranslate="admSupervisionVentesApp.produit.typePrix">Price type</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="prixVente">
+                <span jhiTranslate="admSupervisionVentesApp.produit.prixVente">Sale price</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="tauxRedevanceApplicable">
+                <span jhiTranslate="productCustom.fields.royalty">Royalty</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiSortBy="statut">
+                <span jhiTranslate="admSupervisionVentesApp.produit.statut">Status</span> <fa-icon icon="sort" />
+              </th>
+              <th scope="col" jhiTranslate="productCustom.fields.classification">Classification</th>
+              <th scope="col" class="text-end" jhiTranslate="productCustom.fields.quickActions">Quick actions</th>
+              <th scope="col" class="text-end" jhiTranslate="productCustom.fields.actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (produit of filteredProduits(); track trackId(produit); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-code">{{ formatValeur(produit.codeInterne) }}</span>
+                </td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValeur(produit.designation) }}</strong>
+                    <small>{{ formatValeur(produit.description) }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValeur(produit.boutique?.nom) }}</strong>
+                    <small>{{ formatValeur(produit.uniteMesure?.code) }}</small>
+                  </div>
+                </td>
+                <td>{{ 'admSupervisionVentesApp.TypePrix.' + produit.typePrix | translate }}</td>
+                <td>{{ formatMontant(produit.prixVente) }}</td>
+                <td>{{ formatTaux(produit.tauxRedevanceApplicable) }}</td>
+                <td>
+                  <span
+                    class="adm-pill"
+                    [class.adm-pill--success]="produit.statut === 'ACTIF'"
+                    [class.adm-pill--warning]="produit.statut === 'INACTIF'"
+                    [class.adm-pill--danger]="produit.statut === 'SUSPENDU'"
+                  >
+                    {{ 'admSupervisionVentesApp.StatutGeneral.' + produit.statut | translate }}
+                  </span>
+                </td>
+                <td>
+                  <div class="adm-table-title">
+                    <strong>{{ formatValeur(produit.groupeArticle?.libelle) }}</strong>
+                    <small
+                      >{{ formatValeur(produit.familleArticle?.libelle) }} / {{ formatValeur(produit.sousFamilleArticle?.libelle) }}</small
+                    >
+                  </div>
+                </td>
+                <td class="text-end">
+                  <div class="adm-inline-actions">
+                    @if (permissionsUi.peutGererArticlesBoutique()) {
+                      <button
+                        type="button"
+                        class="adm-link-button"
+                        (click)="ouvrirModalCodeBarres(produit)"
+                        jhiTranslate="productCustom.actions.barcode"
+                      >
+                        Barcode
+                      </button>
+                      <button
+                        type="button"
+                        class="adm-link-button"
+                        (click)="ouvrirModalTarif(produit)"
+                        jhiTranslate="productCustom.actions.price"
+                      >
+                        Price
+                      </button>
+                      <button
+                        type="button"
+                        class="adm-link-button"
+                        (click)="ouvrirModalEtiquettes(produit)"
+                        jhiTranslate="productCustom.actions.labels"
+                      >
+                        Labels
+                      </button>
+                    }
+                    <a
+                      class="adm-link-button"
+                      [routerLink]="['/catalogue-identification']"
+                      [queryParams]="{ produitId: produit.id, onglet: 'codes' }"
+                    >
+                      <span jhiTranslate="productCustom.actions.centre">Centre</span>
+                    </a>
+                  </div>
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/produit', produit.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      [title]="'productCustom.actions.view' | translate"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+
+                    @if (permissionsUi.peutGererArticlesBoutique()) {
+                      <a
+                        [routerLink]="['/produit', produit.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        [title]="'productCustom.actions.edit' | translate"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+
+                      <button
+                        type="button"
+                        (click)="delete(produit)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        [title]="'productCustom.actions.delete' | translate"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+
+  @if (produits().length > 0) {
+    <div class="adm-pagination">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  }
+</section>

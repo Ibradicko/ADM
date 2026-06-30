@@ -1,0 +1,192 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-ligne-inventaire-stock-heading"
+        data-cy="LigneInventaireStockCreateUpdateHeading"
+        jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.home.createOrEditLabel"
+      >
+        Create or edit a Ligne Inventaire Stock
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let quantiteTheoriqueRef = editForm.get('quantiteTheorique')!;
+        <div class="mb-3">
+          <label
+            class="form-label"
+            for="field_quantiteTheorique"
+            jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.quantiteTheorique"
+            >Quantite Theorique</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            name="quantiteTheorique"
+            id="field_quantiteTheorique"
+            data-cy="quantiteTheorique"
+            formControlName="quantiteTheorique"
+          />
+          @if (quantiteTheoriqueRef.invalid && (quantiteTheoriqueRef.dirty || quantiteTheoriqueRef.touched)) {
+            <div>
+              @if (editForm.get('quantiteTheorique')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('quantiteTheorique')?.errors?.min) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+                  >This field should be at least 0.</small
+                >
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('quantiteTheorique')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let quantiteCompteeRef = editForm.get('quantiteComptee')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_quantiteComptee" jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.quantiteComptee"
+            >Quantite Comptee</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            name="quantiteComptee"
+            id="field_quantiteComptee"
+            data-cy="quantiteComptee"
+            formControlName="quantiteComptee"
+          />
+          @if (quantiteCompteeRef.invalid && (quantiteCompteeRef.dirty || quantiteCompteeRef.touched)) {
+            <div>
+              @if (editForm.get('quantiteComptee')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('quantiteComptee')?.errors?.min) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+                  >This field should be at least 0.</small
+                >
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('quantiteComptee')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_ecart" jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.ecart">Ecart</label>
+          <input type="number" class="form-control" name="ecart" id="field_ecart" data-cy="ecart" formControlName="ecart" />
+        </div>
+
+        @let commentaireRef = editForm.get('commentaire')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_commentaire" jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.commentaire"
+            >Commentaire</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="commentaire"
+            id="field_commentaire"
+            data-cy="commentaire"
+            formControlName="commentaire"
+          />
+          @if (commentaireRef.invalid && (commentaireRef.dirty || commentaireRef.touched)) {
+            <div>
+              @if (editForm.get('commentaire')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+                  >This field cannot be longer than 255 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_inventaire" jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.inventaire"
+            >Inventaire</label
+          >
+          <select
+            class="form-control"
+            id="field_inventaire"
+            data-cy="inventaire"
+            name="inventaire"
+            formControlName="inventaire"
+            [compareWith]="compareInventaireStock"
+          >
+            @if (!editForm.get('inventaire')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (inventaireStockOption of inventaireStocksSharedCollection(); track $index) {
+              <option [ngValue]="inventaireStockOption">{{ inventaireStockOption.reference }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['inventaire'])!.invalid && (editForm.get(['inventaire'])!.dirty || editForm.get(['inventaire'])!.touched)) {
+          <div>
+            @if (editForm.get(['inventaire'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_produit" jhiTranslate="admSupervisionVentesApp.ligneInventaireStock.produit">Produit</label>
+          <select
+            class="form-control"
+            id="field_produit"
+            data-cy="produit"
+            name="produit"
+            formControlName="produit"
+            [compareWith]="compareProduit"
+          >
+            @if (!editForm.get('produit')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (produitOption of produitsSharedCollection(); track $index) {
+              <option [ngValue]="produitOption">{{ produitOption.designation }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['produit'])!.invalid && (editForm.get(['produit'])!.dirty || editForm.get(['produit'])!.touched)) {
+          <div>
+            @if (editForm.get(['produit'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

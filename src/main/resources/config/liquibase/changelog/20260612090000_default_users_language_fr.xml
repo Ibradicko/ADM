@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <changeSet id="20260612090000-1" author="codex">
+        <comment>Use French as the default language for all existing ADM users.</comment>
+        <update tableName="jhi_user">
+            <column name="lang_key" value="fr"/>
+        </update>
+    </changeSet>
+</databaseChangeLog>

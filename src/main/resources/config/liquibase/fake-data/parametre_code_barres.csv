@@ -1,0 +1,31 @@
+id;format_par_defaut;prefixe;longueur;actif
+1;EAN13;eek until;20;false
+2;EAN13;splendid which too;28;false
+3;QR_CODE;past;12;true
+4;INTERNE;glorious warped phew;23;false
+5;EAN13;joyfully;25;false
+6;EAN8;well-made like mmm;9;true
+7;EAN13;brr aside;23;false
+8;EAN8;huzzah assist;8;true
+9;CODE128;under wherever;14;true
+10;EAN13;offensively than;14;true
+11;EAN8;crazy;8;true
+12;QR_CODE;hammock about;19;true
+13;CODE128;along;16;true
+14;QR_CODE;despite pfft wordy;16;false
+15;QR_CODE;councilman;21;false
+16;EAN8;whoever ad;21;false
+17;EAN13;vacation upright ane;23;true
+18;QR_CODE;absent;30;false
+19;EAN8;nearly pro when;25;true
+20;QR_CODE;once savour;29;false
+21;INTERNE;although wilderness;11;true
+22;EAN8;unfortunate gifted c;8;false
+23;CODE128;sustenance yet ratio;17;false
+24;EAN13;advertisement grands;26;true
+25;CODE128;tragic;12;true
+26;QR_CODE;than hm ick;29;false
+27;EAN8;ocelot jittery bah;13;true
+28;QR_CODE;hello bungalow;16;true
+29;EAN8;gah;28;true
+30;INTERNE;regarding;9;false

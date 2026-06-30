@@ -167,6 +167,10 @@ spring:
     ansi:
       console-available: true
 
+application:
+  reporting:
+    storage-path: target/generated-reports
+
 server:
   servlet:
     session:

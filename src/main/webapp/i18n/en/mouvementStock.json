@@ -1,0 +1,30 @@
+{
+  "admSupervisionVentesApp": {
+    "mouvementStock": {
+      "home": {
+        "title": "Mouvement Stocks",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Mouvement Stock",
+        "createOrEditLabel": "Create or edit a Mouvement Stock",
+        "notFound": "No Mouvement Stocks found"
+      },
+      "created": "A new Mouvement Stock is created with identifier {{ param }}",
+      "updated": "A Mouvement Stock is updated with identifier {{ param }}",
+      "deleted": "A Mouvement Stock is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Mouvement Stock {{ id }}?"
+      },
+      "detail": {
+        "title": "Mouvement Stock"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "typeMouvement": "Type Mouvement",
+      "statut": "Statut",
+      "dateMouvement": "Date Mouvement",
+      "motif": "Motif",
+      "boutique": "Boutique",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

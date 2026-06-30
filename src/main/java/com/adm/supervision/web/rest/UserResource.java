@@ -1,12 +1,22 @@
 package com.adm.supervision.web.rest;
 
 import com.adm.supervision.config.Constants;
+import com.adm.supervision.domain.AffectationUtilisateur;
+import com.adm.supervision.domain.Boutique;
+import com.adm.supervision.domain.ProfilMetier;
 import com.adm.supervision.domain.User;
+import com.adm.supervision.repository.AffectationUtilisateurRepository;
+import com.adm.supervision.repository.BoutiqueRepository;
+import com.adm.supervision.repository.ProfilMetierRepository;
 import com.adm.supervision.repository.UserRepository;
-import com.adm.supervision.security.AuthoritiesConstants;
+import com.adm.supervision.security.BusinessAuthorizationService;
+import com.adm.supervision.service.BusinessValidationException;
 import com.adm.supervision.service.MailService;
 import com.adm.supervision.service.UserService;
 import com.adm.supervision.service.dto.AdminUserDTO;
+import com.adm.supervision.service.dto.AffectationUtilisateurDTO;
+import com.adm.supervision.service.dto.BoutiqueDTO;
+import com.adm.supervision.service.dto.ProfilMetierDTO;
 import com.adm.supervision.web.rest.errors.BadRequestAlertException;
 import com.adm.supervision.web.rest.errors.EmailAlreadyUsedException;
 import com.adm.supervision.web.rest.errors.LoginAlreadyUsedException;
@@ -14,6 +24,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +35,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -86,10 +99,30 @@ public class UserResource {
 
     private final MailService mailService;
 
-    public UserResource(UserService userService, UserRepository userRepository, MailService mailService) {
+    private final BusinessAuthorizationService businessAuthorizationService;
+
+    private final AffectationUtilisateurRepository affectationUtilisateurRepository;
+
+    private final BoutiqueRepository boutiqueRepository;
+
+    private final ProfilMetierRepository profilMetierRepository;
+
+    public UserResource(
+        UserService userService,
+        UserRepository userRepository,
+        MailService mailService,
+        BusinessAuthorizationService businessAuthorizationService,
+        AffectationUtilisateurRepository affectationUtilisateurRepository,
+        BoutiqueRepository boutiqueRepository,
+        ProfilMetierRepository profilMetierRepository
+    ) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.businessAuthorizationService = businessAuthorizationService;
+        this.affectationUtilisateurRepository = affectationUtilisateurRepository;
+        this.boutiqueRepository = boutiqueRepository;
+        this.profilMetierRepository = profilMetierRepository;
     }
 
     /**
@@ -105,8 +138,13 @@ public class UserResource {
      * @throws BadRequestAlertException {@code 400 (Bad Request)} if the login or email is already in use.
      */
     @PostMapping("/users")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<User> createUser(@Valid @RequestBody AdminUserDTO userDTO) throws URISyntaxException {
+    @PreAuthorize("@businessAuthorizationService.canCreateUsers()")
+    @Transactional
+    public ResponseEntity<User> createUser(
+        @Valid @RequestBody AdminUserDTO userDTO,
+        @RequestParam(required = false) Long boutiqueId,
+        @RequestParam(required = false) Long profilId
+    ) throws URISyntaxException {
         LOG.debug("REST request to save User : {}", userDTO);
 
         if (userDTO.getId() != null) {
@@ -117,7 +155,11 @@ public class UserResource {
         } else if (userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).isPresent()) {
             throw new EmailAlreadyUsedException();
         } else {
-            User newUser = userService.createUser(userDTO);
+            normalizeAuthoritiesForScopedManager(userDTO);
+            User newUser = userService.createUserWithInitialPassword(userDTO, Constants.MOT_DE_PASSE_PAR_DEFAUT, true);
+            if (!businessAuthorizationService.isAdmin() && !businessAuthorizationService.canManageBoutiques()) {
+                assignScopedCreatedUserToBoutique(newUser, boutiqueId, profilId);
+            }
             mailService.sendCreationEmail(newUser);
             return ResponseEntity.created(new URI("/api/admin/users/" + newUser.getLogin()))
                 .headers(HeaderUtil.createAlert(applicationName, "userManagement.created", newUser.getLogin()))
@@ -134,12 +176,13 @@ public class UserResource {
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already in use.
      */
     @PutMapping({ "/users", "/users/{login}" })
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("@businessAuthorizationService.canUpdateUsers()")
     public ResponseEntity<AdminUserDTO> updateUser(
         @PathVariable(name = "login", required = false) @Pattern(regexp = Constants.LOGIN_REGEX) String login,
         @Valid @RequestBody AdminUserDTO userDTO
     ) {
         LOG.debug("REST request to update User : {}", userDTO);
+        assertUserAccessible(userDTO.getId());
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getId().equals(userDTO.getId()))) {
             throw new EmailAlreadyUsedException();
@@ -163,14 +206,16 @@ public class UserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body all users.
      */
     @GetMapping("/users")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("@businessAuthorizationService.canReadUsers()")
     public ResponseEntity<List<AdminUserDTO>> getAllUsers(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        LOG.debug("REST request to get all User for an admin");
+        LOG.debug("REST request to get managed users");
         if (!onlyContainsAllowedProperties(pageable)) {
             return ResponseEntity.badRequest().build();
         }
 
-        final Page<AdminUserDTO> page = userService.getAllManagedUsers(pageable);
+        final Page<AdminUserDTO> page = businessAuthorizationService.isAdmin()
+            ? userService.getAllManagedUsers(pageable)
+            : userService.getManagedUsersByBoutiques(businessAuthorizationService.getAccessibleBoutiqueIds(), pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -186,9 +231,10 @@ public class UserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the "login" user, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/users/{login}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("@businessAuthorizationService.canReadUsers()")
     public ResponseEntity<AdminUserDTO> getUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         LOG.debug("REST request to get User : {}", login);
+        assertUserAccessible(login);
         return ResponseUtil.wrapOrNotFound(userService.getUserWithAuthoritiesByLogin(login).map(AdminUserDTO::new));
     }
 
@@ -199,10 +245,77 @@ public class UserResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/users/{login}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("@businessAuthorizationService.canDeactivateUsers()")
     public ResponseEntity<Void> deleteUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
-        LOG.debug("REST request to delete User: {}", login);
-        userService.deleteUser(login);
-        return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build();
+        LOG.debug("REST request to deactivate User: {}", login);
+        assertUserAccessible(login);
+        userService.deactivateUser(login);
+        return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deactivated", login)).build();
+    }
+
+    private void assertUserAccessible(String login) {
+        if (!businessAuthorizationService.isAdmin() && !businessAuthorizationService.canAccessUser(login)) {
+            throw new AccessDeniedException("Access denied to requested user");
+        }
+    }
+
+    private void assertUserAccessible(Long userId) {
+        if (userId == null) {
+            return;
+        }
+        if (!businessAuthorizationService.isAdmin() && !businessAuthorizationService.canAccessUser(userId)) {
+            throw new AccessDeniedException("Access denied to requested user");
+        }
+    }
+
+    private void normalizeAuthoritiesForScopedManager(AdminUserDTO userDTO) {
+        if (businessAuthorizationService.isAdmin()) {
+            return;
+        }
+
+        if (userDTO.getAuthorities() != null && userDTO.getAuthorities().contains("ROLE_ADMIN")) {
+            throw new AccessDeniedException("Only administrators can create administrator accounts");
+        }
+        userDTO.setAuthorities(Set.of("ROLE_USER"));
+    }
+
+    private void assignScopedCreatedUserToBoutique(User newUser, Long boutiqueId, Long profilId) {
+        if (boutiqueId == null || profilId == null) {
+            throw new BusinessValidationException(
+                "userManagement",
+                "boutiqueAndProfilRequired",
+                "Une boutique et un profil sont requis pour creer un utilisateur"
+            );
+        }
+
+        Boutique boutique = boutiqueRepository
+            .findById(boutiqueId)
+            .orElseThrow(() -> new BusinessValidationException("userManagement", "boutiqueNotFound", "Boutique introuvable"));
+        ProfilMetier profil = profilMetierRepository
+            .findById(profilId)
+            .orElseThrow(() -> new BusinessValidationException("userManagement", "profilNotFound", "Profil introuvable"));
+
+        if (!businessAuthorizationService.canManageAffectationUtilisateur(toAuthorizationDTO(boutiqueId, profilId))) {
+            throw new AccessDeniedException("Acces refuse a cette affectation utilisateur");
+        }
+
+        AffectationUtilisateur affectation = new AffectationUtilisateur()
+            .user(newUser)
+            .boutique(boutique)
+            .profil(profil)
+            .dateDebut(LocalDate.now())
+            .actif(true);
+        affectationUtilisateurRepository.save(affectation);
+    }
+
+    private AffectationUtilisateurDTO toAuthorizationDTO(Long boutiqueId, Long profilId) {
+        BoutiqueDTO boutiqueDTO = new BoutiqueDTO();
+        boutiqueDTO.setId(boutiqueId);
+        ProfilMetierDTO profilDTO = new ProfilMetierDTO();
+        profilDTO.setId(profilId);
+        AffectationUtilisateurDTO dto = new AffectationUtilisateurDTO();
+        dto.setBoutique(boutiqueDTO);
+        dto.setProfil(profilDTO);
+        return dto;
     }
 }

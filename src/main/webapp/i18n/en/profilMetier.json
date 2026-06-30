@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "profilMetier": {
+      "home": {
+        "title": "Profil Metiers",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Profil Metier",
+        "createOrEditLabel": "Create or edit a Profil Metier",
+        "notFound": "No Profil Metiers found"
+      },
+      "created": "A new Profil Metier is created with identifier {{ param }}",
+      "updated": "A Profil Metier is updated with identifier {{ param }}",
+      "deleted": "A Profil Metier is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Profil Metier {{ id }}?"
+      },
+      "detail": {
+        "title": "Profil Metier"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libelle",
+      "description": "Description",
+      "statut": "Statut",
+      "permissions": "Permissions"
+    }
+  }
+}

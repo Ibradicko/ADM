@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (codeBarresProduit(); as codeBarresProduitRef) {
+      <div>
+        <h2 data-cy="codeBarresProduitDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.detail.title">Code Barres Produit</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ codeBarresProduitRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.code">Code</span></dt>
+          <dd>
+            <span>{{ codeBarresProduitRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.type">Type</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypeCodeBarres.' + (codeBarresProduitRef.type ?? 'null')">{{
+              { null: '', EAN13: 'EAN13', EAN8: 'EAN8', CODE128: 'CODE128', QR_CODE: 'QR_CODE', INTERNE: 'INTERNE' }[
+                codeBarresProduitRef.type ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.principal">Principal</span></dt>
+          <dd>
+            <span>{{ codeBarresProduitRef.principal }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.genereParSysteme">Genere Par Systeme</span></dt>
+          <dd>
+            <span>{{ codeBarresProduitRef.genereParSysteme }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.actif">Actif</span></dt>
+          <dd>
+            <span>{{ codeBarresProduitRef.actif }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.dateAffectation">Date Affectation</span></dt>
+          <dd>
+            <span>{{ codeBarresProduitRef.dateAffectation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.produit">Produit</span></dt>
+          <dd>
+            @if (codeBarresProduit()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', codeBarresProduit()!.produit?.id, 'view']">{{ codeBarresProduitRef.produit?.designation }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/code-barres-produit', codeBarresProduitRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

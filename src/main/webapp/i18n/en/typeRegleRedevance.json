@@ -1,0 +1,11 @@
+{
+  "admSupervisionVentesApp": {
+    "TypeRegleRedevance": {
+      "null": "",
+      "BOUTIQUE": "BOUTIQUE",
+      "LOCATAIRE": "LOCATAIRE",
+      "GROUPE_ARTICLE": "GROUPE_ARTICLE",
+      "PRODUIT": "PRODUIT"
+    }
+  }
+}

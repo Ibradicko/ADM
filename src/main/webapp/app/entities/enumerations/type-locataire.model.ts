@@ -1,0 +1,5 @@
+export enum TypeLocataire {
+  PERSONNE_PHYSIQUE = 'PERSONNE_PHYSIQUE',
+
+  PERSONNE_MORALE = 'PERSONNE_MORALE',
+}

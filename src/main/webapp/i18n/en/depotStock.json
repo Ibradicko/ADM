@@ -1,0 +1,28 @@
+{
+  "admSupervisionVentesApp": {
+    "depotStock": {
+      "home": {
+        "title": "Depot Stocks",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Depot Stock",
+        "createOrEditLabel": "Create or edit a Depot Stock",
+        "notFound": "No Depot Stocks found"
+      },
+      "created": "A new Depot Stock is created with identifier {{ param }}",
+      "updated": "A Depot Stock is updated with identifier {{ param }}",
+      "deleted": "A Depot Stock is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Depot Stock {{ id }}?"
+      },
+      "detail": {
+        "title": "Depot Stock"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libelle",
+      "emplacement": "Emplacement",
+      "actif": "Actif",
+      "boutique": "Boutique"
+    }
+  }
+}

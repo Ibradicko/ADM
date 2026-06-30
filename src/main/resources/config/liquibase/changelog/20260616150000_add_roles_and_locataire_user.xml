@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!-- ====================================================================
+         1. GroupeArticle : retrait du lien boutique
+         Les groupes d'articles sont des référentiels ADM globaux.
+         Le taux de redevance s'applique par groupe, toutes boutiques confondues.
+         ==================================================================== -->
+
+    <changeSet id="20260616150000-1" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_groupe_article__boutique_id"/>
+        </preConditions>
+        <dropForeignKeyConstraint
+            baseTableName="groupe_article"
+            constraintName="fk_groupe_article__boutique_id"/>
+    </changeSet>
+
+    <changeSet id="20260616150000-2" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="groupe_article" columnName="boutique_id"/>
+        </preConditions>
+        <dropColumn tableName="groupe_article" columnName="boutique_id"/>
+    </changeSet>
+
+    <!-- ====================================================================
+         2. Locataire : ajout d'un lien vers le compte utilisateur
+         À la création d'un locataire, un compte jhi_user est créé automatiquement
+         (login = code locataire normalisé, mot de passe par défaut).
+         ==================================================================== -->
+
+    <changeSet id="20260616150000-3" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="locataire" columnName="user_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="locataire">
+            <column name="user_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_locataire__user_id"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260616150000-4" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="locataire" columnName="user_id"/>
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_locataire__user_id"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+            baseColumnNames="user_id"
+            baseTableName="locataire"
+            constraintName="fk_locataire__user_id"
+            referencedColumnNames="id"
+            referencedTableName="jhi_user"/>
+    </changeSet>
+
+    <!-- ====================================================================
+         3. Rôles métier : insertion des 5 nouvelles autorités
+         Ces rôles correspondent aux profils fonctionnels de l'application ADM.
+         ==================================================================== -->
+
+    <changeSet id="20260616150000-5" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM jhi_authority WHERE name = 'ROLE_MANAGER_ADM'</sqlCheck>
+        </preConditions>
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_MANAGER_ADM"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20260616150000-6" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM jhi_authority WHERE name = 'ROLE_LOCATAIRE'</sqlCheck>
+        </preConditions>
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_LOCATAIRE"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20260616150000-7" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM jhi_authority WHERE name = 'ROLE_MANAGER_BOUTIQUE'</sqlCheck>
+        </preConditions>
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_MANAGER_BOUTIQUE"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20260616150000-8" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM jhi_authority WHERE name = 'ROLE_VENDEUR'</sqlCheck>
+        </preConditions>
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_VENDEUR"/>
+        </insert>
+    </changeSet>
+
+
+</databaseChangeLog>

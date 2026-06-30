@@ -19,6 +19,10 @@ export class UserManagementService {
     return this.http.post<IUserManagement>(this.resourceUrl, user);
   }
 
+  createForBoutique(user: IUserManagement, boutiqueId: number, profilId: number): Observable<IUserManagement> {
+    return this.http.post<IUserManagement>(this.resourceUrl, user, { params: { boutiqueId, profilId } });
+  }
+
   update(user: IUserManagement): Observable<IUserManagement> {
     return this.http.put<IUserManagement>(this.resourceUrl, user);
   }

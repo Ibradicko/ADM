@@ -1,0 +1,113 @@
+<div>
+  <h2 id="page-heading" data-cy="EtiquetteProduitHeading">
+    <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.home.title">Etiquette Produits</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-etiquette-produit"
+        [routerLink]="['/etiquette-produit/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.home.createLabel">Create a new Etiquette Produit</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (etiquetteProduits().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.home.notFound">No Etiquette Produits found</span>
+    </div>
+  } @else {
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="quantite">
+              <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.quantite">Quantite</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="imprimee">
+              <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.imprimee">Imprimee</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="dateImpression">
+              <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.dateImpression">Date Impression</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="produit.designation">
+              <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.produit">Produit</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="lot.reference">
+              <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.lot">Lot</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (etiquetteProduit of etiquetteProduits(); track trackId(etiquetteProduit); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+              <td>
+                <a [routerLink]="['/etiquette-produit', etiquetteProduit.id, 'view']">{{ etiquetteProduit.id }}</a>
+              </td>
+              <td>{{ etiquetteProduit.quantite }}</td>
+              <td>{{ etiquetteProduit.imprimee }}</td>
+              <td>{{ etiquetteProduit.dateImpression | formatMediumDatetime }}</td>
+              <td>
+                @if (etiquetteProduit.produit) {
+                  <div>
+                    <a [routerLink]="['/produit', etiquetteProduit.produit.id, 'view']">{{ etiquetteProduit.produit.designation }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (etiquetteProduit.lot) {
+                  <div>
+                    <a [routerLink]="['/lot-etiquettes', etiquetteProduit.lot.id, 'view']">{{ etiquetteProduit.lot.reference }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/etiquette-produit', etiquetteProduit.id, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
+                    <fa-icon icon="eye" />
+                  </a>
+                  <a
+                    [routerLink]="['/etiquette-produit', etiquetteProduit.id, 'edit']"
+                    class="adm-icon-button"
+                    data-cy="entityEditButton"
+                    title="Modifier"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                  </a>
+                  <button
+                    type="button"
+                    (click)="delete(etiquetteProduit)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    title="Supprimer"
+                  >
+                    <fa-icon icon="times" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

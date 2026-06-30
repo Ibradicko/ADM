@@ -1,0 +1,30 @@
+{
+  "login": {
+    "title": "Connexion",
+    "description": "Accedez a votre espace securise.",
+    "hero": {
+      "subtitle": "Supervision aeroportuaire centralisee",
+      "eyebrow": "Portail securise",
+      "title": "Gestion des boutiques, ventes, stocks et redevances ADM.",
+      "description": "Un espace de pilotage clair pour suivre les operations commerciales et garder la maitrise des flux.",
+      "modules": "Modules principaux"
+    },
+    "form": {
+      "password": "Mot de passe",
+      "password.placeholder": "Votre mot de passe",
+      "rememberme": "Rester connecte",
+      "button": "Se connecter"
+    },
+    "messages": {
+      "error": {
+        "authentication": "Identifiants invalides. Verifiez votre login et votre mot de passe."
+      }
+    },
+    "password": {
+      "forgot": "Mot de passe oublie"
+    },
+    "account": {
+      "notice": "Les comptes sont crees par l'administration."
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "admSupervisionVentesApp": {
+    "lotEtiquettes": {
+      "home": {
+        "title": "Lot Etiquettes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Lot Etiquettes",
+        "createOrEditLabel": "Create or edit a Lot Etiquettes",
+        "notFound": "No Lot Etiquettes found"
+      },
+      "created": "A new Lot Etiquettes is created with identifier {{ param }}",
+      "updated": "A Lot Etiquettes is updated with identifier {{ param }}",
+      "deleted": "A Lot Etiquettes is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Lot Etiquettes {{ id }}?"
+      },
+      "detail": {
+        "title": "Lot Etiquettes"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "dateGeneration": "Date Generation",
+      "formatImpression": "Format Impression",
+      "nombreEtiquettes": "Nombre Etiquettes"
+    }
+  }
+}

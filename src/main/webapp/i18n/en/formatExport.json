@@ -1,0 +1,9 @@
+{
+  "admSupervisionVentesApp": {
+    "FormatExport": {
+      "null": "",
+      "PDF": "PDF",
+      "EXCEL": "EXCEL"
+    }
+  }
+}

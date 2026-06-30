@@ -1,0 +1,145 @@
+<div>
+  <h2 id="page-heading" data-cy="PaiementVenteHeading">
+    <span jhiTranslate="admSupervisionVentesApp.paiementVente.home.title">Paiement Ventes</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="admSupervisionVentesApp.paiementVente.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-paiement-vente"
+        [routerLink]="['/paiement-vente/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="admSupervisionVentesApp.paiementVente.home.createLabel">Create a new Paiement Vente</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (paiementVentes().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <span jhiTranslate="admSupervisionVentesApp.paiementVente.home.notFound">No Paiement Ventes found</span>
+    </div>
+  } @else {
+    <div class="adm-table-wrapper" id="entities">
+      <table class="adm-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="montant">
+              <span jhiTranslate="admSupervisionVentesApp.paiementVente.montant">Montant</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="statut">
+              <span jhiTranslate="admSupervisionVentesApp.paiementVente.statut">Statut</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="referencePaiement">
+              <span jhiTranslate="admSupervisionVentesApp.paiementVente.referencePaiement">Reference Paiement</span>
+              <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="datePaiement">
+              <span jhiTranslate="admSupervisionVentesApp.paiementVente.datePaiement">Date Paiement</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="vente.numeroTicket">
+              <span jhiTranslate="admSupervisionVentesApp.paiementVente.vente">Vente</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col" jhiSortBy="modePaiement.libelle">
+              <span jhiTranslate="admSupervisionVentesApp.paiementVente.modePaiement">Mode Paiement</span> <fa-icon icon="sort" />
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (paiementVente of paiementVentes(); track trackId(paiementVente); let even = $even) {
+            <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+              <td>
+                <a [routerLink]="['/paiement-vente', paiementVente.id, 'view']">{{ paiementVente.id }}</a>
+              </td>
+              <td>{{ paiementVente.montant }}</td>
+              <td [jhiTranslate]="'admSupervisionVentesApp.StatutPaiement.' + (paiementVente.statut ?? 'null')">
+                {{
+                  { null: '', EN_ATTENTE: 'EN_ATTENTE', PARTIEL: 'PARTIEL', PAYE: 'PAYE', ANNULE: 'ANNULE' }[paiementVente.statut ?? 'null']
+                }}
+              </td>
+              <td>{{ paiementVente.referencePaiement }}</td>
+              <td>{{ paiementVente.datePaiement | formatMediumDatetime }}</td>
+              <td>
+                @if (paiementVente.vente) {
+                  <div>
+                    <a [routerLink]="['/vente', paiementVente.vente.id, 'view']">{{ paiementVente.vente.numeroTicket }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (paiementVente.modePaiement) {
+                  <div>
+                    <a [routerLink]="['/mode-paiement-ref', paiementVente.modePaiement.id, 'view']">{{
+                      paiementVente.modePaiement.libelle
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="adm-table-actions">
+                  <a
+                    [routerLink]="['/paiement-vente', paiementVente.id, 'view']"
+                    class="adm-icon-button"
+                    data-cy="entityDetailsButton"
+                    title="Voir"
+                  >
+                    <fa-icon icon="eye" />
+                  </a>
+                  <a
+                    [routerLink]="['/paiement-vente', paiementVente.id, 'edit']"
+                    class="adm-icon-button"
+                    data-cy="entityEditButton"
+                    title="Modifier"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                  </a>
+                  <button
+                    type="button"
+                    (click)="delete(paiementVente)"
+                    class="adm-icon-button adm-icon-button--danger"
+                    data-cy="entityDeleteButton"
+                    title="Supprimer"
+                  >
+                    <fa-icon icon="times" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (paiementVentes().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,183 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-code-barres-produit-heading"
+        data-cy="CodeBarresProduitCreateUpdateHeading"
+        jhiTranslate="admSupervisionVentesApp.codeBarresProduit.home.createOrEditLabel"
+      >
+        Create or edit a Code Barres Produit
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let codeRef = editForm.get('code')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_code" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.code">Code</label>
+          <input type="text" class="form-control" name="code" id="field_code" data-cy="code" formControlName="code" />
+          @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
+            <div>
+              @if (editForm.get('code')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('code')?.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+                  >This field cannot be longer than 80 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let typeRef = editForm.get('type')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_type" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.type">Type</label>
+          <select class="form-control" name="type" formControlName="type" id="field_type" data-cy="type">
+            <option [ngValue]="null">{{ 'admSupervisionVentesApp.TypeCodeBarres.null' | translate }}</option>
+            @for (typeCodeBarres of typeCodeBarresValues; track $index) {
+              <option [value]="typeCodeBarres">{{ 'admSupervisionVentesApp.TypeCodeBarres.' + typeCodeBarres | translate }}</option>
+            }
+          </select>
+          @if (typeRef.invalid && (typeRef.dirty || typeRef.touched)) {
+            <div>
+              @if (editForm.get('type')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let principalRef = editForm.get('principal')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_principal" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.principal"
+            >Principal</label
+          >
+          <input type="checkbox" class="form-check" name="principal" id="field_principal" data-cy="principal" formControlName="principal" />
+          @if (principalRef.invalid && (principalRef.dirty || principalRef.touched)) {
+            <div>
+              @if (editForm.get('principal')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let genereParSystemeRef = editForm.get('genereParSysteme')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_genereParSysteme" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.genereParSysteme"
+            >Genere Par Systeme</label
+          >
+          <input
+            type="checkbox"
+            class="form-check"
+            name="genereParSysteme"
+            id="field_genereParSysteme"
+            data-cy="genereParSysteme"
+            formControlName="genereParSysteme"
+          />
+          @if (genereParSystemeRef.invalid && (genereParSystemeRef.dirty || genereParSystemeRef.touched)) {
+            <div>
+              @if (editForm.get('genereParSysteme')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let actifRef = editForm.get('actif')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_actif" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.actif">Actif</label>
+          <input type="checkbox" class="form-check" name="actif" id="field_actif" data-cy="actif" formControlName="actif" />
+          @if (actifRef.invalid && (actifRef.dirty || actifRef.touched)) {
+            <div>
+              @if (editForm.get('actif')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateAffectationRef = editForm.get('dateAffectation')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateAffectation" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.dateAffectation"
+            >Date Affectation</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_dateAffectation"
+              data-cy="dateAffectation"
+              type="datetime-local"
+              class="form-control"
+              name="dateAffectation"
+              formControlName="dateAffectation"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (dateAffectationRef.invalid && (dateAffectationRef.dirty || dateAffectationRef.touched)) {
+            <div>
+              @if (editForm.get('dateAffectation')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('dateAffectation')?.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_produit" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.produit">Produit</label>
+          <select
+            class="form-control"
+            id="field_produit"
+            data-cy="produit"
+            name="produit"
+            formControlName="produit"
+            [compareWith]="compareProduit"
+          >
+            @if (!editForm.get('produit')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (produitOption of produitsSharedCollection(); track $index) {
+              <option [ngValue]="produitOption">{{ produitOption.designation }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['produit'])!.invalid && (editForm.get(['produit'])!.dirty || editForm.get(['produit'])!.touched)) {
+          <div>
+            @if (editForm.get(['produit'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

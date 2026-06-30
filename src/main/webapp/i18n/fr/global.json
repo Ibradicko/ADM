@@ -1,0 +1,185 @@
+{
+  "global": {
+    "title": "AdmSupervisionVentes",
+    "menu": {
+      "home": "Accueil",
+      "account": {
+        "main": "Compte",
+        "settings": "Mon profil",
+        "password": "Mot de passe",
+        "sessions": "Sessions",
+        "login": "Connexion",
+        "logout": "Deconnexion",
+        "register": "Inscription"
+      },
+      "language": "Langue"
+    },
+    "navbar": {
+      "mainNavigation": "Navigation principale",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu",
+      "search": "Rechercher...",
+      "notifications": "Notifications",
+      "currentModule": "Module actif",
+      "sessionActive": "Session active",
+      "connectedAs": "Connecte en tant que",
+      "dashboard": "Tableau de bord",
+      "boutiques": "Boutiques",
+      "myBoutique": "Ma boutique",
+      "contracts": "Contrats d'exploitation",
+      "locataires": "Locataires",
+      "produits": "Articles",
+      "catalogue": "Catalogue",
+      "catalogueIdentification": "Etiquettes et codes-barres",
+      "productFamilies": "Familles articles",
+      "productPrices": "Tarifs articles",
+      "barcodes": "Codes-barres",
+      "caisse": "Ventes",
+      "salesHistory": "Historique ventes",
+      "stocks": "Stocks",
+      "warehouses": "Depots",
+      "stockLevels": "Stocks articles",
+      "stockMovements": "Mouvements stock",
+      "receptions": "Receptions",
+      "inventories": "Inventaires",
+      "transfers": "Transferts",
+      "redevances": "Redevances",
+      "royaltyRules": "Regles redevance",
+      "royaltyCalculations": "Calculs redevance",
+      "royaltyPayments": "Paiements redevance",
+      "royaltyAdjustments": "Regularisations",
+      "reporting": "Rapports",
+      "exports": "Exports",
+      "audit": "Audit",
+      "auditLog": "Journal audit",
+      "users": "Utilisateurs",
+      "sellerManagement": "Gestion des vendeurs",
+      "userAssignments": "Affectations",
+      "settings": "Parametres",
+      "businessProfiles": "Profils metier",
+      "businessPermissions": "Permissions metier",
+      "paymentMethods": "Modes de paiement",
+      "globalParameters": "Parametres globaux",
+      "adminUsers": "Admin - utilisateurs",
+      "adminHealth": "Admin - sante",
+      "adminMetrics": "Admin - metriques",
+      "adminLogs": "Admin - journaux",
+      "adminConfiguration": "Admin - configuration",
+      "adminApiDocs": "Admin - API docs",
+      "mesBoutiques": "Mes boutiques"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "managerAdm": "Manager ADM",
+      "managerBoutique": "Manager boutique",
+      "vendeur": "Vendeur",
+      "user": "Utilisateur",
+      "locataire": "Locataire"
+    },
+    "form": {
+      "username.label": "Identifiant",
+      "username.placeholder": "Votre identifiant",
+      "currentpassword.label": "Mot de passe actuel",
+      "currentpassword.placeholder": "Mot de passe actuel",
+      "newpassword.label": "Nouveau mot de passe",
+      "newpassword.placeholder": "Nouveau mot de passe",
+      "confirmpassword.label": "Confirmation du nouveau mot de passe",
+      "confirmpassword.placeholder": "Confirmez le nouveau mot de passe",
+      "email.label": "Email",
+      "email.placeholder": "Votre email"
+    },
+    "messages": {
+      "info": {
+        "authenticated": {
+          "prefix": "Pour vous connecter, ",
+          "link": "ouvrez une session",
+          "suffix": "."
+        },
+        "register": {
+          "noaccount": "Vous n'avez pas encore de compte ?",
+          "link": "Demander la creation d'un compte"
+        }
+      },
+      "error": {
+        "dontmatch": "Le mot de passe et sa confirmation ne correspondent pas."
+      },
+      "validate": {
+        "newpassword": {
+          "required": "Le mot de passe est obligatoire.",
+          "minlength": "Le mot de passe doit contenir au moins 8 caracteres.",
+          "maxlength": "Le mot de passe ne peut pas depasser 100 caracteres.",
+          "strength": "Robustesse du mot de passe :"
+        },
+        "confirmpassword": {
+          "required": "La confirmation du mot de passe est obligatoire.",
+          "minlength": "La confirmation doit contenir au moins 8 caracteres.",
+          "maxlength": "La confirmation ne peut pas depasser 100 caracteres."
+        },
+        "email": {
+          "required": "L'email est obligatoire.",
+          "invalid": "L'email est invalide.",
+          "minlength": "L'email doit contenir au moins 5 caracteres.",
+          "maxlength": "L'email ne peut pas depasser 50 caracteres."
+        }
+      }
+    },
+    "field": {
+      "id": "ID"
+    }
+  },
+  "entity": {
+    "action": {
+      "back": "Retour",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "close": "Fermer",
+      "open": "Ouvrir",
+      "save": "Enregistrer",
+      "view": "Voir"
+    },
+    "detail": {
+      "field": "Champ",
+      "value": "Valeur"
+    },
+    "delete": {
+      "title": "Confirmer la suppression"
+    },
+    "validation": {
+      "required": "Ce champ est obligatoire.",
+      "minlength": "Ce champ doit contenir au moins {{ min }} caracteres.",
+      "maxlength": "Ce champ ne peut pas depasser {{ max }} caracteres.",
+      "min": "Ce champ doit etre superieur ou egal a {{ min }}.",
+      "max": "Ce champ ne peut pas depasser {{ max }}.",
+      "minbytes": "Ce champ doit contenir au moins {{ min }} octets.",
+      "maxbytes": "Ce champ ne peut pas depasser {{ max }} octets.",
+      "pattern": "Ce champ doit respecter le format pour {{ pattern }}.",
+      "number": "Ce champ doit etre un nombre.",
+      "datetimelocal": "Ce champ doit etre une date et une heure.",
+      "patternLogin": "Ce champ ne peut contenir que des lettres, des chiffres et des adresses e-mail."
+    },
+    "filters": {
+      "set": "Filtres actifs",
+      "clear": "Effacer le filtre",
+      "clearAll": "Effacer tous les filtres"
+    }
+  },
+  "error": {
+    "internalServerError": "Erreur interne du serveur",
+    "server.not.reachable": "Serveur inaccessible",
+    "url.not.found": "Introuvable",
+    "userexists": "Cet identifiant est deja utilise.",
+    "emailexists": "Cet email est deja utilise.",
+    "idexists": "Un nouvel element {{ entityName }} ne peut pas deja avoir un ID",
+    "idnull": "ID invalide",
+    "idinvalid": "ID invalide",
+    "idnotfound": "ID introuvable",
+    "missingBoutique": "Les informations de la boutique sont obligatoires.",
+    "managerIdentityConflict": "Le login et l'email correspondent a deux comptes differents.",
+    "managerEmailMismatch": "Ce login existe deja avec un autre email.",
+    "managerProfileMissing": "Le profil MANAGER_BOUTIQUE est introuvable.",
+    "codeAlreadyUsed": "Ce code boutique est deja utilise.",
+    "deleteBlocked": "La boutique ne peut pas etre supprimee car elle est deja utilisee."
+  },
+  "footer": "Developpe par CRA TECHNOLOGIE"
+}

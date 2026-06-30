@@ -53,6 +53,8 @@ public class AdminUserDTO implements Serializable {
 
     private Set<String> authorities;
 
+    private boolean mustChangePassword;
+
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -71,6 +73,7 @@ public class AdminUserDTO implements Serializable {
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        this.mustChangePassword = user.isMustChangePassword();
     }
 
     public Long getId() {
@@ -175,6 +178,14 @@ public class AdminUserDTO implements Serializable {
 
     public void setAuthorities(Set<String> authorities) {
         this.authorities = authorities;
+    }
+
+    public boolean isMustChangePassword() {
+        return mustChangePassword;
+    }
+
+    public void setMustChangePassword(boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
     }
 
     // prettier-ignore

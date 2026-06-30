@@ -1,0 +1,64 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ligneCalculRedevance(); as ligneCalculRedevanceRef) {
+      <div>
+        <h2 data-cy="ligneCalculRedevanceDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.detail.title">Ligne Calcul Redevance</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ligneCalculRedevanceRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.baseCalcul">Base Calcul</span></dt>
+          <dd>
+            <span>{{ ligneCalculRedevanceRef.baseCalcul }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.tauxApplique">Taux Applique</span></dt>
+          <dd>
+            <span>{{ ligneCalculRedevanceRef.tauxApplique }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.montantRedevance">Montant Redevance</span></dt>
+          <dd>
+            <span>{{ ligneCalculRedevanceRef.montantRedevance }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.calcul">Calcul</span></dt>
+          <dd>
+            @if (ligneCalculRedevance()!.calcul) {
+              <div>
+                <a [routerLink]="['/calcul-redevance', ligneCalculRedevance()!.calcul?.id, 'view']">{{
+                  ligneCalculRedevanceRef.calcul?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.vente">Vente</span></dt>
+          <dd>
+            @if (ligneCalculRedevance()!.vente) {
+              <div>
+                <a [routerLink]="['/vente', ligneCalculRedevance()!.vente?.id, 'view']">{{
+                  ligneCalculRedevanceRef.vente?.numeroTicket
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ligne-calcul-redevance', ligneCalculRedevanceRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

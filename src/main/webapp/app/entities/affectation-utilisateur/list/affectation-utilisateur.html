@@ -1,0 +1,127 @@
+<section class="adm-page">
+  <div class="adm-page-header" id="page-heading" data-cy="AffectationUtilisateurHeading">
+    <div>
+      <h1>Affectations utilisateurs</h1>
+      <p>Gestion des profils et accès par boutique</p>
+    </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
+      </button>
+      @if (permissionsUi.peutGererUtilisateurs()) {
+        <a
+          class="adm-button adm-button--primary"
+          [routerLink]="['/affectation-utilisateur/new']"
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+        >
+          <fa-icon icon="plus" />
+          <span>Nouvelle affectation</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  @if (affectationUtilisateurs().length === 0) {
+    <div class="adm-empty-state" id="no-result">
+      <strong>Aucune affectation trouvée</strong>
+      <p>Les affectations permettent de donner un profil métier à un utilisateur sur une boutique.</p>
+    </div>
+  } @else {
+    <article class="adm-card adm-card--table">
+      <div class="adm-card__header">
+        <div>
+          <h2>Liste des affectations</h2>
+          <p>Profils actifs et historiques des accès utilisateurs par boutique</p>
+        </div>
+        <span class="adm-pill adm-pill--primary">{{ affectationUtilisateurs().length }} affectations</span>
+      </div>
+
+      <div class="adm-table-wrapper" id="entities">
+        <table class="adm-table" aria-describedby="page-heading">
+          <thead>
+            <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+              <th scope="col" jhiSortBy="user.login">Utilisateur <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="boutique.nom">Boutique <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="profil.code">Profil <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateDebut">Depuis <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="dateFin">Jusqu'au <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="actif">Actif <fa-icon icon="sort" /></th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (aff of affectationUtilisateurs(); track trackId(aff); let even = $even) {
+              <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                <td>
+                  <span class="adm-table__cell--login">{{ aff.user?.login ?? '—' }}</span>
+                </td>
+                <td>
+                  @if (aff.boutique) {
+                    <div class="adm-table-title">
+                      <strong>{{ aff.boutique.nom }}</strong>
+                      <small>{{ aff.boutique.code }}</small>
+                    </div>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td>
+                  @if (aff.profil) {
+                    <span class="adm-pill adm-pill--dark">{{ aff.profil.code }}</span>
+                  } @else {
+                    <span>—</span>
+                  }
+                </td>
+                <td>{{ aff.dateDebut | formatMediumDate }}</td>
+                <td>{{ aff.dateFin ? (aff.dateFin | formatMediumDate) : '—' }}</td>
+                <td>
+                  @if (aff.actif) {
+                    <span class="adm-pill adm-pill--success">Actif</span>
+                  } @else {
+                    <span class="adm-pill adm-pill--warning">Inactif</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <div class="adm-table-actions">
+                    <a
+                      [routerLink]="['/affectation-utilisateur', aff.id, 'view']"
+                      class="adm-icon-button"
+                      data-cy="entityDetailsButton"
+                      title="Voir"
+                    >
+                      <fa-icon icon="eye" />
+                    </a>
+                    @if (permissionsUi.peutGererUtilisateurs()) {
+                      <a
+                        [routerLink]="['/affectation-utilisateur', aff.id, 'edit']"
+                        class="adm-icon-button"
+                        data-cy="entityEditButton"
+                        title="Modifier"
+                      >
+                        <fa-icon icon="pencil-alt" />
+                      </a>
+                      <button
+                        type="button"
+                        (click)="delete(aff)"
+                        class="adm-icon-button adm-icon-button--danger"
+                        data-cy="entityDeleteButton"
+                        title="Supprimer"
+                      >
+                        <fa-icon icon="times" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+</section>

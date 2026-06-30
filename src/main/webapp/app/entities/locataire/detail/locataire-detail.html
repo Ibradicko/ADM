@@ -1,0 +1,70 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (locataire(); as locataireRef) {
+      <div>
+        <h2 data-cy="locataireDetailsHeading"><span jhiTranslate="admSupervisionVentesApp.locataire.detail.title">Locataire</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ locataireRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.code">Code</span></dt>
+          <dd>
+            <span>{{ locataireRef.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.nom">Nom</span></dt>
+          <dd>
+            <span>{{ locataireRef.nom }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.typeLocataire">Type Locataire</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.TypeLocataire.' + (locataireRef.typeLocataire ?? 'null')">{{
+              { null: '', PERSONNE_PHYSIQUE: 'PERSONNE_PHYSIQUE', PERSONNE_MORALE: 'PERSONNE_MORALE' }[locataireRef.typeLocataire ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.numeroIdentification">Numero Identification</span></dt>
+          <dd>
+            <span>{{ locataireRef.numeroIdentification }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.telephone">Telephone</span></dt>
+          <dd>
+            <span>{{ locataireRef.telephone }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.email">Email</span></dt>
+          <dd>
+            <span>{{ locataireRef.email }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.adresse">Adresse</span></dt>
+          <dd>
+            <span>{{ locataireRef.adresse }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'admSupervisionVentesApp.StatutGeneral.' + (locataireRef.statut ?? 'null')">{{
+              { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[locataireRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.locataire.dateCreation">Date Creation</span></dt>
+          <dd>
+            <span>{{ locataireRef.dateCreation | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/locataire', locataireRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

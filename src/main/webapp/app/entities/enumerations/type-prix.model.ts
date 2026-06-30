@@ -1,0 +1,7 @@
+export enum TypePrix {
+  STANDARD = 'STANDARD',
+
+  PROMOTION = 'PROMOTION',
+
+  CONTRACTUEL = 'CONTRACTUEL',
+}

@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (historiqueCodeBarres(); as historiqueCodeBarresRef) {
+      <div>
+        <h2 data-cy="historiqueCodeBarresDetailsHeading">
+          <span jhiTranslate="admSupervisionVentesApp.historiqueCodeBarres.detail.title">Historique Code Barres</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ historiqueCodeBarresRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.historiqueCodeBarres.ancienCode">Ancien Code</span></dt>
+          <dd>
+            <span>{{ historiqueCodeBarresRef.ancienCode }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.historiqueCodeBarres.nouveauCode">Nouveau Code</span></dt>
+          <dd>
+            <span>{{ historiqueCodeBarresRef.nouveauCode }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.historiqueCodeBarres.motif">Motif</span></dt>
+          <dd>
+            <span>{{ historiqueCodeBarresRef.motif }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.historiqueCodeBarres.dateChangement">Date Changement</span></dt>
+          <dd>
+            <span>{{ historiqueCodeBarresRef.dateChangement | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.historiqueCodeBarres.produit">Produit</span></dt>
+          <dd>
+            @if (historiqueCodeBarres()!.produit) {
+              <div>
+                <a [routerLink]="['/produit', historiqueCodeBarres()!.produit?.id, 'view']">{{
+                  historiqueCodeBarresRef.produit?.designation
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="admSupervisionVentesApp.historiqueCodeBarres.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ historiqueCodeBarresRef.utilisateur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/historique-code-barres', historiqueCodeBarresRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

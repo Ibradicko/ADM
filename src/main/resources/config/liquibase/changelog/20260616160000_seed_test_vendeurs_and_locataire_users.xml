@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <changeSet id="20260616160000-1" author="adm">
+        <comment>Seed vendeur accounts and link locataire user accounts for recette testing.</comment>
+        <sql>
+            -- Vendeur accounts (password: admin)
+            INSERT INTO jhi_user (
+              id, login, password_hash, first_name, last_name, email, image_url, activated, lang_key,
+              created_by, last_modified_by, must_change_password
+            ) VALUES
+              (905001, 'vendeur_alpha', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Vendeur', 'Alpha', 'vendeur.alpha@test.adm', null, true, 'fr', 'system', 'system', false),
+              (905002, 'vendeur_beta',  '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Vendeur', 'Beta',  'vendeur.beta@test.adm',  null, true, 'fr', 'system', 'system', false)
+            ON CONFLICT (login) DO UPDATE SET
+              password_hash = EXCLUDED.password_hash,
+              first_name = EXCLUDED.first_name,
+              last_name = EXCLUDED.last_name,
+              email = EXCLUDED.email,
+              activated = EXCLUDED.activated,
+              lang_key = EXCLUDED.lang_key,
+              must_change_password = EXCLUDED.must_change_password,
+              last_modified_by = EXCLUDED.last_modified_by;
+
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT u.id, 'ROLE_VENDEUR'
+            FROM jhi_user u
+            WHERE u.login IN ('vendeur_alpha', 'vendeur_beta')
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT u.id, 'ROLE_USER'
+            FROM jhi_user u
+            WHERE u.login IN ('vendeur_alpha', 'vendeur_beta')
+            ON CONFLICT DO NOTHING;
+
+            -- Affectations: vendeur_alpha → BTK-01 (VENDEUR), vendeur_beta → BTK-02 (VENDEUR)
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 905101, DATE '2026-01-01', null, true, u.id, b.id, p.id
+            FROM jhi_user u
+            JOIN boutique b ON b.code = 'ADM-BTK-01'
+            JOIN profil_metier p ON p.code = 'VENDEUR'
+            WHERE u.login = 'vendeur_alpha'
+            ON CONFLICT (id) DO UPDATE SET
+              date_debut = EXCLUDED.date_debut,
+              actif = EXCLUDED.actif,
+              user_id = EXCLUDED.user_id,
+              boutique_id = EXCLUDED.boutique_id,
+              profil_id = EXCLUDED.profil_id;
+
+            INSERT INTO affectation_utilisateur (id, date_debut, date_fin, actif, user_id, boutique_id, profil_id)
+            SELECT 905102, DATE '2026-01-01', null, true, u.id, b.id, p.id
+            FROM jhi_user u
+            JOIN boutique b ON b.code = 'ADM-BTK-02'
+            JOIN profil_metier p ON p.code = 'VENDEUR'
+            WHERE u.login = 'vendeur_beta'
+            ON CONFLICT (id) DO UPDATE SET
+              date_debut = EXCLUDED.date_debut,
+              actif = EXCLUDED.actif,
+              user_id = EXCLUDED.user_id,
+              boutique_id = EXCLUDED.boutique_id,
+              profil_id = EXCLUDED.profil_id;
+
+            -- Locataire user accounts (password: Adm@2026 via bcrypt, same hash as "admin" for test convenience)
+            INSERT INTO jhi_user (
+              id, login, password_hash, first_name, last_name, email, image_url, activated, lang_key,
+              created_by, last_modified_by, must_change_password
+            ) VALUES
+              (905003, 'loc_alpha', '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Locataire', 'Alpha', 'loc.alpha@test.adm', null, true, 'fr', 'system', 'system', false),
+              (905004, 'loc_beta',  '$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC', 'Locataire', 'Beta',  'loc.beta@test.adm',  null, true, 'fr', 'system', 'system', false)
+            ON CONFLICT (login) DO UPDATE SET
+              password_hash = EXCLUDED.password_hash,
+              first_name = EXCLUDED.first_name,
+              last_name = EXCLUDED.last_name,
+              email = EXCLUDED.email,
+              activated = EXCLUDED.activated,
+              lang_key = EXCLUDED.lang_key,
+              must_change_password = EXCLUDED.must_change_password,
+              last_modified_by = EXCLUDED.last_modified_by;
+
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT u.id, 'ROLE_LOCATAIRE'
+            FROM jhi_user u
+            WHERE u.login IN ('loc_alpha', 'loc_beta')
+            ON CONFLICT DO NOTHING;
+
+            INSERT INTO jhi_user_authority (user_id, authority_name)
+            SELECT u.id, 'ROLE_USER'
+            FROM jhi_user u
+            WHERE u.login IN ('loc_alpha', 'loc_beta')
+            ON CONFLICT DO NOTHING;
+
+            -- Link locataire records to their user accounts
+            UPDATE locataire SET user_id = (SELECT id FROM jhi_user WHERE login = 'loc_alpha')
+            WHERE code = 'LOC-ALPHA' AND user_id IS NULL;
+
+            UPDATE locataire SET user_id = (SELECT id FROM jhi_user WHERE login = 'loc_beta')
+            WHERE code = 'LOC-BETA' AND user_id IS NULL;
+
+            -- Update vente records to use vendeur accounts instead of manager accounts
+            UPDATE vente SET vendeur_id = (SELECT id FROM jhi_user WHERE login = 'vendeur_alpha')
+            WHERE numero_ticket = 'TCK-ALPHA-2026-001';
+
+            UPDATE vente SET vendeur_id = (SELECT id FROM jhi_user WHERE login = 'vendeur_beta')
+            WHERE numero_ticket = 'TCK-BETA-2026-001';
+
+            SELECT setval('sequence_generator', GREATEST((SELECT last_value FROM sequence_generator), 906000), true);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

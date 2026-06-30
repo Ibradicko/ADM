@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity ScanInconnu.
+    -->
+    <changeSet id="20260505101132-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="boutique_id"
+                                 baseTableName="scan_inconnu"
+                                 constraintName="fk_scan_inconnu__boutique_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="boutique"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="produit_affecte_id"
+                                 baseTableName="scan_inconnu"
+                                 constraintName="fk_scan_inconnu__produit_affecte_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="produit"
+                                 />
+    </changeSet>
+</databaseChangeLog>

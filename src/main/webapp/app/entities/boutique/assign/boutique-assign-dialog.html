@@ -1,0 +1,117 @@
+<div class="modal-header adm-modal-header">
+  <div>
+    <p class="adm-page__eyebrow">Exploitation boutique</p>
+    <h4 class="modal-title">{{ activeExploitation ? 'Reaffecter un locataire' : 'Affecter un locataire' }}</h4>
+    <small>{{ boutique?.code || 'BTQ' }} - {{ boutique?.nom || 'Boutique' }}</small>
+  </div>
+  <button type="button" class="btn-close" aria-label="Fermer" (click)="cancel()"></button>
+</div>
+
+<div class="modal-body adm-modal-body">
+  @if (messageErreur(); as message) {
+    <div class="adm-inline-alert adm-inline-alert--danger">{{ message }}</div>
+  }
+
+  @if (activeExploitation) {
+    <div class="adm-inline-alert adm-inline-alert--warning">
+      Cette boutique est actuellement exploitee par <strong>{{ activeExploitation.locataire?.nom }}</strong> ({{
+        activeExploitation.numeroContrat ?? 'sans numero de contrat'
+      }}). Confirmer la reaffectation cloturera ce contrat (date de fin = aujourd'hui) et creera un nouveau contrat actif avec le locataire
+      selectionne ci-dessous.
+    </div>
+  }
+
+  <section class="adm-subsection">
+    <div class="adm-section-heading">
+      <div>
+        <h3>Locataire exploitant</h3>
+        <p>Le locataire affecte recevra le profil Manager boutique sur ce point de vente.</p>
+      </div>
+    </div>
+
+    <label class="adm-search adm-search--panel">
+      <fa-icon icon="search" />
+      <input
+        type="search"
+        [ngModel]="recherche()"
+        (ngModelChange)="recherche.set($event)"
+        placeholder="Rechercher par nom, code ou email locataire..."
+      />
+    </label>
+
+    <div class="adm-selection-list">
+      @for (locataire of locatairesFiltres(); track locataire.id) {
+        <button
+          type="button"
+          class="adm-selection-row"
+          [class.adm-selection-row--active]="locataireSelectionne()?.id === locataire.id"
+          (click)="choisirLocataire(locataire)"
+        >
+          <span>
+            <strong>{{ formatLocataire(locataire) }}</strong>
+            <small>{{ locataire.email || 'Email manquant' }}</small>
+          </span>
+          @if (locataireSelectionne()?.id === locataire.id) {
+            <fa-icon icon="check" />
+          }
+        </button>
+      } @empty {
+        <div class="adm-empty-state adm-empty-state--compact">
+          <strong>Aucun locataire actif trouve</strong>
+          <p>Verifiez le statut du locataire ou creez sa fiche avant l'affectation.</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="adm-subsection">
+    <div class="adm-section-heading">
+      <div>
+        <h3>Contrat et redevance</h3>
+        <p>Ces informations alimentent le suivi d'exploitation et les calculs de redevance.</p>
+      </div>
+    </div>
+
+    <div class="adm-form-grid">
+      <label class="adm-field">
+        <span>Numero contrat</span>
+        <input type="text" maxlength="80" [ngModel]="numeroContrat()" (ngModelChange)="numeroContrat.set($event)" />
+      </label>
+
+      <label class="adm-field">
+        <span>Date debut</span>
+        <input type="date" [ngModel]="dateDebut()" (ngModelChange)="dateDebut.set($event)" />
+      </label>
+
+      <label class="adm-field">
+        <span>Date fin</span>
+        <input type="date" [ngModel]="dateFin()" (ngModelChange)="dateFin.set($event)" />
+      </label>
+
+      <label class="adm-field">
+        <span>Taux redevance (%)</span>
+        <input
+          type="number"
+          min="0"
+          max="100"
+          step="0.01"
+          [ngModel]="tauxRedevanceDefaut()"
+          (ngModelChange)="tauxRedevanceDefaut.set($event === '' ? null : +$event)"
+        />
+      </label>
+
+      <label class="adm-field adm-field--full">
+        <span>Commentaire</span>
+        <textarea rows="3" [ngModel]="commentaire()" (ngModelChange)="commentaire.set($event)"></textarea>
+      </label>
+    </div>
+  </section>
+</div>
+
+<div class="modal-footer adm-modal-footer">
+  <button type="button" class="adm-button adm-button--ghost" (click)="cancel()">Annuler</button>
+  <button type="button" class="adm-button adm-button--primary" [disabled]="isSaving() || !locataireSelectionne()" (click)="assigner()">
+    <fa-icon [icon]="activeExploitation ? 'user-check' : 'user-plus'" />
+    <span>{{ isSaving() ? 'Affectation...' : activeExploitation ? 'Reaffecter' : 'Affecter' }}</span>
+  </button>
+</div>

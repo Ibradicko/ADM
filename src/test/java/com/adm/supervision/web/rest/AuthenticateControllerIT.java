@@ -1,5 +1,6 @@
 package com.adm.supervision.web.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -10,7 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.adm.supervision.IntegrationTest;
+import com.adm.supervision.domain.JournalAudit;
 import com.adm.supervision.domain.User;
+import com.adm.supervision.domain.enumeration.TypeActionAudit;
+import com.adm.supervision.repository.JournalAuditRepository;
 import com.adm.supervision.repository.UserRepository;
 import com.adm.supervision.web.rest.vm.LoginVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +43,9 @@ class AuthenticateControllerIT {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private JournalAuditRepository journalAuditRepository;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Test
@@ -62,6 +69,10 @@ class AuthenticateControllerIT {
             .andExpect(jsonPath("$.id_token").isNotEmpty())
             .andExpect(header().string("Authorization", not(nullValue())))
             .andExpect(header().string("Authorization", not(is(emptyString()))));
+
+        assertThat(journalAuditRepository.findAll())
+            .extracting(JournalAudit::getTypeAction, JournalAudit::getIdentifiantEntite)
+            .contains(new org.assertj.core.groups.Tuple(TypeActionAudit.CONNEXION, user.getLogin()));
     }
 
     @Test

@@ -1,0 +1,214 @@
+{
+  "admSupervisionVentesApp": {
+    "regleRedevance": {
+      "home": {
+        "title": "Royalty rules",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a royalty rule",
+        "createOrEditLabel": "Create or edit a royalty rule",
+        "notFound": "No royalty rules found"
+      },
+      "detail": { "title": "Royalty rule" },
+      "typeRegle": "Rule type",
+      "taux": "Rate",
+      "dateDebut": "Start date",
+      "dateFin": "End date",
+      "priorite": "Priority",
+      "actif": "Active",
+      "groupeArticle": "Product group"
+    },
+    "calculRedevance": {
+      "home": {
+        "title": "Royalty calculations",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a royalty calculation",
+        "createOrEditLabel": "Create or edit a royalty calculation",
+        "notFound": "No royalty calculations found"
+      },
+      "detail": { "title": "Royalty calculation" },
+      "reference": "Reference",
+      "periodeDebut": "Period start",
+      "periodeFin": "Period end",
+      "chiffreAffaires": "Turnover",
+      "montantRedevance": "Royalty amount",
+      "statut": "Status",
+      "dateCalcul": "Calculation date"
+    },
+    "ligneCalculRedevance": {
+      "home": {
+        "title": "Royalty calculation lines",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a calculation line",
+        "createOrEditLabel": "Create or edit a calculation line",
+        "notFound": "No calculation lines found"
+      },
+      "detail": { "title": "Royalty calculation line" },
+      "baseCalcul": "Calculation basis",
+      "tauxApplique": "Applied rate",
+      "montantRedevance": "Royalty amount",
+      "calcul": "Calculation",
+      "vente": "Sale"
+    },
+    "paiementRedevance": {
+      "home": {
+        "title": "Royalty payments",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a royalty payment",
+        "createOrEditLabel": "Create or edit a royalty payment",
+        "notFound": "No royalty payments found"
+      },
+      "detail": { "title": "Royalty payment" },
+      "reference": "Reference",
+      "montant": "Amount",
+      "datePaiement": "Payment date",
+      "modePaiement": "Payment method",
+      "commentaire": "Comment",
+      "calcul": "Calculation"
+    },
+    "regularisationRedevance": {
+      "home": {
+        "title": "Royalty adjustments",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a royalty adjustment",
+        "createOrEditLabel": "Create or edit a royalty adjustment",
+        "notFound": "No royalty adjustments found"
+      },
+      "detail": { "title": "Royalty adjustment" },
+      "reference": "Reference",
+      "montant": "Amount",
+      "motif": "Reason",
+      "dateRegularisation": "Adjustment date",
+      "calcul": "Calculation"
+    },
+    "journalAudit": {
+      "home": {
+        "title": "Audit log",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create an audit entry",
+        "createOrEditLabel": "Create or edit an audit entry",
+        "notFound": "No audit entries found"
+      },
+      "detail": { "title": "Audit log entry" },
+      "typeAction": "Action type",
+      "entiteConcernee": "Affected entity",
+      "identifiantEntite": "Entity identifier",
+      "adresseIp": "IP address",
+      "dateAction": "Action date",
+      "utilisateur": "User"
+    },
+    "rapportExport": {
+      "home": {
+        "title": "Export reports",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create an export report",
+        "createOrEditLabel": "Create or edit an export report",
+        "notFound": "No export reports found"
+      },
+      "detail": { "title": "Export report" },
+      "reference": "Reference",
+      "typeRapport": "Report type",
+      "periodeDebut": "Period start",
+      "periodeFin": "Period end",
+      "cheminFichier": "File path",
+      "dateGeneration": "Generation date",
+      "utilisateur": "User"
+    },
+    "parametreGlobal": {
+      "home": {
+        "title": "Global parameters",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a global parameter",
+        "createOrEditLabel": "Create or edit a global parameter",
+        "notFound": "No global parameters found"
+      },
+      "detail": { "title": "Global parameter" },
+      "valeur": "Value",
+      "actif": "Active"
+    },
+    "modePaiementRef": {
+      "home": {
+        "title": "Payment methods",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a payment method",
+        "createOrEditLabel": "Create or edit a payment method",
+        "notFound": "No payment methods found"
+      },
+      "detail": { "title": "Payment method" },
+      "libelle": "Label",
+      "actif": "Active"
+    },
+    "profilMetier": {
+      "home": {
+        "title": "Business profiles",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a business profile",
+        "createOrEditLabel": "Create or edit a business profile",
+        "notFound": "No business profiles found"
+      },
+      "detail": { "title": "Business profile" },
+      "libelle": "Label",
+      "statut": "Status"
+    },
+    "permissionMetier": {
+      "home": {
+        "title": "Business permissions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a business permission",
+        "createOrEditLabel": "Create or edit a business permission",
+        "notFound": "No business permissions found"
+      },
+      "detail": { "title": "Business permission" },
+      "libelle": "Label"
+    },
+    "affectationUtilisateur": {
+      "home": {
+        "title": "User assignments",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a user assignment",
+        "createOrEditLabel": "Create or edit a user assignment",
+        "notFound": "No user assignments found"
+      },
+      "detail": { "title": "User assignment" },
+      "dateDebut": "Start date",
+      "dateFin": "End date",
+      "actif": "Active",
+      "user": "User",
+      "profil": "Profile"
+    },
+    "StatutRedevance": {
+      "null": "",
+      "CALCULEE": "Calculated",
+      "VALIDEE": "Validated",
+      "REGULARISEE": "Adjusted",
+      "PARTIELLEMENT_PAYEE": "Partially paid",
+      "PAYEE": "Paid",
+      "ANNULEE": "Cancelled"
+    },
+    "TypeRegleRedevance": {
+      "null": "",
+      "BOUTIQUE": "Shop",
+      "LOCATAIRE": "Tenant",
+      "GROUPE_ARTICLE": "Product group",
+      "PRODUIT": "Product"
+    },
+    "TypeActionAudit": {
+      "null": "",
+      "CONNEXION": "Sign-in",
+      "DECONNEXION": "Sign-out",
+      "CREATION": "Creation",
+      "MODIFICATION": "Modification",
+      "DESACTIVATION": "Deactivation",
+      "CHANGEMENT_PRIX": "Price change",
+      "CHANGEMENT_TAUX_REDEVANCE": "Royalty rate change",
+      "CHANGEMENT_CODE_BARRES": "Barcode change",
+      "VENTE_VALIDEE": "Validated sale",
+      "VENTE_ANNULEE": "Cancelled sale",
+      "RETOUR_VENTE": "Sale return",
+      "MOUVEMENT_STOCK": "Stock movement",
+      "INVENTAIRE": "Inventory",
+      "PARAMETRAGE": "Settings change",
+      "EXPORT": "Export"
+    },
+    "FormatExport": { "null": "", "PDF": "PDF", "EXCEL": "Excel" }
+  }
+}
