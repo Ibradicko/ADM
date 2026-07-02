@@ -1,4 +1,3 @@
-import { IBoutique } from 'app/entities/boutique/boutique.model';
 import { StatutGeneral } from 'app/entities/enumerations/statut-general.model';
 
 export interface IGroupeArticle {
@@ -6,7 +5,7 @@ export interface IGroupeArticle {
   code?: string | null;
   libelle?: string | null;
   statut?: keyof typeof StatutGeneral | null;
-  boutique?: Pick<IBoutique, 'id' | 'nom' | 'code'> | null;
+  tauxRedevance?: number | null;
 }
 
 export type NewGroupeArticle = Omit<IGroupeArticle, 'id'> & { id: null };

@@ -583,8 +583,16 @@
       <article class="adm-card adm-card--spaced">
         <div class="adm-section-heading">
           <div>
-            <h2 jhiTranslate="settingsCenter.sections.userAssignments">User assignments</h2>
-            <p jhiTranslate="settingsCenter.hints.userAssignments">Assign a user role for a shop and validity period.</p>
+            @if (permissionsUi.estProfilBoutique()) {
+              <h2>Gestion des vendeurs</h2>
+              <p>
+                Activez ou desactivez les vendeurs de votre boutique. Un vendeur actif accede a la caisse apres changement du mot de passe
+                initial.
+              </p>
+            } @else {
+              <h2 jhiTranslate="settingsCenter.sections.userAssignments">User assignments</h2>
+              <p jhiTranslate="settingsCenter.hints.userAssignments">Assign a user role for a shop and validity period.</p>
+            }
           </div>
         </div>
         <div class="adm-mini-table">
@@ -602,22 +610,38 @@
             <tbody>
               @for (affectation of affectationsVisibles(); track affectation.id) {
                 <tr>
-                  <td>{{ affectation.user?.login ?? '--' }}</td>
+                  <td>
+                    <strong>{{ affectation.user?.login ?? '--' }}</strong>
+                    @if (vendeurDoitChangerMotDePasse(affectation)) {
+                      <small class="d-block">Mot de passe initial a changer</small>
+                    }
+                  </td>
                   <td>{{ affectation.boutique?.nom ?? '--' }}</td>
                   <td>{{ libelleProfil(affectation.profil?.code) }}</td>
                   <td>{{ formatDate(affectation.dateDebut) }} - {{ formatDate(affectation.dateFin) }}</td>
                   <td>
-                    <span class="adm-pill" [class.adm-pill--success]="affectation.actif" [class.adm-pill--warning]="!affectation.actif">
+                    <span
+                      class="adm-pill"
+                      [class.adm-pill--success]="vendeurActif(affectation)"
+                      [class.adm-pill--warning]="!vendeurActif(affectation)"
+                    >
                       {{
-                        (affectation.actif ? 'settingsCenter.status.activeFeminine' : 'settingsCenter.status.inactiveFeminine') | translate
+                        (vendeurActif(affectation) ? 'settingsCenter.status.activeFeminine' : 'settingsCenter.status.inactiveFeminine')
+                          | translate
                       }}
                     </span>
                   </td>
                   <td class="text-end">
                     @if (peutGererAffectationsBoutique()) {
-                      <button type="button" class="adm-button adm-button--ghost" (click)="basculerAffectation(affectation)">
-                        {{ (affectation.actif ? 'settingsCenter.actions.disable' : 'settingsCenter.actions.enable') | translate }}
-                      </button>
+                      @if ((affectation.profil?.code ?? '').toUpperCase() === 'VENDEUR') {
+                        <button type="button" class="adm-button adm-button--ghost" (click)="basculerVendeur(affectation)">
+                          {{ (vendeurActif(affectation) ? 'settingsCenter.actions.disable' : 'settingsCenter.actions.enable') | translate }}
+                        </button>
+                      } @else {
+                        <button type="button" class="adm-button adm-button--ghost" (click)="basculerAffectation(affectation)">
+                          {{ (affectation.actif ? 'settingsCenter.actions.disable' : 'settingsCenter.actions.enable') | translate }}
+                        </button>
+                      }
                     }
                   </td>
                 </tr>
@@ -702,88 +726,176 @@
                 <p jhiTranslate="settingsCenter.hints.newSellerUser">Create a seller account only for one of your assigned shops.</p>
               }
             </div>
+            @if (peutCreerUtilisateurBoutique()) {
+              <button type="button" class="adm-button adm-button--primary" (click)="ouvrirNouveauVendeurModal()">
+                <span>Nouveau vendeur</span>
+              </button>
+            }
           </div>
 
           @if (peutCreerUtilisateurBoutique()) {
-            <div class="adm-form-grid">
-              <div class="adm-field">
-                <span jhiTranslate="settingsCenter.fields.shop">Shop</span>
-                <details class="adm-search-select" #nouvelUtilisateurBoutiqueSelect>
-                  <summary>
-                    <span>{{ libelleBoutique(nouvelUtilisateurBoutiqueId()) }}</span>
-                  </summary>
-                  <div class="adm-search-select__panel">
-                    <input
-                      type="search"
-                      [ngModel]="rechercheNouvelUtilisateurBoutique()"
-                      (ngModelChange)="rechercheNouvelUtilisateurBoutique.set($event)"
-                      [placeholder]="'settingsCenter.placeholders.searchShop' | translate"
-                    />
-                    <button
-                      type="button"
-                      class="adm-search-select__option"
-                      (click)="selectionnerNouvelUtilisateurBoutique(null, nouvelUtilisateurBoutiqueSelect)"
-                    >
-                      <span jhiTranslate="settingsCenter.common.select">Select</span>
-                    </button>
-                    @for (boutique of boutiquesNouvelUtilisateurFiltrees(); track boutique.id) {
+            @if (dernierIdentifiantVendeur() && dernierMotDePasseTemporaire()) {
+              <div class="adm-inline-alert adm-inline-alert--success">
+                <strong>Compte vendeur cree.</strong>
+                <span>
+                  Identifiant :
+                  <span class="adm-code">{{ dernierIdentifiantVendeur() }}</span>
+                  Mot de passe temporaire :
+                  <span class="adm-code">{{ dernierMotDePasseTemporaire() }}</span>
+                </span>
+                <small>Le vendeur devra changer ce mot de passe a sa premiere connexion avant d'acceder a la caisse.</small>
+              </div>
+            }
+            @if (nouveauVendeurModalOuverte()) {
+              <div
+                class="adm-modal-backdrop"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Créer un vendeur"
+                (click)="fermerNouveauVendeurModal()"
+              >
+                <div class="adm-modal-shell" (click)="$event.stopPropagation()">
+                  <div class="adm-modal">
+                    <div class="adm-modal__header">
+                      <div>
+                        <h2>Nouveau vendeur</h2>
+                        <p>Accès caisse &amp; stock · Mot de passe initial : <strong class="adm-code">Adm@2026</strong></p>
+                      </div>
                       <button
                         type="button"
-                        class="adm-search-select__option"
-                        [class.adm-search-select__option--active]="boutique.id === nouvelUtilisateurBoutiqueId()"
-                        (click)="selectionnerNouvelUtilisateurBoutique(boutique.id, nouvelUtilisateurBoutiqueSelect)"
+                        class="adm-button adm-button--ghost"
+                        (click)="fermerNouveauVendeurModal()"
+                        [disabled]="enregistrement()"
                       >
-                        <strong>{{ boutique.nom }}</strong>
-                        <small>{{ boutique.code }} · {{ boutique.emplacement ?? boutique.type ?? '--' }}</small>
+                        ✕
                       </button>
-                    } @empty {
-                      <div class="adm-search-select__empty" jhiTranslate="settingsCenter.empty.noSearchResult">No result found.</div>
-                    }
+                    </div>
+                    <div class="adm-modal__body">
+                      <div class="adm-review-grid">
+                        <div class="adm-review-item">
+                          <span>Boutique</span>
+                          @if (boutiquesParametrables().length > 1) {
+                            <details class="adm-search-select" #nouvelUtilisateurBoutiqueModalSelect>
+                              <summary>
+                                <span>{{
+                                  boutiqueNouvelUtilisateurSelectionnee()?.nom ?? libelleBoutique(nouvelUtilisateurBoutiqueId())
+                                }}</span>
+                              </summary>
+                              <div class="adm-search-select__panel">
+                                <input
+                                  type="search"
+                                  [ngModel]="rechercheNouvelUtilisateurBoutique()"
+                                  (ngModelChange)="rechercheNouvelUtilisateurBoutique.set($event)"
+                                  [placeholder]="'settingsCenter.placeholders.searchShop' | translate"
+                                />
+                                @for (boutique of boutiquesNouvelUtilisateurFiltrees(); track boutique.id) {
+                                  <button
+                                    type="button"
+                                    class="adm-search-select__option"
+                                    [class.adm-search-select__option--active]="boutique.id === nouvelUtilisateurBoutiqueId()"
+                                    (click)="selectionnerNouvelUtilisateurBoutique(boutique.id, nouvelUtilisateurBoutiqueModalSelect)"
+                                  >
+                                    <strong>{{ boutique.nom }}</strong>
+                                    <small>{{ boutique.code }}</small>
+                                  </button>
+                                } @empty {
+                                  <div class="adm-search-select__empty">Aucun résultat.</div>
+                                }
+                              </div>
+                            </details>
+                          } @else {
+                            <strong>{{ boutiqueNouvelUtilisateurSelectionnee()?.nom ?? '—' }}</strong>
+                          }
+                        </div>
+                        <div class="adm-review-item">
+                          <span>Profil</span>
+                          @if (!permissionsUi.estProfilBoutique() && profilsUtilisateursBoutique().length > 1) {
+                            <select [ngModel]="nouvelUtilisateurProfilId()" (ngModelChange)="nouvelUtilisateurProfilId.set(+$event)">
+                              @for (profil of profilsUtilisateursBoutique(); track profil.id) {
+                                <option [ngValue]="profil.id">{{ profil.libelle }}</option>
+                              }
+                            </select>
+                          } @else {
+                            <strong>{{ profilsUtilisateursBoutique()[0]?.libelle ?? 'Vendeur' }}</strong>
+                          }
+                        </div>
+                        <div class="adm-review-item">
+                          <span>Mot de passe initial</span>
+                          <strong class="adm-code">Adm@2026</strong>
+                          <small>À changer à la 1ʳᵉ connexion</small>
+                        </div>
+                      </div>
+                      <div class="adm-form-grid">
+                        <label class="adm-field">
+                          <span>Prénom</span>
+                          <input
+                            type="text"
+                            [ngModel]="nouvelUtilisateurPrenom()"
+                            (ngModelChange)="nouvelUtilisateurPrenom.set($event)"
+                            autocomplete="off"
+                            placeholder="Prénom du vendeur"
+                          />
+                        </label>
+                        <label class="adm-field">
+                          <span>Nom</span>
+                          <input
+                            type="text"
+                            [ngModel]="nouvelUtilisateurNom()"
+                            (ngModelChange)="nouvelUtilisateurNom.set($event)"
+                            autocomplete="off"
+                            placeholder="Nom de famille"
+                          />
+                        </label>
+                        <label class="adm-field adm-field--full">
+                          <span>Identifiant (login) <strong class="text-danger">*</strong></span>
+                          <input
+                            type="text"
+                            [ngModel]="nouvelUtilisateurLogin()"
+                            (ngModelChange)="nouvelUtilisateurLogin.set($event)"
+                            autocomplete="off"
+                            placeholder="ex : marie.diallo"
+                          />
+                          <small>Identifiant unique de connexion. Sera converti en minuscules.</small>
+                        </label>
+                        <label class="adm-field adm-field--full">
+                          <span>Email <strong class="text-danger">*</strong></span>
+                          <input
+                            type="email"
+                            [ngModel]="nouvelUtilisateurEmail()"
+                            (ngModelChange)="nouvelUtilisateurEmail.set($event)"
+                            autocomplete="off"
+                            placeholder="ex : marie.diallo@boutique.ml"
+                          />
+                          @if (nouvelUtilisateurEmail().trim() && !emailValide(nouvelUtilisateurEmail())) {
+                            <small class="text-danger">Adresse e-mail invalide.</small>
+                          } @else {
+                            <small>Pour l'activation du compte et la récupération du mot de passe.</small>
+                          }
+                        </label>
+                      </div>
+                    </div>
+                    <div class="adm-modal__footer">
+                      <button
+                        type="button"
+                        class="adm-button adm-button--ghost"
+                        (click)="fermerNouveauVendeurModal()"
+                        [disabled]="enregistrement()"
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        type="button"
+                        class="adm-button adm-button--primary"
+                        (click)="creerUtilisateurBoutique()"
+                        [disabled]="enregistrement() || (nouvelUtilisateurEmail().trim() && !emailValide(nouvelUtilisateurEmail()))"
+                      >
+                        {{ enregistrement() ? 'Création en cours…' : 'Créer le vendeur' }}
+                      </button>
+                    </div>
                   </div>
-                </details>
-                <small jhiTranslate="settingsCenter.help.managerScope">Managers only see shops within their scope.</small>
+                </div>
               </div>
-              <label class="adm-field">
-                <span jhiTranslate="settingsCenter.fields.role">Role</span>
-                <select [ngModel]="nouvelUtilisateurProfilId()" (ngModelChange)="nouvelUtilisateurProfilId.set($event)">
-                  <option [ngValue]="null" jhiTranslate="settingsCenter.common.select">Select</option>
-                  @for (profil of profilsUtilisateursBoutique(); track profil.id) {
-                    <option [ngValue]="profil.id">{{ profil.libelle }}</option>
-                  }
-                </select>
-                <small jhiTranslate="settingsCenter.help.role">The role determines visible menus and authorized actions.</small>
-              </label>
-              <label class="adm-field">
-                <span jhiTranslate="settingsCenter.fields.firstName">First name</span>
-                <input type="text" [ngModel]="nouvelUtilisateurPrenom()" (ngModelChange)="nouvelUtilisateurPrenom.set($event)" />
-              </label>
-              <label class="adm-field">
-                <span jhiTranslate="settingsCenter.fields.lastName">Last name</span>
-                <input type="text" [ngModel]="nouvelUtilisateurNom()" (ngModelChange)="nouvelUtilisateurNom.set($event)" />
-              </label>
-              <label class="adm-field">
-                <span jhiTranslate="settingsCenter.fields.login">Login</span>
-                <input type="text" [ngModel]="nouvelUtilisateurLogin()" (ngModelChange)="nouvelUtilisateurLogin.set($event)" />
-                <small jhiTranslate="settingsCenter.help.login">Required identifier for sign-in.</small>
-              </label>
-              <label class="adm-field">
-                <span jhiTranslate="settingsCenter.fields.email">Email</span>
-                <input type="email" [ngModel]="nouvelUtilisateurEmail()" (ngModelChange)="nouvelUtilisateurEmail.set($event)" />
-                @if (nouvelUtilisateurEmail().trim() && !emailValide(nouvelUtilisateurEmail())) {
-                  <small class="text-danger" jhiTranslate="settingsCenter.validation.invalidEmail">Invalid email address.</small>
-                } @else {
-                  <small jhiTranslate="settingsCenter.help.userEmail">Used for activation and password recovery.</small>
-                }
-              </label>
-            </div>
-            <button
-              type="button"
-              class="adm-button adm-button--primary"
-              (click)="creerUtilisateurBoutique()"
-              [disabled]="enregistrement() || (nouvelUtilisateurEmail().trim() && !emailValide(nouvelUtilisateurEmail()))"
-            >
-              <span jhiTranslate="settingsCenter.actions.createAndAssign">Create and assign</span>
-            </button>
+            }
           } @else {
             <div class="adm-empty-inline" jhiTranslate="settingsCenter.readOnly.users">
               You can view assignments but cannot create users.

@@ -68,6 +68,21 @@
         <springdoc-openapi-starter-webmvc-api.version>3.0.2</springdoc-openapi-starter-webmvc-api.version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.typesafe</groupId>
+                <artifactId>config</artifactId>
+                <version>${config.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.14.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>tech.jhipster</groupId>
@@ -202,6 +217,12 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>jcache</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.typesafe</groupId>
+                    <artifactId>config</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.tngtech.archunit</groupId>

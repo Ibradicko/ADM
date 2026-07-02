@@ -2,7 +2,7 @@
   <div class="adm-page-header" id="page-heading" data-cy="RegleRedevanceHeading">
     <div>
       <h1>Règles de redevance</h1>
-      <p>Taux et conditions de calcul des redevances par boutique, locataire et article</p>
+      <p>Taux et conditions de calcul des redevances par boutique, locataire, groupe d'article et article</p>
     </div>
     <div class="adm-page-header__actions">
       <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
@@ -76,7 +76,7 @@
                 <td>{{ rr.boutique?.nom ?? '—' }}</td>
                 <td>{{ rr.locataire?.nom ?? '—' }}</td>
                 <td class="text-end">
-                  <strong>{{ rr.taux != null ? (rr.taux | number: '1.2-2') + ' %' : '—' }}</strong>
+                  <strong>{{ rr.taux !== null ? (rr.taux | number: '1.2-2') + ' %' : '—' }}</strong>
                 </td>
                 <td>{{ rr.priorite ?? '—' }}</td>
                 <td>

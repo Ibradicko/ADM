@@ -84,10 +84,10 @@ export default class RoyaltiesComponent implements OnInit {
       if (this.statut() && calcul.statut !== this.statut()) {
         return false;
       }
-      if (debut && calcul.periodeDebut && calcul.periodeDebut.isBefore(dayjs(debut), 'day')) {
+      if (debut && calcul.periodeDebut?.isBefore(dayjs(debut), 'day')) {
         return false;
       }
-      if (fin && calcul.periodeFin && calcul.periodeFin.isAfter(dayjs(fin), 'day')) {
+      if (fin && calcul.periodeFin?.isAfter(dayjs(fin), 'day')) {
         return false;
       }
       if (!texte) {

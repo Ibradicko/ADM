@@ -9,6 +9,7 @@ import com.adm.supervision.repository.AffectationUtilisateurRepository;
 import com.adm.supervision.repository.BoutiqueRepository;
 import com.adm.supervision.repository.ProfilMetierRepository;
 import com.adm.supervision.repository.UserRepository;
+import com.adm.supervision.security.AuthoritiesConstants;
 import com.adm.supervision.security.BusinessAuthorizationService;
 import com.adm.supervision.service.BusinessValidationException;
 import com.adm.supervision.service.MailService;
@@ -253,6 +254,45 @@ public class UserResource {
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deactivated", login)).build();
     }
 
+    @PostMapping("/users/{login}/activate")
+    @PreAuthorize("@businessAuthorizationService.canUpdateUsers()")
+    public ResponseEntity<Void> activateUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+        LOG.debug("REST request to activate User: {}", login);
+        assertUserAccessible(login);
+        userService.activateUser(login, true);
+        return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.activated", login)).build();
+    }
+
+    @PostMapping("/seller-assignments/{id}/activate")
+    @PreAuthorize("@businessAuthorizationService.canUpdateUsers()")
+    @Transactional
+    public ResponseEntity<Void> activateSellerAssignment(@PathVariable("id") Long id) {
+        LOG.debug("REST request to activate seller assignment: {}", id);
+        AffectationUtilisateur affectation = getManagedSellerAssignment(id);
+        affectation.setActif(true);
+        affectation.setDateFin(null);
+        affectationUtilisateurRepository.save(affectation);
+        userService.activateUser(affectation.getUser().getLogin(), true);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createAlert(applicationName, "userManagement.sellerActivated", affectation.getUser().getLogin()))
+            .build();
+    }
+
+    @PostMapping("/seller-assignments/{id}/deactivate")
+    @PreAuthorize("@businessAuthorizationService.canDeactivateUsers()")
+    @Transactional
+    public ResponseEntity<Void> deactivateSellerAssignment(@PathVariable("id") Long id) {
+        LOG.debug("REST request to deactivate seller assignment: {}", id);
+        AffectationUtilisateur affectation = getManagedSellerAssignment(id);
+        affectation.setActif(false);
+        affectation.setDateFin(LocalDate.now());
+        affectationUtilisateurRepository.save(affectation);
+        userService.deactivateUserAccount(affectation.getUser());
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createAlert(applicationName, "userManagement.sellerDeactivated", affectation.getUser().getLogin()))
+            .build();
+    }
+
     private void assertUserAccessible(String login) {
         if (!businessAuthorizationService.isAdmin() && !businessAuthorizationService.canAccessUser(login)) {
             throw new AccessDeniedException("Access denied to requested user");
@@ -268,15 +308,46 @@ public class UserResource {
         }
     }
 
+    private AffectationUtilisateur getManagedSellerAssignment(Long id) {
+        AffectationUtilisateur affectation = affectationUtilisateurRepository
+            .findOneWithEagerRelationships(id)
+            .orElseThrow(() -> new BusinessValidationException("userManagement", "assignmentNotFound", "Affectation introuvable"));
+
+        String profilCode = Optional.ofNullable(affectation.getProfil()).map(ProfilMetier::getCode).orElse("");
+        if (!"VENDEUR".equalsIgnoreCase(profilCode)) {
+            throw new BusinessValidationException("userManagement", "sellerOnly", "Cette action est reservee aux vendeurs");
+        }
+
+        if (
+            !businessAuthorizationService.canManageAffectationUtilisateur(
+                toAuthorizationDTO(affectation.getBoutique().getId(), affectation.getProfil().getId())
+            )
+        ) {
+            throw new AccessDeniedException("Acces refuse a ce vendeur");
+        }
+
+        return affectation;
+    }
+
     private void normalizeAuthoritiesForScopedManager(AdminUserDTO userDTO) {
         if (businessAuthorizationService.isAdmin()) {
             return;
         }
 
-        if (userDTO.getAuthorities() != null && userDTO.getAuthorities().contains("ROLE_ADMIN")) {
+        if (userDTO.getAuthorities() != null && userDTO.getAuthorities().contains(AuthoritiesConstants.ADMIN)) {
             throw new AccessDeniedException("Only administrators can create administrator accounts");
         }
-        userDTO.setAuthorities(Set.of("ROLE_USER"));
+
+        Set<String> safeScopedRoles = Set.of(AuthoritiesConstants.VENDEUR, AuthoritiesConstants.MANAGER_BOUTIQUE);
+        Set<String> normalized = new HashSet<>(Set.of(AuthoritiesConstants.USER));
+        if (userDTO.getAuthorities() != null) {
+            for (String role : userDTO.getAuthorities()) {
+                if (safeScopedRoles.contains(role)) {
+                    normalized.add(role);
+                }
+            }
+        }
+        userDTO.setAuthorities(normalized);
     }
 
     private void assignScopedCreatedUserToBoutique(User newUser, Long boutiqueId, Long profilId) {

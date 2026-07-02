@@ -8,6 +8,7 @@
     },
     "tabs": {
       "stock": "Stock",
+      "supply": "Supply",
       "receptions": "Receptions",
       "inventories": "Inventories",
       "transfers": "Transfers"
@@ -43,6 +44,7 @@
       "movement": "Movement",
       "origin": "Origin",
       "originWarehouse": "Origin warehouse",
+      "observation": "Observation",
       "product": "Article",
       "quantity": "Quantity",
       "reason": "Reason",
@@ -61,6 +63,7 @@
     },
     "placeholders": {
       "searchStock": "Search by article or warehouse",
+      "optionalReference": "Optional, generated automatically when empty",
       "reverseReason": "Explain why the movement must be reversed"
     },
     "actions": {
@@ -78,7 +81,10 @@
       "scanning": "Scanning...",
       "startInventory": "Start inventory",
       "starting": "Starting...",
+      "supply": "Supply",
+      "supplying": "Supplying...",
       "validateReception": "Validate reception",
+      "validateSupply": "Validate supply",
       "validateTransfer": "Validate transfer",
       "validating": "Validating..."
     },
@@ -86,6 +92,10 @@
       "title": "Available stock",
       "description": "Overall stock levels by article and warehouse.",
       "empty": "No stock line in the current shop scope."
+    },
+    "supply": {
+      "title": "Supply",
+      "description": "Add article stock through the existing reception workflow."
     },
     "alerts": {
       "title": "Priority alerts",
@@ -138,6 +148,8 @@
       "receptionLineAdded": "The reception line was added.",
       "selectReceptionAndDepot": "Select a reception and a destination warehouse.",
       "receptionValidated": "The reception was validated and stock was updated.",
+      "supplyMissingFields": "Enter the shop, article, quantity and date.",
+      "supplyValidated": "The supply was validated and stock was updated.",
       "selectInventoryToStart": "Select an inventory to start.",
       "inventoryStarted": "The inventory was started.",
       "selectInventoryForCount": "Select an inventory before entering a count.",

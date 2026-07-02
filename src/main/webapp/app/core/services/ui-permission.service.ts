@@ -231,7 +231,7 @@ export class UiPermissionService {
   }
 
   routeAccueilAutorisee(): string {
-    const routesParPriorite: Array<[string, Parameters<UiPermissionService['peutVoirEcran']>[0]]> = [
+    const routesParPriorite: [string, Parameters<UiPermissionService['peutVoirEcran']>[0]][] = [
       ['/dashboard', 'dashboard'],
       ['/mes-boutiques', 'mes-boutiques'],
       ['/caisse', 'caisse'],

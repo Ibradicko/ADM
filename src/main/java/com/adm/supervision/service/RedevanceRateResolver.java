@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 /**
  * Resolves the royalty rate (taux de redevance) applicable to a sale line, by priority:
  * matching {@link RegleRedevance} (produit &gt; groupe article &gt; locataire &gt; boutique, then
- * priorite/specificite/date), then the produit's own taux, then the boutique/locataire exploitation
+ * priorite/specificite/date), then the groupe article's taux, then the produit's own taux, then the boutique/locataire exploitation
  * default rate.
  */
 @Service
@@ -66,6 +66,9 @@ public class RedevanceRateResolver {
     }
 
     private BigDecimal fallbackRate(List<ExploitationBoutique> exploitations, Produit produit, Vente vente, LocalDate saleDate) {
+        if (produit.getGroupeArticle() != null && produit.getGroupeArticle().getTauxRedevance() != null) {
+            return produit.getGroupeArticle().getTauxRedevance();
+        }
         if (produit.getTauxRedevanceApplicable() != null) {
             return produit.getTauxRedevanceApplicable();
         }

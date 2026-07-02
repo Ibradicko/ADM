@@ -97,9 +97,7 @@ export default class CatalogueIdentificationComponent implements OnInit {
     ].sort((a, b) => (a.nom ?? '').localeCompare(b.nom ?? '')),
   );
 
-  readonly produitsTries = computed(() =>
-    [...this.produits()].sort((a, b) => `${a.designation ?? ''}`.localeCompare(`${b.designation ?? ''}`)),
-  );
+  readonly produitsTries = computed(() => [...this.produits()].sort((a, b) => (a.designation ?? '').localeCompare(b.designation ?? '')));
 
   readonly resultatsRechercheCodeBarres = computed(() => {
     const texte = this.rechercheCodeBarres().trim().toLowerCase();

@@ -36,6 +36,7 @@ public interface ProduitMapper extends EntityMapper<ProduitDTO, Produit> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "libelle", source = "libelle")
+    @Mapping(target = "tauxRedevance", source = "tauxRedevance")
     GroupeArticleDTO toDtoGroupeArticleLibelle(GroupeArticle groupeArticle);
 
     @Named("familleArticleLibelle")

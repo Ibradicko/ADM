@@ -31,13 +31,9 @@
               { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[groupeArticleRef.statut ?? 'null']
             }}</span>
           </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.boutique">Boutique</span></dt>
+          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.tauxRedevance">Taux de redevance</span></dt>
           <dd>
-            @if (groupeArticle()!.boutique) {
-              <div>
-                <a [routerLink]="['/boutique', groupeArticle()!.boutique?.id, 'view']">{{ groupeArticleRef.boutique?.nom }}</a>
-              </div>
-            }
+            <span>{{ groupeArticleRef.tauxRedevance ?? 0 }}%</span>
           </dd>
         </dl>
 

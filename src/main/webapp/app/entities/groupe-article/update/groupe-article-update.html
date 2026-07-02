@@ -73,31 +73,40 @@
           }
         </div>
 
+        @let tauxRedevanceRef = editForm.get('tauxRedevance')!;
         <div class="mb-3">
-          <label class="form-label" for="field_boutique" jhiTranslate="admSupervisionVentesApp.groupeArticle.boutique">Boutique</label>
-          <select
-            class="form-control"
-            id="field_boutique"
-            data-cy="boutique"
-            name="boutique"
-            formControlName="boutique"
-            [compareWith]="compareBoutique"
+          <label class="form-label" for="field_tauxRedevance" jhiTranslate="admSupervisionVentesApp.groupeArticle.tauxRedevance"
+            >Taux de redevance</label
           >
-            @if (!editForm.get('boutique')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
-              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
-            }
-          </select>
+          <input
+            type="number"
+            class="form-control"
+            name="tauxRedevance"
+            id="field_tauxRedevance"
+            data-cy="tauxRedevance"
+            formControlName="tauxRedevance"
+            min="0"
+            max="100"
+            step="0.01"
+          />
+          @if (tauxRedevanceRef.invalid && (tauxRedevanceRef.dirty || tauxRedevanceRef.touched)) {
+            <div>
+              @if (editForm.get('tauxRedevance')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (editForm.get('tauxRedevance')?.errors?.min) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+                  >This field should be at least 0.</small
+                >
+              }
+              @if (editForm.get('tauxRedevance')?.errors?.max) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.max" [translateValues]="{ max: '100' }"
+                  >This field cannot be more than 100.</small
+                >
+              }
+            </div>
+          }
         </div>
-        @if (editForm.get(['boutique'])!.invalid && (editForm.get(['boutique'])!.dirty || editForm.get(['boutique'])!.touched)) {
-          <div>
-            @if (editForm.get(['boutique'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
       </div>
 
       <div>

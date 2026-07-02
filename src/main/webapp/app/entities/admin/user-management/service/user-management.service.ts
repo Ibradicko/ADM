@@ -39,4 +39,22 @@ export class UserManagementService {
   delete(login: string): Observable<undefined> {
     return this.http.delete<undefined>(`${this.resourceUrl}/${encodeURIComponent(login)}`);
   }
+
+  activate(login: string): Observable<undefined> {
+    return this.http.post<undefined>(`${this.resourceUrl}/${encodeURIComponent(login)}/activate`, {});
+  }
+
+  activateSellerAssignment(assignmentId: number): Observable<undefined> {
+    return this.http.post<undefined>(
+      this.applicationConfigService.getEndpointFor(`api/admin/seller-assignments/${assignmentId}/activate`),
+      {},
+    );
+  }
+
+  deactivateSellerAssignment(assignmentId: number): Observable<undefined> {
+    return this.http.post<undefined>(
+      this.applicationConfigService.getEndpointFor(`api/admin/seller-assignments/${assignmentId}/deactivate`),
+      {},
+    );
+  }
 }

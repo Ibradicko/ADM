@@ -74,7 +74,8 @@ public class Produit implements Serializable {
     @NotNull
     private Boutique boutique;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "boutique" }, allowSetters = true)
     private GroupeArticle groupeArticle;
 

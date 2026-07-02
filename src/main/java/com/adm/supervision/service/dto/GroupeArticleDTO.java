@@ -3,6 +3,7 @@ package com.adm.supervision.service.dto;
 import com.adm.supervision.domain.enumeration.StatutGeneral;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
@@ -23,6 +24,11 @@ public class GroupeArticleDTO implements Serializable {
 
     @NotNull
     private StatutGeneral statut;
+
+    @NotNull
+    @DecimalMin(value = "0")
+    @DecimalMax(value = "100")
+    private BigDecimal tauxRedevance;
 
     public Long getId() {
         return id;
@@ -56,6 +62,14 @@ public class GroupeArticleDTO implements Serializable {
         this.statut = statut;
     }
 
+    public BigDecimal getTauxRedevance() {
+        return tauxRedevance;
+    }
+
+    public void setTauxRedevance(BigDecimal tauxRedevance) {
+        this.tauxRedevance = tauxRedevance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -85,6 +99,7 @@ public class GroupeArticleDTO implements Serializable {
             ", code='" + getCode() + "'" +
             ", libelle='" + getLibelle() + "'" +
             ", statut='" + getStatut() + "'" +
+            ", tauxRedevance=" + getTauxRedevance() +
             '}';
     }
 }

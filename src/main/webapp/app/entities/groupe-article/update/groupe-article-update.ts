@@ -1,4 +1,3 @@
-import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -6,10 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslateModule } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 
-import { IBoutique } from 'app/entities/boutique/boutique.model';
-import { BoutiqueService } from 'app/entities/boutique/service/boutique.service';
 import { StatutGeneral } from 'app/entities/enumerations/statut-general.model';
 import { AlertError } from 'app/shared/alert/alert-error';
 import { TranslateDirective } from 'app/shared/language';
@@ -28,17 +25,12 @@ export class GroupeArticleUpdate implements OnInit {
   groupeArticle: IGroupeArticle | null = null;
   statutGeneralValues = Object.keys(StatutGeneral);
 
-  boutiquesSharedCollection = signal<IBoutique[]>([]);
-
   protected groupeArticleService = inject(GroupeArticleService);
   protected groupeArticleFormService = inject(GroupeArticleFormService);
-  protected boutiqueService = inject(BoutiqueService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: GroupeArticleFormGroup = this.groupeArticleFormService.createGroupeArticleFormGroup();
-
-  compareBoutique = (o1: IBoutique | null, o2: IBoutique | null): boolean => this.boutiqueService.compareBoutique(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ groupeArticle }) => {
@@ -46,8 +38,6 @@ export class GroupeArticleUpdate implements OnInit {
       if (groupeArticle) {
         this.updateForm(groupeArticle);
       }
-
-      this.loadRelationshipsOptions();
     });
   }
 
@@ -87,21 +77,5 @@ export class GroupeArticleUpdate implements OnInit {
   protected updateForm(groupeArticle: IGroupeArticle): void {
     this.groupeArticle = groupeArticle;
     this.groupeArticleFormService.resetForm(this.editForm, groupeArticle);
-
-    this.boutiquesSharedCollection.update(boutiques =>
-      this.boutiqueService.addBoutiqueToCollectionIfMissing<IBoutique>(boutiques, groupeArticle.boutique),
-    );
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.boutiqueService
-      .query()
-      .pipe(map((res: HttpResponse<IBoutique[]>) => res.body ?? []))
-      .pipe(
-        map((boutiques: IBoutique[]) =>
-          this.boutiqueService.addBoutiqueToCollectionIfMissing<IBoutique>(boutiques, this.groupeArticle?.boutique),
-        ),
-      )
-      .subscribe((boutiques: IBoutique[]) => this.boutiquesSharedCollection.set(boutiques));
   }
 }

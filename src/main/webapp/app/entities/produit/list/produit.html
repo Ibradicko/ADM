@@ -1,8 +1,8 @@
 <section class="adm-page">
   <div class="adm-page-header" id="page-heading" data-cy="ProduitHeading">
     <div>
-      <h1 jhiTranslate="productCustom.list.title">Product catalogue</h1>
-      <p jhiTranslate="productCustom.list.subtitle">Product, pricing and sales support supervision</p>
+      <h1 jhiTranslate="productCustom.list.title">Article catalogue</h1>
+      <p jhiTranslate="productCustom.list.subtitle">Article, pricing and sales support supervision</p>
     </div>
 
     <div class="adm-page-header__actions">
@@ -19,7 +19,7 @@
       @if (permissionsUi.peutGererArticlesBoutique()) {
         <a id="jh-create-entity" data-cy="entityCreateButton" class="adm-button adm-button--primary" [routerLink]="['/produit/new']">
           <fa-icon icon="plus" />
-          <span jhiTranslate="productCustom.actions.newProduct">New product</span>
+          <span jhiTranslate="productCustom.actions.newProduct">New article</span>
         </a>
       }
     </div>
@@ -30,11 +30,11 @@
 
   <div class="adm-stats-grid adm-stats-grid--compact">
     <article class="adm-stat-card">
-      <span jhiTranslate="productCustom.kpis.totalProducts">Total products</span>
+      <span jhiTranslate="productCustom.kpis.totalProducts">Total articles</span>
       <strong>{{ totalItems() || produits().length }}</strong>
     </article>
     <article class="adm-stat-card">
-      <span jhiTranslate="productCustom.kpis.activeProducts">Active products</span>
+      <span jhiTranslate="productCustom.kpis.activeProducts">Active articles</span>
       <strong>{{ totalActifs() }}</strong>
     </article>
     <article class="adm-stat-card">
@@ -103,16 +103,16 @@
   <article class="adm-card adm-card--table">
     <div class="adm-card__header">
       <div>
-        <h2 jhiTranslate="productCustom.list.tableTitle">Product list</h2>
-        <p jhiTranslate="productCustom.list.tableSubtitle">Operational view of saleable products and their quick actions</p>
+        <h2 jhiTranslate="productCustom.list.tableTitle">Article list</h2>
+        <p jhiTranslate="productCustom.list.tableSubtitle">Operational view of saleable articles and their quick actions</p>
       </div>
       <span class="adm-pill adm-pill--primary">{{ 'productCustom.list.displayed' | translate: { count: filteredProduits().length } }}</span>
     </div>
 
     @if (filteredProduits().length === 0) {
       <div class="adm-empty-state" id="no-result">
-        <strong jhiTranslate="productCustom.list.emptyTitle">No product matches the selected criteria</strong>
-        <p jhiTranslate="productCustom.list.emptyDescription">Broaden the filters or create a new product to enrich the catalogue.</p>
+        <strong jhiTranslate="productCustom.list.emptyTitle">No article matches the selected criteria</strong>
+        <p jhiTranslate="productCustom.list.emptyDescription">Broaden the filters or create a new article to enrich the catalogue.</p>
       </div>
     } @else {
       <div class="adm-table-wrapper">
@@ -123,7 +123,7 @@
                 <span jhiTranslate="admSupervisionVentesApp.produit.codeInterne">Internal code</span> <fa-icon icon="sort" />
               </th>
               <th scope="col" jhiSortBy="designation">
-                <span jhiTranslate="productCustom.fields.product">Product</span> <fa-icon icon="sort" />
+                <span jhiTranslate="productCustom.fields.product">Article</span> <fa-icon icon="sort" />
               </th>
               <th scope="col" jhiSortBy="boutique.nom">
                 <span jhiTranslate="admSupervisionVentesApp.produit.boutique">Shop</span> <fa-icon icon="sort" />
@@ -134,9 +134,7 @@
               <th scope="col" jhiSortBy="prixVente">
                 <span jhiTranslate="admSupervisionVentesApp.produit.prixVente">Sale price</span> <fa-icon icon="sort" />
               </th>
-              <th scope="col" jhiSortBy="tauxRedevanceApplicable">
-                <span jhiTranslate="productCustom.fields.royalty">Royalty</span> <fa-icon icon="sort" />
-              </th>
+              <th scope="col"><span jhiTranslate="productCustom.fields.royalty">Royalty</span> <fa-icon icon="sort" /></th>
               <th scope="col" jhiSortBy="statut">
                 <span jhiTranslate="admSupervisionVentesApp.produit.statut">Status</span> <fa-icon icon="sort" />
               </th>
@@ -165,7 +163,7 @@
                 </td>
                 <td>{{ 'admSupervisionVentesApp.TypePrix.' + produit.typePrix | translate }}</td>
                 <td>{{ formatMontant(produit.prixVente) }}</td>
-                <td>{{ formatTaux(produit.tauxRedevanceApplicable) }}</td>
+                <td>{{ formatTaux(produit.groupeArticle?.tauxRedevance) }}</td>
                 <td>
                   <span
                     class="adm-pill"
@@ -219,6 +217,15 @@
                     >
                       <span jhiTranslate="productCustom.actions.centre">Centre</span>
                     </a>
+                    @if (permissionsUi.peutGererStock()) {
+                      <a
+                        class="adm-link-button"
+                        [routerLink]="['/stock-operations']"
+                        [queryParams]="{ onglet: 'approvisionnement', produitId: produit.id }"
+                      >
+                        <span jhiTranslate="productCustom.actions.supply">Approvisionner</span>
+                      </a>
+                    }
                   </div>
                 </td>
                 <td class="text-end">

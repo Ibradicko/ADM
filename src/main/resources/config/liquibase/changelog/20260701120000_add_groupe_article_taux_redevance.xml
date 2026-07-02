@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260701120000-1" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="groupe_article"/>
+            <not>
+                <columnExists tableName="groupe_article" columnName="taux_redevance"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="groupe_article">
+            <column name="taux_redevance" type="decimal(21,2)" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

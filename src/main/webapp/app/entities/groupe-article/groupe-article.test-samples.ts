@@ -5,6 +5,7 @@ export const sampleWithRequiredData: IGroupeArticle = {
   code: 'pleased unlucky jeopardise',
   libelle: 'blue tired abnormally',
   statut: 'SUSPENDU',
+  tauxRedevance: 5,
 };
 
 export const sampleWithPartialData: IGroupeArticle = {
@@ -12,6 +13,7 @@ export const sampleWithPartialData: IGroupeArticle = {
   code: 'boss ah',
   libelle: 'rudely celsius stool',
   statut: 'SUSPENDU',
+  tauxRedevance: 7.5,
 };
 
 export const sampleWithFullData: IGroupeArticle = {
@@ -19,12 +21,14 @@ export const sampleWithFullData: IGroupeArticle = {
   code: 'bloom and sleet',
   libelle: 'oh',
   statut: 'SUSPENDU',
+  tauxRedevance: 10,
 };
 
 export const sampleWithNewData: NewGroupeArticle = {
   code: 'plus',
   libelle: 'twine above',
   statut: 'SUSPENDU',
+  tauxRedevance: 3,
   id: null,
 };
 

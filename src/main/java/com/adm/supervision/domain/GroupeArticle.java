@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -40,6 +41,12 @@ public class GroupeArticle implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "statut", nullable = false)
     private StatutGeneral statut;
+
+    @NotNull
+    @DecimalMin(value = "0")
+    @DecimalMax(value = "100")
+    @Column(name = "taux_redevance", precision = 21, scale = 2, nullable = false)
+    private BigDecimal tauxRedevance;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -95,6 +102,19 @@ public class GroupeArticle implements Serializable {
         this.statut = statut;
     }
 
+    public BigDecimal getTauxRedevance() {
+        return this.tauxRedevance;
+    }
+
+    public GroupeArticle tauxRedevance(BigDecimal tauxRedevance) {
+        this.setTauxRedevance(tauxRedevance);
+        return this;
+    }
+
+    public void setTauxRedevance(BigDecimal tauxRedevance) {
+        this.tauxRedevance = tauxRedevance;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -122,6 +142,7 @@ public class GroupeArticle implements Serializable {
             ", code='" + getCode() + "'" +
             ", libelle='" + getLibelle() + "'" +
             ", statut='" + getStatut() + "'" +
+            ", tauxRedevance=" + getTauxRedevance() +
             '}';
     }
 }

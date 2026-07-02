@@ -283,6 +283,45 @@ public class UserService {
             });
     }
 
+    public void activateUser(String login, boolean forcePasswordChange) {
+        userRepository
+            .findOneByLogin(login)
+            .ifPresent(user -> {
+                user.setActivated(true);
+                user.setActivationKey(null);
+                if (forcePasswordChange) {
+                    user.setMustChangePassword(true);
+                }
+                userRepository.save(user);
+                this.clearUserCaches(user);
+                auditUserAction(TypeActionAudit.MODIFICATION, user.getLogin(), "Activation d'un utilisateur", user);
+                LOG.debug("Activated User: {}", user);
+            });
+    }
+
+    public void deactivateUserAccount(User user) {
+        SecurityUtils.getCurrentUserLogin()
+            .filter(currentLogin -> currentLogin.equalsIgnoreCase(user.getLogin()))
+            .ifPresent(currentLogin -> {
+                throw new BusinessValidationException("userManagement", "selfDeactivate", "Vous ne pouvez pas vous desactiver vous-meme");
+            });
+
+        if ("admin".equalsIgnoreCase(user.getLogin())) {
+            throw new BusinessValidationException(
+                "userManagement",
+                "protectedUser",
+                "Le compte administrateur principal ne peut pas etre desactive"
+            );
+        }
+
+        user.setActivated(false);
+        user.setResetKey(RandomUtil.generateResetKey());
+        user.setResetDate(Instant.now());
+        userRepository.save(user);
+        this.clearUserCaches(user);
+        auditUserAction(TypeActionAudit.DESACTIVATION, user.getLogin(), "Desactivation d'un utilisateur", user);
+    }
+
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *

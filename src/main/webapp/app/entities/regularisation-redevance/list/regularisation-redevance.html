@@ -62,7 +62,7 @@
                   </a>
                 </td>
                 <td class="text-end">
-                  <strong>{{ rr.montant != null ? (rr.montant | number: '1.0-0') + ' FCFA' : '—' }}</strong>
+                  <strong>{{ rr.montant !== null ? (rr.montant | number: '1.0-0') + ' FCFA' : '—' }}</strong>
                 </td>
                 <td>
                   @if (rr.motif) {

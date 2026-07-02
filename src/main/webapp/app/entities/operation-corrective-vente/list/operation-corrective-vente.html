@@ -75,7 +75,7 @@
                   }
                 </td>
                 <td class="text-end">
-                  <strong>{{ op.montantImpact != null ? (op.montantImpact | number: '1.0-0') + ' FCFA' : '—' }}</strong>
+                  <strong>{{ op.montantImpact !== null ? (op.montantImpact | number: '1.0-0') + ' FCFA' : '—' }}</strong>
                 </td>
                 <td>{{ op.dateOperation ? (op.dateOperation | formatMediumDatetime) : '—' }}</td>
                 <td>

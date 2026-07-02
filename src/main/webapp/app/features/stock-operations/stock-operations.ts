@@ -2,11 +2,12 @@ import dayjs from 'dayjs/esm';
 
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
+import { AccountService } from 'app/core/auth/account.service';
 import { UiPermissionService } from 'app/core/services/ui-permission.service';
 import { AdmDashboardReportingService, DashboardStockAlertResponse } from 'app/core/services/adm-dashboard-reporting.service';
 import {
@@ -23,6 +24,8 @@ import { IBoutique } from 'app/entities/boutique/boutique.model';
 import { BoutiqueService } from 'app/entities/boutique/service/boutique.service';
 import { IDepotStock } from 'app/entities/depot-stock/depot-stock.model';
 import { DepotStockService } from 'app/entities/depot-stock/service/depot-stock.service';
+import { IGroupeArticle } from 'app/entities/groupe-article/groupe-article.model';
+import { GroupeArticleService } from 'app/entities/groupe-article/service/groupe-article.service';
 import { IInventaireStock } from 'app/entities/inventaire-stock/inventaire-stock.model';
 import { InventaireStockService } from 'app/entities/inventaire-stock/service/inventaire-stock.service';
 import { ILigneInventaireStock } from 'app/entities/ligne-inventaire-stock/ligne-inventaire-stock.model';
@@ -43,7 +46,7 @@ import { ITransfertStock } from 'app/entities/transfert-stock/transfert-stock.mo
 import { TransfertStockService } from 'app/entities/transfert-stock/service/transfert-stock.service';
 import { TranslateDirective } from 'app/shared/language';
 
-type OngletStock = 'stock' | 'receptions' | 'inventaires' | 'transferts';
+type OngletStock = 'stock' | 'approvisionnement' | 'receptions' | 'inventaires' | 'transferts';
 
 interface MessageStock {
   type: 'success' | 'danger' | 'info';
@@ -65,8 +68,8 @@ export default class StockOperationsComponent implements OnInit {
   readonly message = signal<MessageStock | null>(null);
 
   readonly boutiques = signal<IBoutique[]>([]);
-  readonly depots = signal<IDepotStock[]>([]);
   readonly produits = signal<IProduit[]>([]);
+  readonly groupeArticles = signal<IGroupeArticle[]>([]);
   readonly stocks = signal<IStockProduit[]>([]);
   readonly receptions = signal<IReceptionProduit[]>([]);
   readonly inventaires = signal<IInventaireStock[]>([]);
@@ -79,7 +82,6 @@ export default class StockOperationsComponent implements OnInit {
   readonly lignesTransfert = signal<ILigneTransfertStock[]>([]);
 
   readonly boutiqueFiltreId = signal<number | null>(null);
-  readonly depotFiltreId = signal<number | null>(null);
   readonly rechercheStock = signal('');
 
   readonly receptionSelectionneeId = signal<number | null>(null);
@@ -90,7 +92,14 @@ export default class StockOperationsComponent implements OnInit {
   readonly receptionProduitId = signal<number | null>(null);
   readonly receptionCodeBarres = signal('');
   readonly receptionQuantite = signal<number>(1);
-  readonly receptionDepotValidationId = signal<number | null>(null);
+
+  readonly approvisionnementBoutiqueId = signal<number | null>(null);
+  readonly approvisionnementGroupeId = signal<number | null>(null);
+  readonly approvisionnementProduitId = signal<number | null>(null);
+  readonly approvisionnementQuantite = signal<number>(1);
+  readonly approvisionnementDate = signal(dayjs().format('YYYY-MM-DDTHH:mm'));
+  readonly approvisionnementReference = signal('');
+  readonly approvisionnementObservation = signal('');
 
   readonly inventaireProduitId = signal<number | null>(null);
   readonly inventaireCodeBarres = signal('');
@@ -98,12 +107,12 @@ export default class StockOperationsComponent implements OnInit {
   readonly inventaireCommentaire = signal('');
   readonly inventaireAppliquerAjustements = signal(true);
 
-  readonly transfertDepotOrigineId = signal<number | null>(null);
-  readonly transfertDepotDestinationId = signal<number | null>(null);
   readonly transfertProduitId = signal<number | null>(null);
   readonly transfertCodeBarres = signal('');
   readonly transfertQuantite = signal(1);
   readonly motifReverse = signal('');
+
+  private readonly depots = signal<IDepotStock[]>([]);
 
   readonly peutVoirToutesBoutiques = computed(() => this.permissionsUi.estAdmin() || this.permissionsUi.estProfilAdm());
   readonly libellePerimetre = computed(() => {
@@ -120,32 +129,24 @@ export default class StockOperationsComponent implements OnInit {
     const ids = this.boutiqueIdsAccessibles();
     return this.boutiques().filter(boutique => ids.has(boutique.id));
   });
-  readonly depotsAccessibles = computed(() => {
-    const boutiqueFiltre = this.boutiqueFiltreId();
-    return this.depots().filter(depot => {
-      if (boutiqueFiltre && depot.boutique?.id !== boutiqueFiltre) {
-        return false;
-      }
-      return this.peutVoirToutesBoutiques() || (depot.boutique?.id ? this.boutiqueIdsAccessibles().has(depot.boutique.id) : false);
-    });
-  });
   readonly stocksFiltres = computed(() => {
     const recherche = this.rechercheStock().trim().toLowerCase();
-    const depotsAccessibles = new Set(this.depotsAccessibles().map(depot => depot.id));
+    const boutiqueFiltre = this.boutiqueFiltreId();
+    const boutiqueIds = this.boutiqueIdsAccessibles();
     return this.stocks().filter(stock => {
-      if (stock.depot?.id && !depotsAccessibles.has(stock.depot.id)) {
-        return false;
+      if (!this.peutVoirToutesBoutiques()) {
+        const depotBoutiqueId = this.depots().find(d => d.id === stock.depot?.id)?.boutique?.id;
+        if (depotBoutiqueId && !boutiqueIds.has(depotBoutiqueId)) {
+          return false;
+        }
       }
-      if (this.boutiqueFiltreId() && stock.depot?.id && !this.estDepotDansBoutique(stock.depot.id, this.boutiqueFiltreId())) {
-        return false;
-      }
-      if (this.depotFiltreId() && stock.depot?.id !== this.depotFiltreId()) {
+      if (boutiqueFiltre && !this.estDepotDansBoutique(stock.depot?.id ?? null, boutiqueFiltre)) {
         return false;
       }
       if (!recherche) {
         return true;
       }
-      return [stock.produit?.designation, stock.depot?.code].filter(Boolean).some(valeur => valeur!.toLowerCase().includes(recherche));
+      return stock.produit?.designation?.toLowerCase().includes(recherche) ?? false;
     });
   });
   readonly produitsAccessibles = computed(() => {
@@ -179,7 +180,6 @@ export default class StockOperationsComponent implements OnInit {
       );
     }),
   );
-  readonly depotsFiltres = this.depotsAccessibles;
   readonly receptionSelectionnee = computed(
     () => this.receptionsAccessibles().find(item => item.id === this.receptionSelectionneeId()) ?? null,
   );
@@ -189,24 +189,57 @@ export default class StockOperationsComponent implements OnInit {
   readonly transfertSelectionne = computed(
     () => this.transfertsAccessibles().find(item => item.id === this.transfertSelectionneId()) ?? null,
   );
-  readonly depotsOrigineTransfert = computed(() => {
-    const boutiqueId = this.transfertSelectionne()?.boutiqueOrigine?.id;
-    return this.depotsAccessibles().filter(depot => !boutiqueId || depot.boutique?.id === boutiqueId);
-  });
-  readonly depotsDestinationTransfert = computed(() => {
-    const boutiqueId = this.transfertSelectionne()?.boutiqueDestination?.id;
-    return this.depotsAccessibles().filter(depot => !boutiqueId || depot.boutique?.id === boutiqueId);
-  });
   readonly produitsTransfert = computed(() => {
     const boutiqueId = this.transfertSelectionne()?.boutiqueOrigine?.id;
     return this.produitsAccessibles().filter(produit => !boutiqueId || produit.boutique?.id === boutiqueId);
   });
+  readonly produitsApprovisionnement = computed(() => {
+    const boutiqueId = this.approvisionnementBoutiqueId();
+    const groupeId = this.approvisionnementGroupeId();
+    return this.produitsAccessibles().filter(produit => {
+      if (boutiqueId && produit.boutique?.id !== boutiqueId) {
+        return false;
+      }
+      if (groupeId && produit.groupeArticle?.id !== groupeId) {
+        return false;
+      }
+      return true;
+    });
+  });
+  readonly articleApprovisionnement = computed(
+    () => this.produitsAccessibles().find(produit => produit.id === this.approvisionnementProduitId()) ?? null,
+  );
+  readonly stockArticleApprovisionnement = computed(() => {
+    const produitId = this.approvisionnementProduitId();
+    const boutiqueId = this.approvisionnementBoutiqueId();
+    if (!produitId) {
+      return null;
+    }
+    return (
+      this.stocks().find(stock => {
+        if (stock.produit?.id !== produitId) {
+          return false;
+        }
+        return !boutiqueId || this.estDepotDansBoutique(stock.depot?.id ?? null, boutiqueId);
+      }) ?? null
+    );
+  });
+  readonly formulaireApprovisionnementValide = computed(
+    () =>
+      !!this.approvisionnementBoutiqueId() &&
+      !!this.approvisionnementProduitId() &&
+      this.approvisionnementQuantite() > 0 &&
+      !!this.approvisionnementDate(),
+  );
   readonly mouvementSelectionne = computed(
     () => this.mouvementsAccessibles().find(item => item.id === this.mouvementSelectionneId()) ?? null,
   );
 
+  private readonly accountService = inject(AccountService);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly boutiqueService = inject(BoutiqueService);
   private readonly depotStockService = inject(DepotStockService);
+  private readonly groupeArticleService = inject(GroupeArticleService);
   private readonly produitService = inject(ProduitService);
   private readonly stockProduitService = inject(StockProduitService);
   private readonly receptionProduitService = inject(ReceptionProduitService);
@@ -237,16 +270,61 @@ export default class StockOperationsComponent implements OnInit {
 
   changerBoutiqueFiltre(boutiqueId: number | null): void {
     this.boutiqueFiltreId.set(boutiqueId);
-    if (this.depotFiltreId() && !this.depotsAccessibles().some(depot => depot.id === this.depotFiltreId())) {
-      this.depotFiltreId.set(null);
-    }
     this.reinitialiserSelectionsOperationnelles();
     void this.chargerAlertes();
   }
 
-  changerDepotFiltre(depotId: number | null): void {
-    this.depotFiltreId.set(depotId);
-    void this.chargerAlertes();
+  changerBoutiqueApprovisionnement(boutiqueId: number | null): void {
+    this.approvisionnementBoutiqueId.set(boutiqueId);
+    if (
+      this.approvisionnementProduitId() &&
+      !this.produitsApprovisionnement().some(produit => produit.id === this.approvisionnementProduitId())
+    ) {
+      this.approvisionnementProduitId.set(null);
+    }
+  }
+
+  changerGroupeApprovisionnement(groupeId: number | null): void {
+    this.approvisionnementGroupeId.set(groupeId);
+    if (
+      this.approvisionnementProduitId() &&
+      !this.produitsApprovisionnement().some(produit => produit.id === this.approvisionnementProduitId())
+    ) {
+      this.approvisionnementProduitId.set(null);
+    }
+  }
+
+  changerArticleApprovisionnement(produitId: number | null): void {
+    this.approvisionnementProduitId.set(produitId);
+    const produit = this.produitsAccessibles().find(item => item.id === produitId);
+    if (!produit) {
+      return;
+    }
+    if (produit.boutique?.id) {
+      this.approvisionnementBoutiqueId.set(produit.boutique.id);
+    }
+    if (produit.groupeArticle?.id) {
+      this.approvisionnementGroupeId.set(produit.groupeArticle.id);
+    }
+  }
+
+  preparerApprovisionnement(produit?: IProduit | null): void {
+    if (produit?.boutique?.id) {
+      this.approvisionnementBoutiqueId.set(produit.boutique.id);
+    }
+    if (produit?.groupeArticle?.id) {
+      this.approvisionnementGroupeId.set(produit.groupeArticle.id);
+    }
+    if (produit?.id) {
+      this.approvisionnementProduitId.set(produit.id);
+    }
+    this.initialiserApprovisionnementParDefaut();
+    this.ongletActif.set('approvisionnement');
+  }
+
+  preparerApprovisionnementDepuisStock(stock: IStockProduit): void {
+    const produit = this.produitsAccessibles().find(item => item.id === stock.produit?.id) ?? null;
+    this.preparerApprovisionnement(produit);
   }
 
   async selectionnerReception(receptionId: number): Promise<void> {
@@ -297,9 +375,15 @@ export default class StockOperationsComponent implements OnInit {
 
   async validerReception(): Promise<void> {
     const receptionId = this.receptionSelectionneeId();
-    const depotId = this.receptionDepotValidationId();
-    if (!receptionId || !depotId) {
-      this.message.set({ type: 'info', key: 'stockOperations.messages.selectReceptionAndDepot' });
+    const reception = this.receptionSelectionnee();
+    if (!receptionId || !reception) {
+      this.message.set({ type: 'info', key: 'stockOperations.messages.selectReceptionForScan' });
+      return;
+    }
+    const boutiqueReception = reception.boutique;
+    const depotId = boutiqueReception ? await this.resolveOuCreerDepotPourBoutique(boutiqueReception) : null;
+    if (!depotId) {
+      this.message.set({ type: 'danger', key: 'stockOperations.messages.actionFailed' });
       return;
     }
 
@@ -308,6 +392,54 @@ export default class StockOperationsComponent implements OnInit {
       await firstValueFrom(this.stockWorkflowService.validateReception(receptionId, payload));
       await Promise.all([this.chargerReceptions(), this.chargerStocks(), this.chargerAlertes()]);
       this.message.set({ type: 'success', key: 'stockOperations.messages.receptionValidated' });
+    });
+  }
+
+  async validerApprovisionnement(): Promise<void> {
+    const boutiqueId = this.approvisionnementBoutiqueId();
+    const produitId = this.approvisionnementProduitId();
+    const quantite = this.approvisionnementQuantite();
+    const account = this.accountService.account();
+    const accountId = account?.id;
+    const accountLogin = account?.login ?? '';
+    const boutique = this.boutiquesAccessibles().find(item => item.id === boutiqueId);
+
+    if (!boutiqueId || !produitId || quantite <= 0 || !this.approvisionnementDate() || !accountId || !boutique) {
+      this.message.set({ type: 'info', key: 'stockOperations.messages.supplyMissingFields' });
+      return;
+    }
+
+    const depotId = await this.resolveOuCreerDepotPourBoutique(boutique);
+    if (!depotId) {
+      this.message.set({ type: 'danger', key: 'stockOperations.messages.actionFailed' });
+      return;
+    }
+
+    await this.executerAction('approvisionnement', async () => {
+      const reference = this.approvisionnementReference().trim() || `APP-${Date.now()}`;
+      const reception = await firstValueFrom(
+        this.receptionProduitService.create({
+          id: null,
+          reference,
+          dateReception: dayjs(this.approvisionnementDate()),
+          fournisseur: null,
+          commentaire: this.approvisionnementObservation().trim() || null,
+          boutique,
+          utilisateur: { id: accountId, login: accountLogin },
+        }),
+      );
+
+      if (!reception?.id) {
+        throw new Error('Reception creation failed');
+      }
+
+      await firstValueFrom(this.stockWorkflowService.scanReception(reception.id, { produitId, codeBarres: null, quantiteRecue: quantite }));
+      await firstValueFrom(this.stockWorkflowService.validateReception(reception.id, { depotId }));
+      this.approvisionnementQuantite.set(1);
+      this.approvisionnementReference.set('');
+      this.approvisionnementObservation.set('');
+      await Promise.all([this.chargerReceptions(), this.chargerStocks(), this.chargerMouvements(), this.chargerAlertes()]);
+      this.message.set({ type: 'success', key: 'stockOperations.messages.supplyValidated' });
     });
   }
 
@@ -366,10 +498,18 @@ export default class StockOperationsComponent implements OnInit {
 
   async validerTransfert(): Promise<void> {
     const transfertId = this.transfertSelectionneId();
-    const depotOrigineId = this.transfertDepotOrigineId();
-    const depotDestinationId = this.transfertDepotDestinationId();
-    if (!transfertId || !depotOrigineId || !depotDestinationId) {
+    const transfert = this.transfertSelectionne();
+    if (!transfertId || !transfert) {
       this.message.set({ type: 'info', key: 'stockOperations.messages.selectTransferAndDepots' });
+      return;
+    }
+
+    const [depotOrigineId, depotDestinationId] = await Promise.all([
+      transfert.boutiqueOrigine ? this.resolveOuCreerDepotPourBoutique(transfert.boutiqueOrigine) : Promise.resolve(null),
+      transfert.boutiqueDestination ? this.resolveOuCreerDepotPourBoutique(transfert.boutiqueDestination) : Promise.resolve(null),
+    ]);
+    if (!depotOrigineId || !depotDestinationId) {
+      this.message.set({ type: 'danger', key: 'stockOperations.messages.actionFailed' });
       return;
     }
 
@@ -425,6 +565,7 @@ export default class StockOperationsComponent implements OnInit {
       await this.chargerBoutiquesEtDepots();
       this.initialiserBoutiqueParDefaut();
       await Promise.all([
+        this.chargerGroupeArticles(),
         this.chargerProduits(),
         this.chargerStocks(),
         this.chargerReceptions(),
@@ -433,6 +574,8 @@ export default class StockOperationsComponent implements OnInit {
         this.chargerMouvements(),
         this.chargerAlertes(),
       ]);
+      this.initialiserApprovisionnementDepuisRoute();
+      this.initialiserApprovisionnementParDefaut();
     } finally {
       this.chargement.set(false);
     }
@@ -446,6 +589,11 @@ export default class StockOperationsComponent implements OnInit {
 
     this.boutiques.set(boutiquesResponse.body ?? []);
     this.depots.set(depotsResponse.body ?? []);
+  }
+
+  private async chargerGroupeArticles(): Promise<void> {
+    const response = await firstValueFrom(this.groupeArticleService.query({ size: 200, sort: ['libelle,asc'] }));
+    this.groupeArticles.set(response.body ?? []);
   }
 
   private async chargerProduits(): Promise<void> {
@@ -514,7 +662,6 @@ export default class StockOperationsComponent implements OnInit {
       const response = await firstValueFrom(
         this.dashboardReportingService.getStockAlerts({
           boutiqueId: this.boutiqueFiltreId() ?? undefined,
-          depotId: this.depotFiltreId() ?? undefined,
         }),
       );
       this.alertesStock.set(response);
@@ -559,11 +706,45 @@ export default class StockOperationsComponent implements OnInit {
     }
   }
 
-  private estDepotDansBoutique(depotId: number, boutiqueId: number | null): boolean {
-    if (!boutiqueId) {
+  private estDepotDansBoutique(depotId: number | null, boutiqueId: number | null): boolean {
+    if (!boutiqueId || depotId === null) {
       return true;
     }
     return this.depots().some(depot => depot.id === depotId && depot.boutique?.id === boutiqueId);
+  }
+
+  private resolveDepotPourBoutique(boutiqueId: number | null): number | null {
+    const depotsActifs = this.depots().filter(d => d.actif === true);
+    if (!boutiqueId) {
+      return depotsActifs[0]?.id ?? null;
+    }
+    return depotsActifs.find(depot => depot.boutique?.id === boutiqueId)?.id ?? null;
+  }
+
+  private async resolveOuCreerDepotPourBoutique(boutique: Pick<IBoutique, 'id' | 'nom' | 'code'>): Promise<number | null> {
+    const existing = this.resolveDepotPourBoutique(boutique.id);
+    if (existing) {
+      return existing;
+    }
+    try {
+      const depot = await firstValueFrom(
+        this.depotStockService.create({
+          id: null,
+          code: `DPT-${boutique.id}`,
+          libelle: `Dépôt ${boutique.nom ?? 'principal'}`.substring(0, 150),
+          actif: true,
+          emplacement: null,
+          boutique: { id: boutique.id, nom: boutique.nom ?? '', code: boutique.code ?? '' },
+        }),
+      );
+      if (depot?.id) {
+        this.depots.update(depots => [...depots, depot]);
+        return depot.id;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   }
 
   private filtrerParBoutiqueAccessible<T>(items: T[], getBoutiqueId: (item: T) => number | null | undefined): T[] {
@@ -585,6 +766,30 @@ export default class StockOperationsComponent implements OnInit {
     const boutiques = this.boutiquesAccessibles();
     if (boutiques.length === 1 && boutiques[0].id) {
       this.boutiqueFiltreId.set(boutiques[0].id);
+    }
+  }
+
+  private initialiserApprovisionnementDepuisRoute(): void {
+    const queryParamMap = this.activatedRoute.snapshot.queryParamMap;
+    const onglet = queryParamMap.get('onglet');
+    const produitId = Number(queryParamMap.get('produitId'));
+
+    if (onglet === 'approvisionnement' || (Number.isFinite(produitId) && produitId > 0)) {
+      this.ongletActif.set('approvisionnement');
+    }
+
+    if (Number.isFinite(produitId) && produitId > 0) {
+      const produit = this.produitsAccessibles().find(item => item.id === produitId);
+      if (produit) {
+        this.preparerApprovisionnement(produit);
+      }
+    }
+  }
+
+  private initialiserApprovisionnementParDefaut(): void {
+    const boutiqueId = this.approvisionnementBoutiqueId() ?? this.boutiqueFiltreId() ?? this.boutiquesAccessibles()[0]?.id ?? null;
+    if (!this.approvisionnementBoutiqueId() && boutiqueId) {
+      this.approvisionnementBoutiqueId.set(boutiqueId);
     }
   }
 
@@ -612,7 +817,11 @@ export default class StockOperationsComponent implements OnInit {
       return {};
     }
 
-    const ids = this.depotsAccessibles()
+    const ids = this.depots()
+      .filter(depot => {
+        const boutiqueId = depot.boutique?.id;
+        return boutiqueId ? this.boutiqueIdsAccessibles().has(boutiqueId) : false;
+      })
       .map(depot => depot.id)
       .filter((id): id is number => typeof id === 'number');
     return ids.length ? { 'depotId.in': ids.join(',') } : { 'depotId.equals': -1 };

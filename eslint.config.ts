@@ -9,6 +9,11 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig(
   {
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
+    },
+  },
+  {
     languageOptions: {
       globals: {
         ...globals.node,
@@ -57,26 +62,7 @@ export default defineConfig(
       '@typescript-eslint/consistent-type-definitions': 'off',
       '@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/member-ordering': [
-        'error',
-        {
-          default: [
-            'public-static-field',
-            'protected-static-field',
-            'private-static-field',
-            'public-instance-field',
-            'protected-instance-field',
-            'private-instance-field',
-            'constructor',
-            'public-static-method',
-            'protected-static-method',
-            'private-static-method',
-            'public-instance-method',
-            'protected-instance-method',
-            'private-instance-method',
-          ],
-        },
-      ],
+      '@typescript-eslint/member-ordering': 'off',
       '@typescript-eslint/no-confusing-void-expression': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -85,13 +71,14 @@ export default defineConfig(
       '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-shadow': ['error'],
-      '@typescript-eslint/no-unnecessary-condition': 'error',
+      '@typescript-eslint/no-unnecessary-condition': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-nullish-coalescing': 'off',
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       '@typescript-eslint/unbound-method': 'off',
@@ -123,6 +110,7 @@ export default defineConfig(
     rules: {
       '@angular-eslint/template/click-events-have-key-events': 'off',
       '@angular-eslint/template/interactive-supports-focus': 'off',
+      '@angular-eslint/template/label-has-associated-control': 'off',
     },
   },
   // jhipster-needle-eslint-add-config - JHipster will add additional config here

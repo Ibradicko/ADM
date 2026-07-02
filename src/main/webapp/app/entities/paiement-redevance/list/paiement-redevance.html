@@ -73,7 +73,7 @@
                 </td>
                 <td>{{ pr.datePaiement | formatMediumDate }}</td>
                 <td class="text-end">
-                  <strong>{{ pr.montant != null ? (pr.montant | number: '1.0-0') + ' FCFA' : '—' }}</strong>
+                  <strong>{{ pr.montant !== null ? (pr.montant | number: '1.0-0') + ' FCFA' : '—' }}</strong>
                 </td>
                 <td>{{ pr.modePaiement ?? '—' }}</td>
                 <td>

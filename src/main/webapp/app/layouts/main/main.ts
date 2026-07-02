@@ -40,7 +40,7 @@ export default class Main implements OnInit {
     this.accountService.identity().subscribe();
 
     this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(event => {
-      this.currentUrl.set((event as NavigationEnd).urlAfterRedirects);
+      this.currentUrl.set(event.urlAfterRedirects);
     });
 
     this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {

@@ -48,6 +48,7 @@ public class ProduitDTO implements Serializable {
     @NotNull
     private BoutiqueDTO boutique;
 
+    @NotNull
     private GroupeArticleDTO groupeArticle;
 
     private FamilleArticleDTO familleArticle;

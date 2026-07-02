@@ -2,7 +2,7 @@
   <div class="adm-page-header" id="page-heading" data-cy="StockProduitHeading">
     <div>
       <h1>Niveaux de stock</h1>
-      <p>Quantités disponibles par produit et par dépôt — alertes de réapprovisionnement</p>
+      <p>Quantités disponibles par article et par dépôt — alertes de réapprovisionnement</p>
     </div>
     <div class="adm-page-header__actions">
       <button type="button" class="adm-button adm-button--ghost" (click)="load()" [disabled]="isLoading()">
@@ -28,23 +28,23 @@
   <article class="adm-card adm-card--table">
     <div class="adm-card__header">
       <div>
-        <h2>État des stocks produits</h2>
-        <p>Quantités théoriques et seuils d'alerte par produit et dépôt</p>
+        <h2>État des stocks articles</h2>
+        <p>Quantités théoriques et seuils d'alerte par article et dépôt</p>
       </div>
       <span class="adm-pill adm-pill--primary">{{ totalItems() }} article(s)</span>
     </div>
 
     @if (stockProduits().length === 0) {
       <div class="adm-empty-state" id="no-result">
-        <strong>Aucun stock produit trouvé</strong>
-        <p>Ajustez les filtres ou créez des entrées de stock pour vos produits.</p>
+        <strong>Aucun stock article trouvé</strong>
+        <p>Ajustez les filtres ou créez des entrées de stock pour vos articles.</p>
       </div>
     } @else {
       <div class="adm-table-wrapper" id="entities">
         <table class="adm-table" aria-describedby="page-heading">
           <thead>
             <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-              <th scope="col" jhiSortBy="produit.designation">Produit <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="produit.designation">Article <fa-icon icon="sort" /></th>
               <th scope="col" jhiSortBy="depot.code">Dépôt <fa-icon icon="sort" /></th>
               <th scope="col" jhiSortBy="quantiteTheorique" class="text-end">Qté théorique <fa-icon icon="sort" /></th>
               <th scope="col" jhiSortBy="stockAlerte" class="text-end">Seuil alerte <fa-icon icon="sort" /></th>
@@ -76,7 +76,9 @@
                 <td class="text-end">
                   <strong
                     [class.adm-text--danger]="
-                      sp.stockAlerte != null && sp.quantiteTheorique != null && sp.quantiteTheorique <= sp.stockAlerte
+                      (sp.stockAlerte ?? null) !== null &&
+                      (sp.quantiteTheorique ?? null) !== null &&
+                      (sp.quantiteTheorique ?? 0) <= (sp.stockAlerte ?? 0)
                     "
                   >
                     {{ sp.quantiteTheorique ?? '—' }}
@@ -90,6 +92,14 @@
                       <fa-icon icon="eye" />
                     </a>
                     @if (permissionsUi.peutGererStock()) {
+                      <a
+                        [routerLink]="['/stock-operations']"
+                        [queryParams]="{ onglet: 'approvisionnement', produitId: sp.produit?.id, depotId: sp.depot?.id }"
+                        class="adm-icon-button"
+                        title="Approvisionner"
+                      >
+                        <fa-icon icon="plus" />
+                      </a>
                       <a
                         [routerLink]="['/stock-produit', sp.id, 'edit']"
                         class="adm-icon-button"

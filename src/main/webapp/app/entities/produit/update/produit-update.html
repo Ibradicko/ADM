@@ -6,44 +6,62 @@
     </div>
 
     <div class="adm-page-header__actions">
+      @if (isEdition()) {
+        <button type="button" class="adm-button adm-button--ghost" (click)="approvisionnerArticle()">
+          <fa-icon icon="plus" />
+          <span>Approvisionner</span>
+        </button>
+      }
+
       <button type="button" class="adm-button adm-button--ghost" (click)="previousState()">
         <fa-icon icon="ban" />
         <span>{{ 'productCustom.actions.cancel' | translate }}</span>
       </button>
 
+      @if (!isEdition()) {
+        <button type="button" class="adm-button adm-button--ghost" [disabled]="editForm.invalid || isSaving()" (click)="saveAndSupply()">
+          <fa-icon [icon]="isSaving() && sauvegardeEtApprovisionnement() ? 'sync' : 'plus'" [animation]="isSaving() ? 'spin' : undefined" />
+          <span>{{ isSaving() && sauvegardeEtApprovisionnement() ? 'Enregistrement...' : 'Enregistrer et approvisionner' }}</span>
+        </button>
+      }
+
       <button type="submit" class="adm-button adm-button--primary" [disabled]="editForm.invalid || isSaving()">
-        <fa-icon [icon]="isSaving() ? 'sync' : 'save'" [animation]="isSaving() ? 'spin' : undefined" />
-        <span>{{ isSaving() ? 'Enregistrement...' : 'Enregistrer' }}</span>
+        <fa-icon [icon]="isSaving() && !sauvegardeEtApprovisionnement() ? 'sync' : 'save'" [animation]="isSaving() ? 'spin' : undefined" />
+        <span>{{ isSaving() && !sauvegardeEtApprovisionnement() ? 'Enregistrement...' : 'Enregistrer' }}</span>
       </button>
     </div>
   </div>
 
   <jhi-alert-error />
 
+  @if (boutiqueVerrouillee() && boutiqueCourante(); as boutique) {
+    <section class="adm-toolbar" aria-label="Boutique courante">
+      <div class="adm-toolbar__filters">
+        <span class="adm-pill adm-pill--primary">Boutique : {{ boutique.nom }}</span>
+        <span class="adm-text--muted">Les articles crees par un manager boutique sont rattaches automatiquement a sa boutique.</span>
+      </div>
+    </section>
+  }
+
   <div class="adm-form-layout">
     <div class="adm-form-layout__main">
       <article class="adm-card">
         <div class="adm-card__header">
           <div>
-            <h2>{{ 'productCustom.update.identificationTitle' | translate }}</h2>
-            <p>{{ 'productCustom.update.identificationDescription' | translate }}</p>
+            <h2>Identification article</h2>
+            <p>Informations visibles dans le catalogue, la caisse et les operations de stock.</p>
           </div>
         </div>
 
         <div class="adm-form-grid">
           @let codeInterneRef = editForm.controls.codeInterne;
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.codeInterne' | translate }} *</span>
-            <input
-              class="adm-input"
-              type="text"
-              formControlName="codeInterne"
-              [placeholder]="'productCustom.placeholders.internalCode' | translate"
-            />
+            <span>Code interne *</span>
+            <input class="adm-input" type="text" formControlName="codeInterne" placeholder="Ex. ART-BKO-001" />
             @if (champInvalide('codeInterne')) {
               <small class="adm-field-error">
                 @if (codeInterneRef.errors?.['required']) {
-                  {{ 'productCustom.validation.internalCodeRequired' | translate }}
+                  Le code interne est obligatoire.
                 } @else if (codeInterneRef.errors?.['maxlength']) {
                   Le code interne ne doit pas depasser 50 caracteres.
                 }
@@ -53,17 +71,12 @@
 
           @let designationRef = editForm.controls.designation;
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.designation' | translate }} *</span>
-            <input
-              class="adm-input"
-              type="text"
-              formControlName="designation"
-              [placeholder]="'productCustom.placeholders.productName' | translate"
-            />
+            <span>Designation *</span>
+            <input class="adm-input" type="text" formControlName="designation" placeholder="Nom commercial de l'article" />
             @if (champInvalide('designation')) {
               <small class="adm-field-error">
                 @if (designationRef.errors?.['required']) {
-                  {{ 'productCustom.validation.designationRequired' | translate }}
+                  La designation est obligatoire.
                 } @else if (designationRef.errors?.['maxlength']) {
                   La designation ne doit pas depasser 200 caracteres.
                 }
@@ -72,218 +85,136 @@
           </label>
 
           <label class="adm-field adm-field--full">
-            <span>{{ 'admSupervisionVentesApp.produit.description' | translate }}</span>
+            <span>Description</span>
             <textarea
               class="adm-input adm-input--textarea"
               formControlName="description"
               rows="4"
-              [placeholder]="'productCustom.placeholders.productDescription' | translate"
+              placeholder="Description courte utile aux vendeurs et au catalogue"
             ></textarea>
           </label>
+        </div>
+      </article>
 
-          @let dateCreationRef = editForm.controls.dateCreation;
+      <article class="adm-card">
+        <div class="adm-card__header">
+          <div>
+            <h2>Rattachement</h2>
+            <p>Le groupe d'article est obligatoire et porte le taux de redevance applique a la vente.</p>
+          </div>
+        </div>
+
+        <div class="adm-form-grid">
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.dateCreation' | translate }} *</span>
-            <input class="adm-input" type="datetime-local" formControlName="dateCreation" />
-            @if (champInvalide('dateCreation')) {
-              <small class="adm-field-error">
-                @if (dateCreationRef.errors?.['required']) {
-                  {{ 'productCustom.validation.creationDateRequired' | translate }}
-                } @else if (dateCreationRef.errors?.['datetimelocal']) {
-                  Le format de date et heure est invalide.
+            <span>Boutique *</span>
+            @if (boutiqueVerrouillee()) {
+              <input class="adm-input" type="text" [value]="formatValeur(boutiqueCourante()?.nom)" readonly />
+            } @else {
+              <select class="adm-select" formControlName="boutique" [compareWith]="compareBoutique">
+                <option [ngValue]="null">Selectionner</option>
+                @for (boutiqueOption of boutiquesSharedCollection(); track boutiqueOption.id) {
+                  <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
                 }
-              </small>
+              </select>
+            }
+            @if (champInvalide('boutique') && editForm.controls.boutique.errors?.['required']) {
+              <small class="adm-field-error">La boutique est obligatoire.</small>
             }
           </label>
 
-          @let statutRef = editForm.controls.statut;
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.statut' | translate }} *</span>
-            <select class="adm-select" formControlName="statut">
-              <option [ngValue]="null">{{ 'productCustom.actions.select' | translate }}</option>
-              @for (statutGeneral of statutGeneralValues; track statutGeneral) {
-                <option [value]="statutGeneral">{{ statutGeneral }}</option>
+            <span>Groupe d'article *</span>
+            <select
+              class="adm-select"
+              formControlName="groupeArticle"
+              [compareWith]="compareGroupeArticle"
+              (change)="onGroupeArticleChange()"
+            >
+              <option [ngValue]="null">Selectionner</option>
+              @for (groupeArticleOption of groupeArticlesSharedCollection(); track groupeArticleOption.id) {
+                <option [ngValue]="groupeArticleOption">
+                  {{ groupeArticleOption.libelle }} - {{ formatTaux(groupeArticleOption.tauxRedevance) }}
+                </option>
               }
             </select>
-            @if (champInvalide('statut') && statutRef.errors?.['required']) {
-              <small class="adm-field-error">{{ 'productCustom.validation.statusRequired' | translate }}</small>
+            @if (champInvalide('groupeArticle') && editForm.controls.groupeArticle.errors?.['required']) {
+              <small class="adm-field-error">Le groupe d'article est obligatoire.</small>
             }
           </label>
         </div>
       </article>
 
-      @if (!isEdition()) {
-        <article class="adm-card">
-          <div class="adm-card__header">
-            <div>
-              <h2>Stock initial</h2>
-              <p>Initialisez facultativement le stock de l'article dans un depot de la boutique.</p>
-            </div>
-          </div>
-
-          <div class="adm-form-grid">
-            <label class="adm-field">
-              <span>Depot</span>
-              <select
-                class="adm-select"
-                [value]="stockInitialDepotId() ?? ''"
-                (change)="stockInitialDepotId.set(+$any($event.target).value || null); stockInitialErreur.set(false)"
-              >
-                <option value="">Selectionner</option>
-                @for (depot of depotsStockInitial(); track depot.id) {
-                  <option [value]="depot.id">{{ depot.code }} - {{ depot.libelle }}</option>
-                }
-              </select>
-              @if (stockInitialErreur()) {
-                <small class="adm-field-error">Selectionnez un depot pour enregistrer le stock initial.</small>
-              }
-            </label>
-
-            <label class="adm-field">
-              <span>Quantite initiale</span>
-              <input
-                class="adm-input"
-                type="number"
-                min="0"
-                step="0.01"
-                [value]="stockInitialQuantite()"
-                (input)="stockInitialQuantite.set(+$any($event.target).value || 0)"
-              />
-            </label>
-          </div>
-        </article>
-      }
-
       <article class="adm-card">
         <div class="adm-card__header">
           <div>
-            <h2>{{ 'productCustom.update.priceTitle' | translate }}</h2>
-            <p>{{ 'productCustom.update.priceDescription' | translate }}</p>
+            <h2>Prix et statut</h2>
+            <p>Informations necessaires pour rendre l'article vendable.</p>
           </div>
         </div>
 
         <div class="adm-form-grid">
           @let typePrixRef = editForm.controls.typePrix;
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.typePrix' | translate }} *</span>
+            <span>Type de prix *</span>
             <select class="adm-select" formControlName="typePrix">
-              <option [ngValue]="null">{{ 'productCustom.actions.select' | translate }}</option>
+              <option [ngValue]="null">Selectionner</option>
               @for (typePrix of typePrixValues; track typePrix) {
-                <option [value]="typePrix">{{ typePrix }}</option>
+                <option [value]="typePrix">{{ 'admSupervisionVentesApp.TypePrix.' + typePrix | translate }}</option>
               }
             </select>
             @if (champInvalide('typePrix') && typePrixRef.errors?.['required']) {
-              <small class="adm-field-error">{{ 'productCustom.validation.priceTypeRequired' | translate }}</small>
+              <small class="adm-field-error">Le type de prix est obligatoire.</small>
             }
           </label>
 
           @let prixVenteRef = editForm.controls.prixVente;
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.prixVente' | translate }} *</span>
+            <span>Prix de vente *</span>
             <input class="adm-input" type="number" min="0" step="0.01" formControlName="prixVente" placeholder="0" />
             @if (champInvalide('prixVente')) {
               <small class="adm-field-error">
                 @if (prixVenteRef.errors?.['required']) {
-                  {{ 'productCustom.validation.salePriceRequired' | translate }}
+                  Le prix de vente est obligatoire.
                 } @else if (prixVenteRef.errors?.['min']) {
                   Le prix de vente doit etre superieur ou egal a 0.
-                } @else if (prixVenteRef.errors?.['number']) {
-                  Saisissez une valeur numerique valide.
                 }
               </small>
             }
           </label>
 
-          @let tauxRedevanceApplicableRef = editForm.controls.tauxRedevanceApplicable;
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.tauxRedevanceApplicable' | translate }}</span>
-            <input
-              class="adm-input"
-              type="number"
-              min="0"
-              max="100"
-              step="0.01"
-              formControlName="tauxRedevanceApplicable"
-              placeholder="0"
-            />
-            @if (champInvalide('tauxRedevanceApplicable')) {
-              <small class="adm-field-error">
-                @if (tauxRedevanceApplicableRef.errors?.['min']) {
-                  Le taux ne peut pas etre negatif.
-                } @else if (tauxRedevanceApplicableRef.errors?.['max']) {
-                  Le taux ne peut pas depasser 100%.
-                } @else if (tauxRedevanceApplicableRef.errors?.['number']) {
-                  Saisissez une valeur numerique valide.
-                }
-              </small>
-            }
-          </label>
-        </div>
-      </article>
-
-      <article class="adm-card">
-        <div class="adm-form-grid">
-          <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.boutique' | translate }} *</span>
-            <select class="adm-select" formControlName="boutique" [compareWith]="compareBoutique">
-              @if (!editForm.controls.boutique.value) {
-                <option [ngValue]="null" selected>{{ 'productCustom.actions.select' | translate }}</option>
-              }
-              @for (boutiqueOption of boutiquesSharedCollection(); track boutiqueOption.id) {
-                <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
-              }
-            </select>
-            @if (champInvalide('boutique') && editForm.controls.boutique.errors?.['required']) {
-              <small class="adm-field-error">{{ 'productCustom.validation.shopRequired' | translate }}</small>
-            }
-          </label>
-
-          <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.uniteMesure' | translate }} *</span>
+            <span>Unite de mesure *</span>
             <select class="adm-select" formControlName="uniteMesure" [compareWith]="compareUniteMesure">
-              @if (!editForm.controls.uniteMesure.value) {
-                <option [ngValue]="null" selected>{{ 'productCustom.actions.select' | translate }}</option>
-              }
+              <option [ngValue]="null">Selectionner</option>
               @for (uniteMesureOption of uniteMesuresSharedCollection(); track uniteMesureOption.id) {
                 <option [ngValue]="uniteMesureOption">{{ uniteMesureOption.code }}</option>
               }
             </select>
             @if (champInvalide('uniteMesure') && editForm.controls.uniteMesure.errors?.['required']) {
-              <small class="adm-field-error">{{ 'productCustom.validation.unitRequired' | translate }}</small>
+              <small class="adm-field-error">L'unite de mesure est obligatoire.</small>
+            }
+          </label>
+
+          @let statutRef = editForm.controls.statut;
+          <label class="adm-field">
+            <span>Statut *</span>
+            <select class="adm-select" formControlName="statut">
+              <option [ngValue]="null">Selectionner</option>
+              @for (statutGeneral of statutGeneralValues; track statutGeneral) {
+                <option [value]="statutGeneral">{{ 'admSupervisionVentesApp.StatutGeneral.' + statutGeneral | translate }}</option>
+              }
+            </select>
+            @if (champInvalide('statut') && statutRef.errors?.['required']) {
+              <small class="adm-field-error">Le statut est obligatoire.</small>
             }
           </label>
 
           <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.groupeArticle' | translate }} *</span>
-            <select class="adm-select" formControlName="groupeArticle" [compareWith]="compareGroupeArticle">
-              <option [ngValue]="null">{{ 'productCustom.actions.select' | translate }}</option>
-              @for (groupeArticleOption of groupeArticlesSharedCollection(); track groupeArticleOption.id) {
-                <option [ngValue]="groupeArticleOption">{{ groupeArticleOption.libelle }}</option>
-              }
-            </select>
-            @if (champInvalide('groupeArticle') && editForm.controls.groupeArticle.errors?.['required']) {
-              <small class="adm-field-error">{{ 'productCustom.validation.groupRequired' | translate }}</small>
+            <span>Date de creation *</span>
+            <input class="adm-input" type="datetime-local" formControlName="dateCreation" />
+            @if (champInvalide('dateCreation')) {
+              <small class="adm-field-error">La date de creation est obligatoire.</small>
             }
-          </label>
-
-          <label class="adm-field">
-            <span>{{ 'admSupervisionVentesApp.produit.familleArticle' | translate }}</span>
-            <select class="adm-select" formControlName="familleArticle" [compareWith]="compareFamilleArticle">
-              <option [ngValue]="null">{{ 'productCustom.common.noneFeminine' | translate }}</option>
-              @for (familleArticleOption of familleArticlesSharedCollection(); track familleArticleOption.id) {
-                <option [ngValue]="familleArticleOption">{{ familleArticleOption.libelle }}</option>
-              }
-            </select>
-          </label>
-
-          <label class="adm-field adm-field--full">
-            <span>{{ 'admSupervisionVentesApp.produit.sousFamilleArticle' | translate }}</span>
-            <select class="adm-select" formControlName="sousFamilleArticle" [compareWith]="compareSousFamilleArticle">
-              <option [ngValue]="null">{{ 'productCustom.common.noneFeminine' | translate }}</option>
-              @for (sousFamilleArticleOption of sousFamilleArticlesSharedCollection(); track sousFamilleArticleOption.id) {
-                <option [ngValue]="sousFamilleArticleOption">{{ sousFamilleArticleOption.libelle }}</option>
-              }
-            </select>
           </label>
         </div>
       </article>
@@ -293,51 +224,55 @@
       <article class="adm-card">
         <div class="adm-card__header">
           <div>
-            <h2>{{ 'productCustom.update.summaryTitle' | translate }}</h2>
-            <p>{{ 'productCustom.update.summaryDescription' | translate }}</p>
+            <h2>Resume</h2>
+            <p>Controle rapide avant enregistrement.</p>
           </div>
         </div>
 
         <div class="adm-detail-grid">
           <div class="adm-detail-block adm-detail-block--full">
-            <span class="adm-detail-block__label">{{ 'productCustom.fields.product' | translate }}</span>
+            <span class="adm-detail-block__label">Article</span>
             <strong>{{ formatValeur(editForm.controls.designation.value) }}</strong>
           </div>
           <div class="adm-detail-block">
-            <span class="adm-detail-block__label">{{ 'productCustom.fields.code' | translate }}</span>
+            <span class="adm-detail-block__label">Code</span>
             <strong class="adm-code">{{ formatValeur(editForm.controls.codeInterne.value) }}</strong>
           </div>
           <div class="adm-detail-block">
-            <span class="adm-detail-block__label">{{ 'productCustom.fields.price' | translate }}</span>
+            <span class="adm-detail-block__label">Boutique</span>
+            <strong>{{ formatValeur(boutiqueCourante()?.nom) }}</strong>
+          </div>
+          <div class="adm-detail-block">
+            <span class="adm-detail-block__label">Prix</span>
             <strong>{{ formatMontant(editForm.controls.prixVente.value ?? undefined) }}</strong>
           </div>
           <div class="adm-detail-block">
-            <span class="adm-detail-block__label">{{ 'productCustom.fields.royalty' | translate }}</span>
-            <strong>{{ formatTaux(editForm.controls.tauxRedevanceApplicable.value ?? undefined) }}</strong>
-          </div>
-          <div class="adm-detail-block">
-            <span class="adm-detail-block__label">{{ 'admSupervisionVentesApp.produit.boutique' | translate }}</span>
-            <strong>{{ formatValeur(editForm.controls.boutique.value?.nom) }}</strong>
+            <span class="adm-detail-block__label">Taux groupe</span>
+            <strong>{{ formatTaux(groupeSelectionne()?.tauxRedevance) }}</strong>
           </div>
           <div class="adm-detail-block adm-detail-block--full">
-            <span class="adm-detail-block__label">{{ 'productCustom.fields.classification' | translate }}</span>
-            <strong>
-              {{ formatValeur(editForm.controls.groupeArticle.value?.libelle) }} /
-              {{ formatValeur(editForm.controls.familleArticle.value?.libelle) }} /
-              {{ formatValeur(editForm.controls.sousFamilleArticle.value?.libelle) }}
-            </strong>
+            <span class="adm-detail-block__label">Groupe</span>
+            <strong>{{ formatValeur(groupeSelectionne()?.libelle) }}</strong>
           </div>
         </div>
 
         <div class="adm-action-stack">
-          <a class="adm-button adm-button--ghost" [routerLink]="['/historique-code-barres']">
-            <fa-icon icon="road" />
-            <span>{{ 'productCustom.actions.viewHistory' | translate }}</span>
-          </a>
-          <a class="adm-button adm-button--ghost" [routerLink]="['/parametre-code-barres']">
-            <fa-icon icon="cogs" />
-            <span>{{ 'productCustom.actions.barcodeSettings' | translate }}</span>
-          </a>
+          @if (isEdition()) {
+            <button type="button" class="adm-button adm-button--primary" (click)="approvisionnerArticle()">
+              <fa-icon icon="plus" />
+              <span>Approvisionner cet article</span>
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="adm-button adm-button--primary"
+              [disabled]="editForm.invalid || isSaving()"
+              (click)="saveAndSupply()"
+            >
+              <fa-icon icon="plus" />
+              <span>Enregistrer et approvisionner</span>
+            </button>
+          }
         </div>
       </article>
     </aside>

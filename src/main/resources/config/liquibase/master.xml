@@ -108,5 +108,7 @@
     <include file="config/liquibase/changelog/20260621090000_fix_locataire_seed_must_change_password.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260630090000_restrict_manager_boutique_settings_audit.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260630110000_seed_e2e_role_test_data.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260701103000_make_produit_groupe_article_required.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260701120000_add_groupe_article_taux_redevance.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

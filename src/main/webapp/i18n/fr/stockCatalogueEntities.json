@@ -1,18 +1,37 @@
 {
   "admSupervisionVentesApp": {
+    "groupeArticle": {
+      "home": {
+        "title": "Groupes d'articles",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un groupe d'articles",
+        "createOrEditLabel": "Créer ou modifier un groupe d'articles",
+        "notFound": "Aucun groupe d'articles trouvé"
+      },
+      "created": "Le groupe d'articles {{ param }} a été créé",
+      "updated": "Le groupe d'articles {{ param }} a été modifié",
+      "deleted": "Le groupe d'articles {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du groupe d'articles {{ id }} ?" },
+      "detail": { "title": "Groupe d'articles" },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libellé",
+      "statut": "Statut",
+      "tauxRedevance": "Taux de redevance"
+    },
     "produit": {
       "home": {
-        "title": "Produits",
+        "title": "Articles",
         "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un produit",
-        "createOrEditLabel": "Créer ou modifier un produit",
-        "notFound": "Aucun produit trouvé"
+        "createLabel": "Créer un article",
+        "createOrEditLabel": "Créer ou modifier un article",
+        "notFound": "Aucun article trouvé"
       },
-      "created": "Le produit {{ param }} a été créé",
-      "updated": "Le produit {{ param }} a été modifié",
-      "deleted": "Le produit {{ param }} a été supprimé",
-      "delete": { "question": "Confirmez-vous la suppression du produit {{ id }} ?" },
-      "detail": { "title": "Produit" },
+      "created": "L'article {{ param }} a été créé",
+      "updated": "L'article {{ param }} a été modifié",
+      "deleted": "L'article {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression de l'article {{ id }} ?" },
+      "detail": { "title": "Article" },
       "id": "ID",
       "codeInterne": "Code interne",
       "designation": "Désignation",
@@ -30,22 +49,22 @@
     },
     "stockProduit": {
       "home": {
-        "title": "Stocks produits",
+        "title": "Stocks articles",
         "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un stock produit",
-        "createOrEditLabel": "Créer ou modifier un stock produit",
-        "notFound": "Aucun stock produit trouvé"
+        "createLabel": "Créer un stock article",
+        "createOrEditLabel": "Créer ou modifier un stock article",
+        "notFound": "Aucun stock article trouvé"
       },
-      "created": "Le stock produit {{ param }} a été créé",
-      "updated": "Le stock produit {{ param }} a été modifié",
-      "deleted": "Le stock produit {{ param }} a été supprimé",
-      "delete": { "question": "Confirmez-vous la suppression du stock produit {{ id }} ?" },
-      "detail": { "title": "Stock produit" },
+      "created": "Le stock article {{ param }} a été créé",
+      "updated": "Le stock article {{ param }} a été modifié",
+      "deleted": "Le stock article {{ param }} a été supprimé",
+      "delete": { "question": "Confirmez-vous la suppression du stock article {{ id }} ?" },
+      "detail": { "title": "Stock article" },
       "id": "ID",
       "quantiteTheorique": "Quantité théorique",
       "stockAlerte": "Seuil d'alerte",
       "dateDernierMouvement": "Date du dernier mouvement",
-      "produit": "Produit",
+      "produit": "Article",
       "depot": "Dépôt"
     },
     "mouvementStock": {

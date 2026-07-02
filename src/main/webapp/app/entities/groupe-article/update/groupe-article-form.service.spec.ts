@@ -23,7 +23,7 @@ describe('GroupeArticle Form Service', () => {
             code: expect.any(Object),
             libelle: expect.any(Object),
             statut: expect.any(Object),
-            boutique: expect.any(Object),
+            tauxRedevance: expect.any(Object),
           }),
         );
       });
@@ -37,7 +37,7 @@ describe('GroupeArticle Form Service', () => {
             code: expect.any(Object),
             libelle: expect.any(Object),
             statut: expect.any(Object),
-            boutique: expect.any(Object),
+            tauxRedevance: expect.any(Object),
           }),
         );
       });

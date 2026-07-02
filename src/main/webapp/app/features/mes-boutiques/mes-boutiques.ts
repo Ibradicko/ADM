@@ -62,8 +62,8 @@ export default class MesBoutiquesComponent implements OnInit {
   private readonly userManagementService = inject(UserManagementService);
   private readonly dashboardReportingService = inject(AdmDashboardReportingService);
 
-  async ngOnInit(): Promise<void> {
-    await Promise.all([this.chargerMesExploitations(), this.chargerProfils()]);
+  ngOnInit(): void {
+    void Promise.all([this.chargerMesExploitations(), this.chargerProfils()]);
   }
 
   async chargerMesExploitations(): Promise<void> {

@@ -19,9 +19,9 @@ export interface IProduit {
   statut?: keyof typeof StatutGeneral | null;
   dateCreation?: dayjs.Dayjs | null;
   boutique?: Pick<IBoutique, 'id' | 'nom' | 'code'> | null;
-  groupeArticle?: Pick<IGroupeArticle, 'id' | 'libelle'> | null;
-  familleArticle?: Pick<IFamilleArticle, 'id' | 'libelle'> | null;
-  sousFamilleArticle?: Pick<ISousFamilleArticle, 'id' | 'libelle'> | null;
+  groupeArticle?: Pick<IGroupeArticle, 'id' | 'libelle' | 'tauxRedevance'> | null;
+  familleArticle?: Pick<IFamilleArticle, 'id' | 'libelle' | 'groupeArticle'> | null;
+  sousFamilleArticle?: Pick<ISousFamilleArticle, 'id' | 'libelle' | 'familleArticle'> | null;
   uniteMesure?: Pick<IUniteMesure, 'id' | 'code'> | null;
 }
 

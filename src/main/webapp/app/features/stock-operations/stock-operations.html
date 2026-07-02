@@ -65,6 +65,14 @@
         <button
           type="button"
           class="adm-chip"
+          [class.adm-pill--primary]="ongletActif() === 'approvisionnement'"
+          (click)="definirOnglet('approvisionnement')"
+        >
+          <span jhiTranslate="stockOperations.tabs.supply">Approvisionnement</span>
+        </button>
+        <button
+          type="button"
+          class="adm-chip"
           [class.adm-pill--primary]="ongletActif() === 'receptions'"
           (click)="definirOnglet('receptions')"
         >
@@ -94,17 +102,7 @@
           <select class="adm-select" [ngModel]="boutiqueFiltreId()" (ngModelChange)="changerBoutiqueFiltre($event ? +$event : null)">
             <option [ngValue]="null" jhiTranslate="stockOperations.common.allFeminine">All</option>
             @for (boutique of boutiquesAccessibles(); track boutique.id) {
-              <option [value]="boutique.id">{{ boutique.nom }}</option>
-            }
-          </select>
-        </label>
-
-        <label class="adm-field">
-          <span jhiTranslate="stockOperations.fields.warehouse">Warehouse</span>
-          <select class="adm-select" [ngModel]="depotFiltreId()" (ngModelChange)="changerDepotFiltre($event ? +$event : null)">
-            <option [ngValue]="null" jhiTranslate="stockOperations.common.all">All</option>
-            @for (depot of depotsFiltres(); track depot.id) {
-              <option [value]="depot.id">{{ depot.code }}</option>
+              <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
             }
           </select>
         </label>
@@ -137,8 +135,8 @@
               <strong>{{ mouvementsAccessibles().length }}</strong>
             </article>
             <article class="adm-stat-card">
-              <span jhiTranslate="stockOperations.kpis.activeWarehouses">Active warehouses</span>
-              <strong>{{ depotsFiltres().length }}</strong>
+              <span>Approvisionnements</span>
+              <strong>{{ receptionsAccessibles().length }}</strong>
             </article>
           </div>
 
@@ -154,26 +152,32 @@
               <table class="adm-data-table">
                 <thead>
                   <tr>
-                    <th jhiTranslate="stockOperations.fields.product">Product</th>
-                    <th jhiTranslate="stockOperations.fields.warehouse">Warehouse</th>
-                    <th jhiTranslate="stockOperations.fields.theoreticalQuantity">Theoretical quantity</th>
-                    <th jhiTranslate="stockOperations.fields.threshold">Threshold</th>
-                    <th jhiTranslate="stockOperations.fields.lastMovement">Last movement</th>
+                    <th jhiTranslate="stockOperations.fields.product">Article</th>
+                    <th jhiTranslate="stockOperations.fields.theoreticalQuantity">Quantite</th>
+                    <th jhiTranslate="stockOperations.fields.threshold">Seuil alerte</th>
+                    <th jhiTranslate="stockOperations.fields.lastMovement">Dernier mouvement</th>
+                    <th class="text-end" jhiTranslate="stockOperations.fields.action">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (stock of stocksFiltres().slice(0, 100); track stock.id) {
-                    <tr>
+                    <tr [class.adm-row--alert]="(stock.quantiteTheorique ?? 0) <= (stock.stockAlerte ?? 0)">
                       <td>{{ stock.produit?.designation ?? '--' }}</td>
-                      <td>{{ stock.depot?.code ?? '--' }}</td>
                       <td>{{ formatMontant(stock.quantiteTheorique) }}</td>
                       <td>{{ formatMontant(stock.stockAlerte) }}</td>
                       <td>{{ formatDate(stock.dateDernierMouvement) }}</td>
+                      <td class="text-end">
+                        @if (permissionsUi.peutGererStock()) {
+                          <button type="button" class="adm-link-button" (click)="preparerApprovisionnementDepuisStock(stock)">
+                            {{ 'stockOperations.actions.supply' | translate }}
+                          </button>
+                        }
+                      </td>
                     </tr>
                   } @empty {
                     <tr>
                       <td colspan="5" class="adm-table-empty" jhiTranslate="stockOperations.stock.empty">
-                        No stock line in the current shop scope.
+                        Aucune ligne de stock pour ce perimetre.
                       </td>
                     </tr>
                   }
@@ -200,7 +204,7 @@
                   <div class="adm-list-panel__row">
                     <div>
                       <strong>{{ alerte.produitDesignation ?? '--' }}</strong>
-                      <small>{{ alerte.boutiqueNom ?? '--' }} - {{ alerte.depotCode ?? '--' }}</small>
+                      <small>{{ alerte.boutiqueNom ?? '--' }}</small>
                     </div>
                     <div class="text-end">
                       <strong>{{ formatMontant(alerte.quantiteTheorique) }}</strong>
@@ -232,7 +236,7 @@
               >
                 <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Select</option>
                 @for (mouvement of mouvementsAccessibles().slice(0, 50); track mouvement.id) {
-                  <option [value]="mouvement.id">{{ mouvement.reference }} - {{ mouvement.typeMouvement }}</option>
+                  <option [ngValue]="mouvement.id">{{ mouvement.reference }} - {{ mouvement.typeMouvement }}</option>
                 }
               </select>
             </label>
@@ -261,6 +265,157 @@
             </button>
           </article>
         </div>
+      </div>
+    }
+
+    @if (ongletActif() === 'approvisionnement') {
+      <div class="adm-form-layout">
+        <div class="adm-form-layout__main">
+          <article class="adm-card">
+            <div class="adm-card__header">
+              <div>
+                <h2 jhiTranslate="stockOperations.supply.title">Approvisionnement</h2>
+                <p>Ajoutez une quantite a un article. Le depot technique est gere automatiquement par boutique.</p>
+              </div>
+            </div>
+
+            <div class="adm-form-grid">
+              <label class="adm-field">
+                <span jhiTranslate="stockOperations.fields.shop">Boutique</span>
+                <select
+                  class="adm-select"
+                  [ngModel]="approvisionnementBoutiqueId()"
+                  (ngModelChange)="changerBoutiqueApprovisionnement($event ? +$event : null)"
+                >
+                  <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Selectionner</option>
+                  @for (boutique of boutiquesAccessibles(); track boutique.id) {
+                    <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="adm-field">
+                <span>Groupe d'article</span>
+                <select
+                  class="adm-select"
+                  [ngModel]="approvisionnementGroupeId()"
+                  (ngModelChange)="changerGroupeApprovisionnement($event ? +$event : null)"
+                >
+                  <option [ngValue]="null">Tous les groupes</option>
+                  @for (groupe of groupeArticles(); track groupe.id) {
+                    <option [ngValue]="groupe.id">{{ groupe.libelle }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="adm-field adm-field--wide">
+                <span jhiTranslate="stockOperations.fields.product">Article</span>
+                <select
+                  class="adm-select"
+                  [ngModel]="approvisionnementProduitId()"
+                  (ngModelChange)="changerArticleApprovisionnement($event ? +$event : null)"
+                >
+                  <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Selectionner</option>
+                  @for (produit of produitsApprovisionnement().slice(0, 500); track produit.id) {
+                    <option [ngValue]="produit.id">{{ produit.designation }} - {{ produit.codeInterne }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="adm-field">
+                <span jhiTranslate="stockOperations.fields.quantity">Quantity</span>
+                <input
+                  class="adm-input"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  [ngModel]="approvisionnementQuantite()"
+                  (ngModelChange)="approvisionnementQuantite.set(+$event || 0)"
+                />
+              </label>
+
+              <label class="adm-field">
+                <span jhiTranslate="stockOperations.fields.date">Date</span>
+                <input
+                  class="adm-input"
+                  type="datetime-local"
+                  [ngModel]="approvisionnementDate()"
+                  (ngModelChange)="approvisionnementDate.set($event)"
+                />
+              </label>
+
+              <label class="adm-field">
+                <span jhiTranslate="stockOperations.fields.reference">Reference</span>
+                <input
+                  class="adm-input"
+                  type="text"
+                  [ngModel]="approvisionnementReference()"
+                  (ngModelChange)="approvisionnementReference.set($event)"
+                  [placeholder]="'stockOperations.placeholders.optionalReference' | translate"
+                />
+              </label>
+
+              <label class="adm-field adm-field--wide">
+                <span jhiTranslate="stockOperations.fields.observation">Observation</span>
+                <textarea
+                  class="adm-input adm-input--textarea"
+                  rows="3"
+                  [ngModel]="approvisionnementObservation()"
+                  (ngModelChange)="approvisionnementObservation.set($event)"
+                  placeholder="Note interne, bon fournisseur ou contexte de reception"
+                ></textarea>
+              </label>
+            </div>
+
+            <div class="adm-page-header__actions">
+              <button
+                type="button"
+                class="adm-button adm-button--primary"
+                (click)="validerApprovisionnement()"
+                [disabled]="
+                  !permissionsUi.peutGererStock() || !formulaireApprovisionnementValide() || actionEnCours() === 'approvisionnement'
+                "
+              >
+                {{
+                  (actionEnCours() === 'approvisionnement' ? 'stockOperations.actions.supplying' : 'stockOperations.actions.validateSupply')
+                    | translate
+                }}
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <aside class="adm-form-layout__aside">
+          <article class="adm-card">
+            <div class="adm-card__header">
+              <div>
+                <h2>Article selectionne</h2>
+                <p>Controle rapide avant validation.</p>
+              </div>
+            </div>
+
+            <div class="adm-detail-grid">
+              <div class="adm-detail-block adm-detail-block--full">
+                <span class="adm-detail-block__label">Article</span>
+                <strong>{{ articleApprovisionnement()?.designation ?? '--' }}</strong>
+              </div>
+              <div class="adm-detail-block">
+                <span class="adm-detail-block__label">Code</span>
+                <strong class="adm-code">{{ articleApprovisionnement()?.codeInterne ?? '--' }}</strong>
+              </div>
+              <div class="adm-detail-block">
+                <span class="adm-detail-block__label">Stock actuel</span>
+                <strong>{{ formatMontant(stockArticleApprovisionnement()?.quantiteTheorique) }}</strong>
+              </div>
+              <div class="adm-detail-block">
+                <span class="adm-detail-block__label">Apres validation</span>
+                <strong>
+                  {{ formatMontant((stockArticleApprovisionnement()?.quantiteTheorique ?? 0) + (approvisionnementQuantite() || 0)) }}
+                </strong>
+              </div>
+            </div>
+          </article>
+        </aside>
       </div>
     }
 
@@ -369,7 +524,7 @@
               <select class="adm-select" [ngModel]="receptionProduitId()" (ngModelChange)="receptionProduitId.set($event ? +$event : null)">
                 <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Select</option>
                 @for (produit of produitsAccessibles().slice(0, 500); track produit.id) {
-                  <option [value]="produit.id">{{ produit.designation }}</option>
+                  <option [ngValue]="produit.id">{{ produit.designation }}</option>
                 }
               </select>
             </label>
@@ -406,30 +561,35 @@
           <article class="adm-card">
             <div class="adm-card__header">
               <div>
-                <h2 jhiTranslate="stockOperations.receptions.validateTitle">Validate reception</h2>
-                <p jhiTranslate="stockOperations.receptions.validateDescription">Choose the warehouse where stock will be added.</p>
+                <h2 jhiTranslate="stockOperations.receptions.validateTitle">Valider la reception</h2>
+                <p>La reception sera validee et le stock mis a jour automatiquement.</p>
               </div>
             </div>
 
-            <label class="adm-field">
-              <span jhiTranslate="stockOperations.fields.destinationWarehouse">Destination warehouse</span>
-              <select
-                class="adm-select"
-                [ngModel]="receptionDepotValidationId()"
-                (ngModelChange)="receptionDepotValidationId.set($event ? +$event : null)"
-              >
-                <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Select</option>
-                @for (depot of depotsFiltres(); track depot.id) {
-                  <option [value]="depot.id">{{ depot.code }} - {{ depot.libelle }}</option>
-                }
-              </select>
-            </label>
+            @if (!receptionSelectionnee()) {
+              <div class="adm-empty-inline">Selectionnez une reception dans la liste pour la valider.</div>
+            } @else {
+              <div class="adm-detail-grid">
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label">Reference</span>
+                  <strong class="adm-code">{{ receptionSelectionnee()?.reference ?? '--' }}</strong>
+                </div>
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label">Boutique</span>
+                  <strong>{{ receptionSelectionnee()?.boutique?.nom ?? '--' }}</strong>
+                </div>
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label">Lignes scannees</span>
+                  <strong>{{ lignesReception().length }}</strong>
+                </div>
+              </div>
+            }
 
             <button
               type="button"
               class="adm-button adm-button--primary adm-button--block"
               (click)="validerReception()"
-              [disabled]="!permissionsUi.peutGererStock() || actionEnCours() === 'validation-reception'"
+              [disabled]="!permissionsUi.peutGererStock() || !receptionSelectionnee() || actionEnCours() === 'validation-reception'"
             >
               {{
                 (actionEnCours() === 'validation-reception'
@@ -459,9 +619,8 @@
                 <thead>
                   <tr>
                     <th jhiTranslate="stockOperations.fields.reference">Reference</th>
-                    <th jhiTranslate="stockOperations.fields.shop">Shop</th>
-                    <th jhiTranslate="stockOperations.fields.warehouse">Warehouse</th>
-                    <th jhiTranslate="stockOperations.fields.status">Status</th>
+                    <th jhiTranslate="stockOperations.fields.shop">Boutique</th>
+                    <th jhiTranslate="stockOperations.fields.status">Statut</th>
                     <th jhiTranslate="stockOperations.fields.action">Action</th>
                   </tr>
                 </thead>
@@ -470,7 +629,6 @@
                     <tr>
                       <td class="adm-code">{{ inventaire.reference ?? '--' }}</td>
                       <td>{{ inventaire.boutique?.nom ?? '--' }}</td>
-                      <td>{{ inventaire.depot?.code ?? '--' }}</td>
                       <td>
                         {{ inventaire.statut ? ('admSupervisionVentesApp.StatutInventaire.' + inventaire.statut | translate) : '--' }}
                       </td>
@@ -481,14 +639,14 @@
                           (click)="selectionnerInventaire(inventaire.id)"
                           jhiTranslate="stockOperations.actions.open"
                         >
-                          Open
+                          Ouvrir
                         </button>
                       </td>
                     </tr>
                   } @empty {
                     <tr>
-                      <td colspan="5" class="adm-table-empty" jhiTranslate="stockOperations.inventories.empty">
-                        No inventory in the current shop scope.
+                      <td colspan="4" class="adm-table-empty" jhiTranslate="stockOperations.inventories.empty">
+                        Aucun inventaire sur ce perimetre.
                       </td>
                     </tr>
                   }
@@ -566,7 +724,7 @@
               >
                 <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Select</option>
                 @for (produit of produitsAccessibles().slice(0, 500); track produit.id) {
-                  <option [value]="produit.id">{{ produit.designation }}</option>
+                  <option [ngValue]="produit.id">{{ produit.designation }}</option>
                 }
               </select>
             </label>
@@ -750,7 +908,7 @@
               <select class="adm-select" [ngModel]="transfertProduitId()" (ngModelChange)="transfertProduitId.set($event ? +$event : null)">
                 <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Select</option>
                 @for (produit of produitsTransfert().slice(0, 500); track produit.id) {
-                  <option [value]="produit.id">{{ produit.designation }}</option>
+                  <option [ngValue]="produit.id">{{ produit.designation }}</option>
                 }
               </select>
             </label>
@@ -787,46 +945,35 @@
           <article class="adm-card">
             <div class="adm-card__header">
               <div>
-                <h2 jhiTranslate="stockOperations.transfers.validateTitle">Validate transfer</h2>
-                <p jhiTranslate="stockOperations.transfers.validateDescription">
-                  Select the source and destination warehouses used by the backend workflow.
-                </p>
+                <h2 jhiTranslate="stockOperations.transfers.validateTitle">Valider le transfert</h2>
+                <p>Le stock sera debite de la boutique d'origine et credite a la boutique de destination.</p>
               </div>
             </div>
 
-            <label class="adm-field">
-              <span jhiTranslate="stockOperations.fields.originWarehouse">Origin warehouse</span>
-              <select
-                class="adm-select"
-                [ngModel]="transfertDepotOrigineId()"
-                (ngModelChange)="transfertDepotOrigineId.set($event ? +$event : null)"
-              >
-                <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Select</option>
-                @for (depot of depotsOrigineTransfert(); track depot.id) {
-                  <option [value]="depot.id">{{ depot.code }} - {{ depot.libelle }}</option>
-                }
-              </select>
-            </label>
-
-            <label class="adm-field">
-              <span jhiTranslate="stockOperations.fields.destinationWarehouse">Destination warehouse</span>
-              <select
-                class="adm-select"
-                [ngModel]="transfertDepotDestinationId()"
-                (ngModelChange)="transfertDepotDestinationId.set($event ? +$event : null)"
-              >
-                <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Select</option>
-                @for (depot of depotsDestinationTransfert(); track depot.id) {
-                  <option [value]="depot.id">{{ depot.code }} - {{ depot.libelle }}</option>
-                }
-              </select>
-            </label>
+            @if (!transfertSelectionne()) {
+              <div class="adm-empty-inline">Selectionnez un transfert dans la liste pour le valider.</div>
+            } @else {
+              <div class="adm-detail-grid">
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label">Origine</span>
+                  <strong>{{ transfertSelectionne()?.boutiqueOrigine?.nom ?? '--' }}</strong>
+                </div>
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label">Destination</span>
+                  <strong>{{ transfertSelectionne()?.boutiqueDestination?.nom ?? '--' }}</strong>
+                </div>
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label">Lignes</span>
+                  <strong>{{ lignesTransfert().length }}</strong>
+                </div>
+              </div>
+            }
 
             <button
               type="button"
               class="adm-button adm-button--primary adm-button--block"
               (click)="validerTransfert()"
-              [disabled]="!permissionsUi.peutGererStock() || actionEnCours() === 'validation-transfert'"
+              [disabled]="!permissionsUi.peutGererStock() || !transfertSelectionne() || actionEnCours() === 'validation-transfert'"
             >
               {{
                 (actionEnCours() === 'validation-transfert'

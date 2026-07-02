@@ -46,7 +46,7 @@ interface TypeRapportOption {
 })
 export default class ReportingComponent implements OnInit {
   readonly permissionsUi = inject(UiPermissionService);
-  readonly typesRapport: ReadonlyArray<TypeRapportOption> = [
+  readonly typesRapport: readonly TypeRapportOption[] = [
     {
       valeur: 'ventes-par-jour',
       labelKey: 'reporting.types.salesByDay.label',
@@ -312,6 +312,6 @@ export default class ReportingComponent implements OnInit {
   }
 
   private localeCourante(): string {
-    return this.translateService.currentLang === 'en' ? 'en-US' : 'fr-FR';
+    return this.translateService.getCurrentLang() === 'en' ? 'en-US' : 'fr-FR';
   }
 }

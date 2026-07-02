@@ -496,11 +496,11 @@ export default class Caisse implements OnInit {
     await this.chargerDetailsVente(venteId);
   }
 
-  async annulerVenteSelectionnee(): Promise<void> {
+  annulerVenteSelectionnee(): void {
     this.ouvrirOperationHistorique('ANNULATION');
   }
 
-  async retournerVenteSelectionnee(): Promise<void> {
+  retournerVenteSelectionnee(): void {
     this.ouvrirOperationHistorique('RETOUR');
   }
 
@@ -726,7 +726,7 @@ export default class Caisse implements OnInit {
   private genererContenuTicket(
     vente: IVente,
     lignes: ILigneVente[],
-    paiements: Array<{ montant?: number | null; modePaiement?: { libelle?: string | null } | null }>,
+    paiements: { montant?: number | null; modePaiement?: { libelle?: string | null } | null }[],
   ): string {
     const lignesTexte = lignes
       .map(
@@ -789,7 +789,7 @@ export default class Caisse implements OnInit {
   }
 
   private localeCourante(): string {
-    return this.translateService.currentLang === 'en' ? 'en-US' : 'fr-FR';
+    return this.translateService.getCurrentLang() === 'en' ? 'en-US' : 'fr-FR';
   }
 
   private paramsBoutiquesAccessibles(): Record<string, string | number> {

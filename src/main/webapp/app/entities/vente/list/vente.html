@@ -82,7 +82,7 @@
                 </td>
                 <td>{{ vente.vendeur?.login ?? '—' }}</td>
                 <td class="text-end">
-                  <strong>{{ vente.montantNet != null ? (vente.montantNet | number: '1.0-0') + ' FCFA' : '—' }}</strong>
+                  <strong>{{ vente.montantNet !== null ? (vente.montantNet | number: '1.0-0') + ' FCFA' : '—' }}</strong>
                   @if (vente.montantRemise && vente.montantRemise > 0) {
                     <br /><small class="adm-text--muted">Remise : -{{ vente.montantRemise | number: '1.0-0' }}</small>
                   }

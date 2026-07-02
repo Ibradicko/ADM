@@ -1,7 +1,9 @@
 package com.adm.supervision.service;
 
 import com.adm.supervision.domain.Boutique;
+import com.adm.supervision.domain.DepotStock;
 import com.adm.supervision.repository.BoutiqueRepository;
+import com.adm.supervision.repository.DepotStockRepository;
 import com.adm.supervision.service.dto.BoutiqueDTO;
 import com.adm.supervision.service.mapper.BoutiqueMapper;
 import java.util.Optional;
@@ -24,9 +26,16 @@ public class BoutiqueService {
 
     private final BoutiqueMapper boutiqueMapper;
 
-    public BoutiqueService(BoutiqueRepository boutiqueRepository, BoutiqueMapper boutiqueMapper) {
+    private final DepotStockRepository depotStockRepository;
+
+    public BoutiqueService(
+        BoutiqueRepository boutiqueRepository,
+        BoutiqueMapper boutiqueMapper,
+        DepotStockRepository depotStockRepository
+    ) {
         this.boutiqueRepository = boutiqueRepository;
         this.boutiqueMapper = boutiqueMapper;
+        this.depotStockRepository = depotStockRepository;
     }
 
     /**
@@ -40,6 +49,7 @@ public class BoutiqueService {
         assertCodeAvailable(boutiqueDTO.getCode(), null);
         Boutique boutique = boutiqueMapper.toEntity(boutiqueDTO);
         boutique = boutiqueRepository.save(boutique);
+        creerDepotSiAbsent(boutique);
         return boutiqueMapper.toDto(boutique);
     }
 
@@ -109,6 +119,19 @@ public class BoutiqueService {
                 "La boutique ne peut pas etre supprimee car elle est deja utilisee par des operations, des stocks ou des affectations"
             );
         }
+    }
+
+    private void creerDepotSiAbsent(Boutique boutique) {
+        if (depotStockRepository.existsByBoutiqueId(boutique.getId())) {
+            return;
+        }
+        String code = ("DPT-" + boutique.getId()).substring(0, Math.min(30, ("DPT-" + boutique.getId()).length()));
+        String libelle =
+            boutique.getNom() != null
+                ? ("Dépôt " + boutique.getNom()).substring(0, Math.min(150, ("Dépôt " + boutique.getNom()).length()))
+                : "Dépôt principal";
+        depotStockRepository.save(new DepotStock().code(code).libelle(libelle).actif(true).boutique(boutique));
+        LOG.debug("Dépôt auto-créé pour la boutique : {}", boutique.getNom());
     }
 
     private void assertCodeAvailable(String code, Long currentBoutiqueId) {

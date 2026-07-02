@@ -178,6 +178,9 @@ export default class SettingsCenterComponent implements OnInit {
   readonly nouvelUtilisateurEmail = signal('');
   readonly nouvelUtilisateurBoutiqueId = signal<number | null>(null);
   readonly nouvelUtilisateurProfilId = signal<number | null>(null);
+  readonly dernierIdentifiantVendeur = signal('');
+  readonly dernierMotDePasseTemporaire = signal('');
+  readonly nouveauVendeurModalOuverte = signal(false);
 
   readonly formatsBarcode = ['EAN13', 'EAN8', 'CODE128', 'QR_CODE', 'INTERNE'] as const;
   readonly typesBoutique = Object.values(TypeBoutique);
@@ -238,6 +241,15 @@ export default class SettingsCenterComponent implements OnInit {
     }),
   );
   readonly affectationsActives = computed(() => this.affectationsVisibles().filter(affectation => affectation.actif));
+  readonly utilisateursParId = computed(() => {
+    const map = new Map<number, IUserManagement>();
+    for (const utilisateur of this.utilisateurs()) {
+      if (utilisateur.id) {
+        map.set(utilisateur.id, utilisateur);
+      }
+    }
+    return map;
+  });
   readonly parametresActifs = computed(() => this.parametresGlobaux().filter(parametre => parametre.actif).length);
   readonly boutiquesParametrables = computed(() => {
     if (this.permissionsUi.estAdmin() || this.permissionsUi.codesProfil().has('MANAGER_ADM')) {
@@ -253,6 +265,9 @@ export default class SettingsCenterComponent implements OnInit {
   );
   readonly boutiquesNouvelUtilisateurFiltrees = computed(() =>
     this.filtrerBoutiques(this.boutiquesParametrables(), this.rechercheNouvelUtilisateurBoutique()),
+  );
+  readonly boutiqueNouvelUtilisateurSelectionnee = computed(
+    () => this.boutiquesParametrables().find(boutique => boutique.id === this.nouvelUtilisateurBoutiqueId()) ?? null,
   );
   readonly boutiquesAffectationFiltrees = computed(() =>
     this.filtrerBoutiques(this.boutiquesParametrables(), this.rechercheAffectationBoutique()),
@@ -615,6 +630,8 @@ export default class SettingsCenterComponent implements OnInit {
     }
 
     this.enregistrement.set(true);
+    this.dernierIdentifiantVendeur.set('');
+    this.dernierMotDePasseTemporaire.set('');
     try {
       const utilisateur = await this.creerCompteUtilisateur({
         login: this.nouvelUtilisateurLogin(),
@@ -629,6 +646,9 @@ export default class SettingsCenterComponent implements OnInit {
       }
       this.reinitialiserFormulaireUtilisateurBoutique();
       await this.recharger();
+      this.dernierIdentifiantVendeur.set(utilisateur.login);
+      this.dernierMotDePasseTemporaire.set('Adm@2026');
+      this.fermerNouveauVendeurModal();
       this.message.set({ type: 'success', key: 'settingsCenter.messages.shopUserCreated' });
     } catch {
       this.message.set({ type: 'danger', key: 'settingsCenter.messages.shopUserCreateFailed' });
@@ -723,6 +743,29 @@ export default class SettingsCenterComponent implements OnInit {
     }
   }
 
+  async basculerVendeur(affectation: IAffectationUtilisateur): Promise<void> {
+    if (!this.permissionsUi.peutGererAffectationsBoutique() || !affectation.id) {
+      return;
+    }
+
+    this.enregistrement.set(true);
+    try {
+      const action = this.vendeurActif(affectation)
+        ? this.userManagementService.deactivateSellerAssignment(affectation.id)
+        : this.userManagementService.activateSellerAssignment(affectation.id);
+      await firstValueFrom(action);
+      await this.recharger();
+      this.message.set({
+        type: 'success',
+        key: this.vendeurActif(affectation) ? 'settingsCenter.messages.assignmentUpdated' : 'settingsCenter.messages.assignmentUpdated',
+      });
+    } catch {
+      this.message.set({ type: 'danger', key: 'settingsCenter.messages.assignmentUpdateFailed' });
+    } finally {
+      this.enregistrement.set(false);
+    }
+  }
+
   permissionCochee(permissionId: number): boolean {
     return this.permissionIdsProfil().includes(permissionId);
   }
@@ -782,6 +825,20 @@ export default class SettingsCenterComponent implements OnInit {
     this.fermerSelecteur(selecteur);
   }
 
+  ouvrirNouveauVendeurModal(): void {
+    if (!this.nouvelUtilisateurBoutiqueId() && this.boutiquesParametrables().length) {
+      this.nouvelUtilisateurBoutiqueId.set(this.boutiquesParametrables()[0].id);
+    }
+    if (!this.nouvelUtilisateurProfilId() && this.profilsUtilisateursBoutique().length) {
+      this.nouvelUtilisateurProfilId.set(this.profilsUtilisateursBoutique()[0].id);
+    }
+    this.nouveauVendeurModalOuverte.set(true);
+  }
+
+  fermerNouveauVendeurModal(): void {
+    this.nouveauVendeurModalOuverte.set(false);
+  }
+
   selectionnerAffectationUtilisateur(userId: number | null, selecteur?: HTMLDetailsElement): void {
     this.affectationUserId.set(userId);
     this.rechercheAffectationUtilisateur.set('');
@@ -829,6 +886,20 @@ export default class SettingsCenterComponent implements OnInit {
 
   formatProfil(profil: IProfilMetier): string {
     return [profil.code, profil.libelle].filter(Boolean).join(' - ');
+  }
+
+  utilisateurPourAffectation(affectation: IAffectationUtilisateur): IUserManagement | null {
+    const userId = affectation.user?.id;
+    return userId ? (this.utilisateursParId().get(userId) ?? null) : null;
+  }
+
+  vendeurActif(affectation: IAffectationUtilisateur): boolean {
+    const utilisateur = this.utilisateurPourAffectation(affectation);
+    return affectation.actif === true && utilisateur?.activated !== false;
+  }
+
+  vendeurDoitChangerMotDePasse(affectation: IAffectationUtilisateur): boolean {
+    return this.utilisateurPourAffectation(affectation)?.mustChangePassword === true;
   }
 
   codeParametreBoutique(boutiqueId: number, code: string): string {
@@ -968,6 +1039,8 @@ export default class SettingsCenterComponent implements OnInit {
     profilId: number;
   }): Promise<IUserManagement> {
     const login = source.login.trim().toLowerCase();
+    const profilCode = (this.profilsUtilisateursBoutique().find(p => p.id === source.profilId)?.code ?? '').toUpperCase();
+    const authorities = profilCode === 'VENDEUR' ? ['ROLE_USER', 'ROLE_VENDEUR'] : ['ROLE_USER'];
     const payload: IUserManagement = {
       login,
       email: source.email.trim().toLowerCase(),
@@ -975,7 +1048,7 @@ export default class SettingsCenterComponent implements OnInit {
       lastName: source.lastName.trim() || null,
       activated: true,
       langKey: 'fr',
-      authorities: ['ROLE_USER'],
+      authorities,
     };
     if (!this.estGestionAdm()) {
       return firstValueFrom(this.userManagementService.createForBoutique(payload, source.boutiqueId, source.profilId));

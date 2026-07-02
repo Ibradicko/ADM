@@ -87,10 +87,10 @@ export default class AuditSupervisionComponent implements OnInit {
       if (this.typeAction() && evenement.typeAction !== this.typeAction()) {
         return false;
       }
-      if (debut && evenement.dateAction && evenement.dateAction.isBefore(dayjs(debut), 'day')) {
+      if (debut && evenement.dateAction?.isBefore(dayjs(debut), 'day')) {
         return false;
       }
-      if (fin && evenement.dateAction && evenement.dateAction.isAfter(dayjs(fin).endOf('day'))) {
+      if (fin && evenement.dateAction?.isAfter(dayjs(fin).endOf('day'))) {
         return false;
       }
       if (!texte) {

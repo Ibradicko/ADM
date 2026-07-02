@@ -8,6 +8,7 @@
     },
     "tabs": {
       "stock": "Stock",
+      "supply": "Approvisionnement",
       "receptions": "Réceptions",
       "inventories": "Inventaires",
       "transfers": "Transferts"
@@ -43,6 +44,7 @@
       "movement": "Mouvement",
       "origin": "Origine",
       "originWarehouse": "Dépôt d'origine",
+      "observation": "Observation",
       "product": "Article",
       "quantity": "Quantité",
       "reason": "Motif",
@@ -61,6 +63,7 @@
     },
     "placeholders": {
       "searchStock": "Rechercher un article ou un dépôt",
+      "optionalReference": "Optionnelle, générée automatiquement si vide",
       "reverseReason": "Expliquer pourquoi le mouvement doit être reversé"
     },
     "actions": {
@@ -78,7 +81,10 @@
       "scanning": "Scan en cours...",
       "startInventory": "Démarrer l'inventaire",
       "starting": "Démarrage...",
+      "supply": "Approvisionner",
+      "supplying": "Approvisionnement...",
       "validateReception": "Valider la réception",
+      "validateSupply": "Valider l'approvisionnement",
       "validateTransfer": "Valider le transfert",
       "validating": "Validation..."
     },
@@ -86,6 +92,10 @@
       "title": "Stocks disponibles",
       "description": "Vue globale des niveaux de stock par article et dépôt.",
       "empty": "Aucune ligne de stock dans le périmètre boutique courant."
+    },
+    "supply": {
+      "title": "Approvisionnement",
+      "description": "Ajout de stock article via le workflow de réception existant."
     },
     "alerts": {
       "title": "Alertes prioritaires",
@@ -138,6 +148,8 @@
       "receptionLineAdded": "La ligne de réception a été ajoutée.",
       "selectReceptionAndDepot": "Sélectionnez une réception et un dépôt de destination.",
       "receptionValidated": "La réception a été validée et le stock mis à jour.",
+      "supplyMissingFields": "Renseignez la boutique, l'article, la quantité et la date.",
+      "supplyValidated": "L'approvisionnement a été validé et le stock mis à jour.",
       "selectInventoryToStart": "Sélectionnez un inventaire à démarrer.",
       "inventoryStarted": "L'inventaire a été démarré.",
       "selectInventoryForCount": "Sélectionnez un inventaire avant de saisir un comptage.",

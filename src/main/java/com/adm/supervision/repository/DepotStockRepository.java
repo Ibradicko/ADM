@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface DepotStockRepository extends JpaRepository<DepotStock, Long>, JpaSpecificationExecutor<DepotStock> {
+    boolean existsByBoutiqueId(Long boutiqueId);
+
     default Optional<DepotStock> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }

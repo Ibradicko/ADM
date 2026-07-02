@@ -86,6 +86,13 @@ export default class Navbar implements OnInit {
       feature: 'exploitations',
     },
     { id: 'locataires', labelKey: 'global.navbar.locataires', route: '/locataire', icon: 'user', feature: 'locataires' },
+    {
+      id: 'groupesArticles',
+      labelKey: 'global.navbar.productGroups',
+      route: '/groupe-article',
+      icon: 'tags',
+      feature: 'settings',
+    },
     { id: 'catalogue', labelKey: 'global.navbar.catalogue', route: '/produit', icon: 'list', feature: 'produits' },
     {
       id: 'catalogueIdentification',
@@ -119,6 +126,7 @@ export default class Navbar implements OnInit {
         'boutiques',
         'contracts',
         'locataires',
+        'groupesArticles',
         'caisse',
         'stocks',
         'redevances',
@@ -131,7 +139,18 @@ export default class Navbar implements OnInit {
     }
 
     if (profils.has('MANAGER_ADM')) {
-      return new Set(['dashboard', 'boutiques', 'contracts', 'locataires', 'redevances', 'reporting', 'audit', 'users', 'settings']);
+      return new Set([
+        'dashboard',
+        'boutiques',
+        'contracts',
+        'locataires',
+        'groupesArticles',
+        'redevances',
+        'reporting',
+        'audit',
+        'users',
+        'settings',
+      ]);
     }
 
     if (this.account()?.authorities.includes('ROLE_LOCATAIRE')) {
@@ -182,12 +201,17 @@ export default class Navbar implements OnInit {
         !this.permissionsUi.estAdmin() &&
         !this.permissionsUi.peutGererBoutiques()
           ? 'global.navbar.myBoutique'
-          : item.id === 'users' &&
+          : item.id === 'catalogue' &&
               this.permissionsUi.estProfilBoutique() &&
               !this.permissionsUi.estProfilAdm() &&
               !this.permissionsUi.estAdmin()
-            ? 'global.navbar.sellerManagement'
-            : item.labelKey,
+            ? 'global.navbar.produits'
+            : item.id === 'users' &&
+                this.permissionsUi.estProfilBoutique() &&
+                !this.permissionsUi.estProfilAdm() &&
+                !this.permissionsUi.estAdmin()
+              ? 'global.navbar.sellerManagement'
+              : item.labelKey,
     })),
   );
   readonly activeSectionLabelKey = computed(

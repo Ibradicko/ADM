@@ -42,6 +42,7 @@
             <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
               <th scope="col" jhiSortBy="code">Code <fa-icon icon="sort" /></th>
               <th scope="col" jhiSortBy="libelle">Libellé <fa-icon icon="sort" /></th>
+              <th scope="col" jhiSortBy="tauxRedevance" class="text-end">Taux redevance <fa-icon icon="sort" /></th>
               <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
               <th scope="col" class="text-end">Actions</th>
             </tr>
@@ -53,6 +54,7 @@
                   <span class="adm-code">{{ groupeArticle.code ?? '—' }}</span>
                 </td>
                 <td>{{ groupeArticle.libelle ?? '—' }}</td>
+                <td class="text-end">{{ groupeArticle.tauxRedevance ?? 0 }}%</td>
                 <td>
                   <span
                     class="adm-pill"
@@ -74,6 +76,7 @@
                       <fa-icon icon="eye" />
                     </a>
                     @if (permissionsUi.peutAdministrerParametresGlobaux()) {
+                      <a [routerLink]="['/groupe-article', groupeArticle.id, 'edit']" class="adm-icon-button" title="Définir taux"> % </a>
                       <a
                         [routerLink]="['/groupe-article', groupeArticle.id, 'edit']"
                         class="adm-icon-button"

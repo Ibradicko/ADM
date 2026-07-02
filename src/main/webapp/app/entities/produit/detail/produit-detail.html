@@ -35,7 +35,7 @@
       </article>
       <article class="adm-stat-card">
         <span jhiTranslate="productCustom.fields.royalty">Royalty</span>
-        <strong>{{ formatTaux(produitRef.tauxRedevanceApplicable) }}</strong>
+        <strong>{{ formatTaux(produitRef.groupeArticle?.tauxRedevance) }}</strong>
       </article>
       <article class="adm-stat-card">
         <span jhiTranslate="admSupervisionVentesApp.produit.statut">Status</span>
@@ -105,7 +105,7 @@
           </div>
           <div class="adm-detail-block">
             <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.tauxRedevanceApplicable">Royalty rate</span>
-            <strong>{{ formatTaux(produitRef.tauxRedevanceApplicable) }}</strong>
+            <strong>{{ formatTaux(produitRef.groupeArticle?.tauxRedevance) }}</strong>
           </div>
           <div class="adm-detail-block">
             <span class="adm-detail-block__label" jhiTranslate="productCustom.fields.technicalId">Technical identifier</span>

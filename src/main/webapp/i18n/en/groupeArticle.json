@@ -21,7 +21,7 @@
       "code": "Code",
       "libelle": "Libelle",
       "statut": "Statut",
-      "boutique": "Boutique"
+      "tauxRedevance": "Royalty rate"
     }
   }
 }

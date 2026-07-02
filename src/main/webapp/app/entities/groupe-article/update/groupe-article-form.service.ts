@@ -21,7 +21,7 @@ type GroupeArticleFormGroupContent = {
   code: FormControl<IGroupeArticle['code']>;
   libelle: FormControl<IGroupeArticle['libelle']>;
   statut: FormControl<IGroupeArticle['statut']>;
-  boutique: FormControl<IGroupeArticle['boutique']>;
+  tauxRedevance: FormControl<IGroupeArticle['tauxRedevance']>;
 };
 
 export type GroupeArticleFormGroup = FormGroup<GroupeArticleFormGroupContent>;
@@ -50,8 +50,8 @@ export class GroupeArticleFormService {
       statut: new FormControl(groupeArticleRawValue.statut, {
         validators: [Validators.required],
       }),
-      boutique: new FormControl(groupeArticleRawValue.boutique, {
-        validators: [Validators.required],
+      tauxRedevance: new FormControl(groupeArticleRawValue.tauxRedevance, {
+        validators: [Validators.required, Validators.min(0), Validators.max(100)],
       }),
     });
   }
