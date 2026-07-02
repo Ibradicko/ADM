@@ -2,13 +2,26 @@
   display: block;
 }
 
+.adm-caisse {
+  --pos-accent: #0f766e;
+  --pos-accent-strong: #115e59;
+  --pos-warn: #f59e0b;
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.08), rgba(255, 255, 255, 0) 18rem), var(--adm-page-bg, #f6f8fb);
+}
+
+.adm-pos-header {
+  align-items: flex-start;
+  gap: 1rem;
+}
+
 .adm-pos-tabs {
   display: inline-flex;
   gap: 0.35rem;
   padding: 0.3rem;
   border: 1px solid var(--adm-border);
-  border-radius: 1rem;
-  background: var(--adm-surface-soft);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
 .adm-pos-tab {
@@ -17,40 +30,186 @@
   gap: 0.5rem;
   padding: 0.6rem 1.1rem;
   border: none;
-  border-radius: 0.8rem;
+  border-radius: 0.55rem;
   background: transparent;
   color: var(--adm-text-soft);
   font-weight: 600;
 }
 
 .adm-pos-tab--active {
-  background: var(--adm-sidebar);
+  background: var(--pos-accent);
   color: #fff;
-  box-shadow: 0 8px 18px rgba(11, 31, 58, 0.18);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.22);
 }
 
 .adm-pos-context {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   align-items: center;
   gap: 0.85rem;
   flex-wrap: wrap;
+  padding: 0.85rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.07);
+  backdrop-filter: blur(10px);
 }
 
 .adm-pos-context .adm-field {
-  min-width: 9rem;
+  min-width: 13rem;
+  flex: 1 1 13rem;
+}
+
+.adm-pos-context details {
+  flex: 2 1 18rem;
+}
+
+.adm-pos-shop-context {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.adm-pos-shop-context__label {
+  color: var(--adm-text-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.adm-pos-shop-context__value {
+  color: var(--adm-text);
+  font-size: 0.95rem;
+}
+
+.adm-pos-shop-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.adm-pos-shop-pill {
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--adm-border);
+  background: #fff;
+  color: var(--adm-text);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.adm-pos-shop-pill--active {
+  background: var(--pos-accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.adm-pos-context summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--adm-text);
+}
+
+.adm-pos-summary {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1.4fr) minmax(12rem, 1.2fr) repeat(3, minmax(8rem, 1fr));
+  gap: 0.75rem;
+}
+
+.adm-pos-summary > div {
+  min-height: 4.4rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 0.7rem;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.adm-pos-summary span {
+  display: block;
+  color: var(--adm-text-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.adm-pos-summary strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--adm-text);
+  font-size: 1.15rem;
+  line-height: 1.2;
 }
 
 .adm-pos-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 22rem);
-  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1.45fr) minmax(22rem, 25rem);
+  gap: 1rem;
   align-items: start;
 }
 
 .adm-pos-main {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.9rem;
+}
+
+.adm-caisse-panel {
+  border-radius: 0.75rem;
+}
+
+.adm-pos-search-panel {
+  border-color: rgba(15, 118, 110, 0.22);
+  box-shadow: 0 18px 35px rgba(15, 118, 110, 0.08);
+}
+
+.adm-pos-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.adm-pos-section-heading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.adm-pos-section-heading p {
+  margin: 0.2rem 0 0;
+  color: var(--adm-text-soft);
+  font-size: 0.86rem;
+}
+
+.adm-pos-section-heading__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.adm-pos-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.adm-caisse-scan-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.adm-caisse-scan-input input {
+  min-height: 3rem;
+  font-size: 1rem;
 }
 
 .adm-pos-categories {
@@ -63,7 +222,7 @@
 .adm-pos-category {
   flex: 0 0 auto;
   padding: 0.5rem 1rem;
-  border-radius: 999px;
+  border-radius: 0.65rem;
   border: 1px solid var(--adm-border);
   background: #fff;
   color: var(--adm-text);
@@ -73,16 +232,17 @@
 }
 
 .adm-pos-category--active {
-  background: var(--adm-sidebar);
+  background: var(--pos-accent);
   color: #fff;
   border-color: transparent;
 }
 
 .adm-pos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   gap: 0.85rem;
-  max-height: 32rem;
+  max-height: calc(100vh - 21rem);
+  min-height: 20rem;
   overflow-y: auto;
   padding-right: 0.25rem;
 }
@@ -92,10 +252,10 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 0.5rem;
-  min-height: 6.5rem;
-  padding: 0.95rem 1rem;
+  min-height: 7.6rem;
+  padding: 1rem;
   border: 1px solid var(--adm-border);
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   background: #fff;
   text-align: left;
   transition:
@@ -104,10 +264,25 @@
     border-color 0.15s ease;
 }
 
+.adm-pos-tile:disabled {
+  cursor: not-allowed;
+}
+
+.adm-pos-tile--disabled {
+  opacity: 0.55;
+  background: var(--adm-surface-soft);
+}
+
 .adm-pos-tile:hover {
   transform: translateY(-2px);
-  border-color: var(--adm-primary);
-  box-shadow: 0 12px 24px rgba(29, 78, 216, 0.12);
+  border-color: var(--pos-accent);
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.12);
+}
+
+.adm-pos-tile:disabled:hover {
+  transform: none;
+  border-color: var(--adm-border);
+  box-shadow: none;
 }
 
 .adm-pos-tile strong {
@@ -122,24 +297,197 @@
 }
 
 .adm-pos-tile__price {
-  align-self: flex-end;
   font-weight: 700;
-  color: var(--adm-primary);
+  color: var(--pos-accent-strong);
+}
+
+.adm-pos-tile__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.adm-pos-stock,
+.adm-stock-line {
+  color: var(--adm-text-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.adm-pos-stock--empty {
+  color: var(--adm-danger);
 }
 
 .adm-pos-sidebar {
   position: sticky;
-  top: 1rem;
+  top: 5.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  max-height: calc(100vh - 2rem);
+  gap: 0.85rem;
+  max-height: calc(100vh - 6rem);
   overflow-y: auto;
 }
 
 .adm-pos-validate {
   width: 100%;
   margin-top: 1rem;
+  min-height: 3.2rem;
+  font-size: 1rem;
+}
+
+.adm-pos-ticket-panel,
+.adm-pos-payment-panel {
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+}
+
+.adm-caisse-cart {
+  max-height: 17rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.adm-caisse-cart-row {
+  border-radius: 0.7rem;
+}
+
+.adm-caisse-cart-row__qty {
+  min-width: 6.75rem;
+}
+
+.adm-caisse-totaux {
+  border-radius: 0.7rem;
+  background: var(--adm-surface-soft);
+}
+
+.adm-pos-payment-panel {
+  margin-top: 1rem;
+}
+
+.adm-pos-payment-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.adm-pos-payment-layout__entries {
+  min-width: 0;
+}
+
+.adm-pos-payment-layout__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: sticky;
+  top: 0.5rem;
+}
+
+.adm-caisse-due-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 0.7rem;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.adm-caisse-due-banner > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.adm-caisse-due-banner > div + div {
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(15, 23, 42, 0.12);
+}
+
+.adm-caisse-due-banner span {
+  color: var(--adm-text-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.adm-caisse-due-banner strong {
+  font-size: 1.1rem;
+  color: var(--pos-warn);
+}
+
+.adm-caisse-due-banner--settled {
+  border-color: rgba(15, 118, 110, 0.3);
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.adm-caisse-due-banner--settled strong {
+  color: var(--pos-accent-strong);
+}
+
+.adm-caisse-paiements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.adm-caisse-paiement-row {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 1.1fr) minmax(9rem, 1.15fr) minmax(8rem, 1.1fr) auto;
+  gap: 0.6rem;
+  align-items: start;
+  padding: 0.75rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 0.7rem;
+  background: #fff;
+}
+
+.adm-caisse-paiement-row--header {
+  padding: 0 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--adm-text-soft);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.adm-caisse-paiement-row--header .adm-caisse-paiement-row__actions-label {
+  justify-self: center;
+}
+
+.adm-caisse-paiement-row .adm-field--compact {
+  gap: 0.3rem;
+}
+
+.adm-caisse-paiement-row .adm-field__mobile-label {
+  display: none;
+}
+
+.adm-caisse-amount-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.adm-caisse-amount-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.adm-caisse-amount-input__solder {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+
+.adm-caisse-paiement-row__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding-top: 1.6rem;
 }
 
 @media (max-width: 1100px) {
@@ -150,5 +498,69 @@
   .adm-pos-sidebar {
     position: static;
     max-height: none;
+  }
+
+  .adm-pos-grid {
+    max-height: none;
+  }
+
+  .adm-pos-payment-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-pos-payment-layout__summary {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .adm-pos-header {
+    flex-direction: column;
+  }
+
+  .adm-pos-tabs,
+  .adm-page-header__actions {
+    width: 100%;
+  }
+
+  .adm-pos-tab {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .adm-pos-context {
+    position: static;
+  }
+
+  .adm-pos-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adm-caisse-scan-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-caisse-paiement-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-caisse-paiement-row--header {
+    display: none;
+  }
+
+  .adm-caisse-paiement-row .adm-field__mobile-label {
+    display: block;
+  }
+
+  .adm-caisse-paiement-row__actions {
+    justify-content: flex-end;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .adm-pos-summary,
+  .adm-pos-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

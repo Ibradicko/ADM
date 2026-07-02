@@ -1,10 +1,12 @@
 package com.adm.supervision.repository;
 
 import com.adm.supervision.domain.Produit;
+import com.adm.supervision.domain.enumeration.StatutGeneral;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,6 +17,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit, Long>, JpaSpecificationExecutor<Produit> {
     Optional<Produit> findByCodeInterneAndBoutique_Id(String codeInterne, Long boutiqueId);
+
+    @Query(
+        "select produit from Produit produit left join fetch produit.groupeArticle where produit.boutique.id = :boutiqueId and produit.statut = :statut"
+    )
+    List<Produit> findByBoutique_IdAndStatut(@Param("boutiqueId") Long boutiqueId, @Param("statut") StatutGeneral statut, Sort sort);
+
+    boolean existsByBoutique_IdAndStatut(Long boutiqueId, StatutGeneral statut);
 
     default Optional<Produit> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);

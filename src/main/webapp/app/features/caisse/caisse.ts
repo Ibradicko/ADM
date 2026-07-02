@@ -10,17 +10,9 @@ import { firstValueFrom } from 'rxjs';
 
 import { AccountService } from 'app/core/auth/account.service';
 import { UiPermissionService } from 'app/core/services/ui-permission.service';
-import { IBoutique } from 'app/entities/boutique/boutique.model';
-import { BoutiqueService } from 'app/entities/boutique/service/boutique.service';
 import { CodeBarresProduitService } from 'app/entities/code-barres-produit/service/code-barres-produit.service';
-import { ILocataire } from 'app/entities/locataire/locataire.model';
-import { LocataireService } from 'app/entities/locataire/service/locataire.service';
-import { IExploitationBoutique } from 'app/entities/exploitation-boutique/exploitation-boutique.model';
-import { ExploitationBoutiqueService } from 'app/entities/exploitation-boutique/service/exploitation-boutique.service';
 import { ILigneVente } from 'app/entities/ligne-vente/ligne-vente.model';
 import { LigneVenteService } from 'app/entities/ligne-vente/service/ligne-vente.service';
-import { IModePaiementRef } from 'app/entities/mode-paiement-ref/mode-paiement-ref.model';
-import { ModePaiementRefService } from 'app/entities/mode-paiement-ref/service/mode-paiement-ref.service';
 import {
   IOperationCorrectiveVente,
   NewOperationCorrectiveVente,
@@ -29,16 +21,15 @@ import { OperationCorrectiveVenteService } from 'app/entities/operation-correcti
 import { IPaiementVente } from 'app/entities/paiement-vente/paiement-vente.model';
 import { PaiementVenteService } from 'app/entities/paiement-vente/service/paiement-vente.service';
 import { IProduit } from 'app/entities/produit/produit.model';
-import { ProduitService } from 'app/entities/produit/service/produit.service';
 import { TypeOperationCorrective } from 'app/entities/enumerations/type-operation-corrective.model';
 import { ITicketCaisse } from 'app/entities/ticket-caisse/ticket-caisse.model';
 import { TicketCaisseService } from 'app/entities/ticket-caisse/service/ticket-caisse.service';
 import { IVente } from 'app/entities/vente/vente.model';
-import { VenteService } from 'app/entities/vente/service/vente.service';
+import { CaissePosteArticle, CaissePosteContexte, VenteService } from 'app/entities/vente/service/vente.service';
 import { TranslateDirective } from 'app/shared/language';
 
 interface CaisseLignePanier {
-  produit: IProduit;
+  article: CaissePosteArticle;
   quantite: number;
   remise: number;
   codeBarresScanne?: string | null;
@@ -76,29 +67,26 @@ type OngletCaisse = 'caisse' | 'historique';
 export default class Caisse implements OnInit {
   readonly account = inject(AccountService).account;
   readonly permissionsUi = inject(UiPermissionService);
-  readonly boutiques = signal<IBoutique[]>([]);
-  readonly locataires = signal<ILocataire[]>([]);
-  readonly exploitations = signal<IExploitationBoutique[]>([]);
-  readonly produits = signal<IProduit[]>([]);
-  readonly modesPaiement = signal<IModePaiementRef[]>([]);
+
+  readonly contexte = signal<CaissePosteContexte | null>(null);
   readonly ventesHistorique = signal<IVente[]>([]);
   readonly panier = signal<CaisseLignePanier[]>([]);
   readonly paiements = signal<CaissePaiementSaisie[]>([{ uid: 1, modePaiementId: null, montant: null, reference: '' }]);
   readonly scanInput = signal('');
   readonly rechercheProduit = signal('');
-  readonly boutiqueId = signal<number | null>(null);
-  readonly locataireId = signal<number | null>(null);
   readonly referencePassager = signal('');
   readonly referenceCarte = signal('');
   readonly commentaire = signal('');
   readonly ticketGenere = signal<ITicketCaisse | null>(null);
   readonly venteGeneree = signal<IVente | null>(null);
   readonly chargement = signal(false);
+  readonly chargementArticles = signal(false);
   readonly enregistrement = signal(false);
   readonly message = signal<MessageCaisse | null>(null);
   readonly scanInconnuAffectable = signal(false);
   readonly activeTab = signal<OngletCaisse>('caisse');
   readonly categorieActive = signal<number | null>(null);
+  readonly chargementPermissions = signal(true);
 
   readonly rechercheHistorique = signal('');
   readonly statutHistorique = signal<string>('TOUS');
@@ -113,27 +101,20 @@ export default class Caisse implements OnInit {
   readonly motifOperationHistorique = signal('');
 
   readonly compteSansIdentifiant = computed(() => !this.account()?.id);
-  readonly modesPaiementActifs = computed(() => this.modesPaiement().filter(mode => mode.actif !== false));
-  readonly produitsDisponibles = computed(() =>
-    this.produits().filter(produit => produit.statut === 'ACTIF' && (!this.boutiqueId() || produit.boutique?.id === this.boutiqueId())),
+  readonly boutique = computed(() => this.contexte()?.boutique ?? null);
+  readonly boutiquesAccessibles = computed(() => this.contexte()?.boutiquesAccessibles ?? []);
+  readonly locataire = computed(() => this.contexte()?.locataire ?? null);
+  readonly modesPaiementActifs = computed(() => (this.contexte()?.modesPaiement ?? []).filter(mode => mode.actif !== false));
+  readonly articlesDisponibles = computed(() => this.contexte()?.articles ?? []);
+  readonly aucunArticleConfigure = computed(
+    () => !this.chargementArticles() && !!this.boutique() && this.articlesDisponibles().length === 0,
   );
-  readonly locatairesDisponibles = computed(() => {
-    if (!this.boutiqueId()) {
-      return [];
-    }
-    const ids = new Set(
-      this.exploitations()
-        .filter(exploitation => exploitation.boutique?.id === this.boutiqueId() && exploitation.statut === 'ACTIF')
-        .map(exploitation => exploitation.locataire?.id)
-        .filter((id): id is number => typeof id === 'number'),
-    );
-    return this.locataires().filter(locataire => ids.has(locataire.id));
-  });
+  readonly articlesEnStock = computed(() => this.articlesDisponibles().filter(article => (article.stockDisponible ?? 0) > 0));
   readonly categories = computed<CategorieCaisse[]>(() => {
     const vues = new Map<number, string>();
-    for (const produit of this.produitsDisponibles()) {
-      if (produit.groupeArticle?.id && !vues.has(produit.groupeArticle.id)) {
-        vues.set(produit.groupeArticle.id, produit.groupeArticle.libelle ?? '--');
+    for (const article of this.articlesDisponibles()) {
+      if (article.groupeArticleId && !vues.has(article.groupeArticleId)) {
+        vues.set(article.groupeArticleId, article.groupeArticleLibelle ?? '--');
       }
     }
     return [...vues.entries()].map(([id, libelle]) => ({ id, libelle })).sort((left, right) => left.libelle.localeCompare(right.libelle));
@@ -142,25 +123,19 @@ export default class Caisse implements OnInit {
     const recherche = this.rechercheProduit().trim().toLowerCase();
     const categorie = this.categorieActive();
 
-    return this.produitsDisponibles().filter(produit => {
-      if (categorie && produit.groupeArticle?.id !== categorie) {
+    return this.articlesDisponibles().filter(article => {
+      if (categorie && article.groupeArticleId !== categorie) {
         return false;
       }
       if (!recherche) {
         return true;
       }
-      return [
-        produit.codeInterne,
-        produit.designation,
-        produit.description,
-        produit.groupeArticle?.libelle,
-        produit.familleArticle?.libelle,
-      ]
+      return [article.codeInterne, article.designation, article.description, article.groupeArticleLibelle]
         .filter(Boolean)
         .some(value => value!.toLowerCase().includes(recherche));
     });
   });
-  readonly sousTotal = computed(() => this.panier().reduce((total, ligne) => total + (ligne.produit.prixVente ?? 0) * ligne.quantite, 0));
+  readonly sousTotal = computed(() => this.panier().reduce((total, ligne) => total + (ligne.article.prixVente ?? 0) * ligne.quantite, 0));
   readonly totalRemise = computed(() => this.panier().reduce((total, ligne) => total + ligne.remise, 0));
   readonly totalNet = computed(() => this.arrondirMontant(this.sousTotal() - this.totalRemise()));
   readonly totalPaiements = computed(() =>
@@ -171,10 +146,11 @@ export default class Caisse implements OnInit {
   readonly resteAPayer = computed(() => this.arrondirMontant(this.totalNet() - this.totalPaiements()));
   readonly peutValider = computed(
     () =>
-      !!this.boutiqueSelectionnee() &&
-      !!this.locataireSelectionne() &&
+      !!this.boutique() &&
+      !!this.locataire() &&
       !this.compteSansIdentifiant() &&
       this.panier().length > 0 &&
+      this.panierStockValide() &&
       this.totalNet() > 0 &&
       this.totalPaiements() > 0 &&
       this.resteAPayer() === 0,
@@ -208,14 +184,11 @@ export default class Caisse implements OnInit {
       !this.permissionsUi.estProfilBoutique(),
   );
   readonly peutVoirHistoriqueSav = computed(() => !this.estVendeurPoste());
+  readonly peutVoirHistoriqueVentes = computed(() => this.permissionsUi.peutLireVentes());
+  readonly peutGererSav = computed(() => this.permissionsUi.peutGererVentes() && !this.estVendeurPoste());
 
   private readonly accountService = inject(AccountService);
-  private readonly boutiqueService = inject(BoutiqueService);
-  private readonly locataireService = inject(LocataireService);
-  private readonly exploitationBoutiqueService = inject(ExploitationBoutiqueService);
-  private readonly produitService = inject(ProduitService);
   private readonly codeBarresProduitService = inject(CodeBarresProduitService);
-  private readonly modePaiementRefService = inject(ModePaiementRefService);
   private readonly venteService = inject(VenteService);
   private readonly ligneVenteService = inject(LigneVenteService);
   private readonly paiementVenteService = inject(PaiementVenteService);
@@ -223,11 +196,11 @@ export default class Caisse implements OnInit {
   private readonly operationCorrectiveVenteService = inject(OperationCorrectiveVenteService);
   private readonly translateService = inject(TranslateService);
 
-  ngOnInit(): void {
-    if (!this.account()) {
-      this.accountService.identity().subscribe();
-    }
-    void this.initialiser();
+  async ngOnInit(): Promise<void> {
+    const compte = this.account() ?? (await firstValueFrom(this.accountService.identity()));
+    await this.permissionsUi.chargerPermissions(compte);
+    this.chargementPermissions.set(false);
+    await this.initialiser();
   }
 
   formatMontant(valeur: number | null | undefined): string {
@@ -238,18 +211,30 @@ export default class Caisse implements OnInit {
     return valeur?.trim() ? valeur : '--';
   }
 
-  boutiqueSelectionnee(): IBoutique | null {
-    return this.boutiques().find(boutique => boutique.id === this.boutiqueId()) ?? null;
-  }
-
-  locataireSelectionne(): ILocataire | null {
-    return this.locataires().find(locataire => locataire.id === this.locataireId()) ?? null;
-  }
-
   selectionnerBoutique(boutiqueId: number | null): void {
-    this.boutiqueId.set(boutiqueId);
-    const locataires = this.locatairesDisponibles();
-    this.locataireId.set(locataires.length === 1 ? locataires[0].id : null);
+    if (!boutiqueId || boutiqueId === this.boutique()?.id) {
+      return;
+    }
+    void this.chargerContexte(boutiqueId);
+  }
+
+  async rafraichirArticles(): Promise<void> {
+    this.message.set(null);
+    await this.chargerContexte(this.boutique()?.id ?? null);
+  }
+
+  stockDisponible(produitId: number): number {
+    return this.articlesDisponibles().find(article => article.produitId === produitId)?.stockDisponible ?? 0;
+  }
+
+  quantiteDansPanier(produitId: number): number {
+    return this.panier()
+      .filter(ligne => ligne.article.produitId === produitId)
+      .reduce((total, ligne) => total + ligne.quantite, 0);
+  }
+
+  peutAjouterProduit(article: CaissePosteArticle): boolean {
+    return this.stockDisponible(article.produitId) > this.quantiteDansPanier(article.produitId);
   }
 
   solderPaiement(uid: number): void {
@@ -267,7 +252,7 @@ export default class Caisse implements OnInit {
       return;
     }
 
-    if (!this.boutiqueSelectionnee()) {
+    if (!this.boutique()) {
       this.message.set({
         type: 'info',
         key: 'caisse.messages.selectShopBeforeScan',
@@ -275,45 +260,65 @@ export default class Caisse implements OnInit {
       return;
     }
 
-    const produit = await this.resoudreProduitScanne(code);
-    if (produit) {
-      this.ajouterProduitAuPanier(produit, code);
+    const article = await this.resoudreProduitScanne(code);
+    if (article) {
+      this.ajouterArticleAuPanier(article, code);
       this.scanInput.set('');
       this.rechercheProduit.set('');
       this.message.set({
         type: 'success',
         key: 'caisse.messages.productAdded',
-        params: { product: this.formatValeur(produit.designation) },
+        params: { product: this.formatValeur(article.designation) },
       });
     }
   }
 
-  ajouterProduitDepuisRecherche(produit: IProduit): void {
-    this.ajouterProduitAuPanier(produit);
+  ajouterProduitDepuisRecherche(article: CaissePosteArticle): void {
+    if (!this.peutAjouterProduit(article)) {
+      this.message.set({
+        type: 'info',
+        key: 'caisse.messages.productOutOfStock',
+        params: { product: this.formatValeur(article.designation) },
+      });
+      return;
+    }
+    this.ajouterArticleAuPanier(article);
     this.rechercheProduit.set('');
     this.message.set({
       type: 'success',
       key: 'caisse.messages.productAdded',
-      params: { product: this.formatValeur(produit.designation) },
+      params: { product: this.formatValeur(article.designation) },
     });
   }
 
   incrementerQuantite(produitId: number): void {
+    const ligne = this.panier().find(item => item.article.produitId === produitId);
+    if (ligne && !this.peutAjouterProduit(ligne.article)) {
+      this.message.set({
+        type: 'info',
+        key: 'caisse.messages.stockLimitReached',
+        params: { product: this.formatValeur(ligne.article.designation), stock: this.stockDisponible(produitId) },
+      });
+      return;
+    }
     this.panier.update(panier =>
-      panier.map(ligne => (ligne.produit.id === produitId ? { ...ligne, quantite: ligne.quantite + 1 } : ligne)),
+      panier.map(ligne => (ligne.article.produitId === produitId ? { ...ligne, quantite: ligne.quantite + 1 } : ligne)),
     );
+    this.ajusterPaiementUniqueAuTotal();
   }
 
   decrementerQuantite(produitId: number): void {
     this.panier.update(panier =>
       panier
-        .map(ligne => (ligne.produit.id === produitId ? { ...ligne, quantite: Math.max(0, ligne.quantite - 1) } : ligne))
+        .map(ligne => (ligne.article.produitId === produitId ? { ...ligne, quantite: Math.max(0, ligne.quantite - 1) } : ligne))
         .filter(ligne => ligne.quantite > 0),
     );
+    this.ajusterPaiementUniqueAuTotal();
   }
 
   retirerProduit(produitId: number): void {
-    this.panier.update(panier => panier.filter(ligne => ligne.produit.id !== produitId));
+    this.panier.update(panier => panier.filter(ligne => ligne.article.produitId !== produitId));
+    this.ajusterPaiementUniqueAuTotal();
   }
 
   ajouterPaiement(): void {
@@ -354,8 +359,8 @@ export default class Caisse implements OnInit {
   }
 
   async finaliserTicket(): Promise<void> {
-    const boutique = this.boutiqueSelectionnee();
-    const locataire = this.locataireSelectionne();
+    const boutique = this.boutique();
+    const locataire = this.locataire();
     if (!this.peutValider() || !boutique || !locataire) {
       this.message.set({
         type: 'danger',
@@ -377,7 +382,7 @@ export default class Caisse implements OnInit {
           referenceCarteEmbarquement: this.referenceCarte().trim() || null,
           commentaire: this.commentaire().trim() || null,
           lignes: this.panier().map(ligne => ({
-            produitId: ligne.produit.id,
+            produitId: ligne.article.produitId,
             quantite: ligne.quantite,
             remise: ligne.remise,
             codeBarresScanne: ligne.codeBarresScanne ?? null,
@@ -403,14 +408,15 @@ export default class Caisse implements OnInit {
         params: { ticket: resultat.vente.numeroTicket },
       });
       this.reinitialiserSessionCaisse();
-      if (this.peutVoirHistoriqueSav()) {
+      await this.chargerContexte(boutique.id);
+      if (this.peutVoirHistoriqueVentes()) {
         await this.chargerHistoriqueVentes();
         await this.selectionnerVenteHistorique(resultat.vente.id);
       }
-    } catch {
+    } catch (error) {
       this.message.set({
         type: 'danger',
-        key: 'caisse.messages.finalizeError',
+        key: this.messageErreurCheckout(error),
       });
     } finally {
       this.enregistrement.set(false);
@@ -560,8 +566,8 @@ export default class Caisse implements OnInit {
   private async initialiser(): Promise<void> {
     this.chargement.set(true);
     try {
-      await this.chargerReferentiels();
-      if (this.peutVoirHistoriqueSav()) {
+      await this.chargerContexte(null);
+      if (this.peutVoirHistoriqueVentes()) {
         await this.chargerHistoriqueVentes();
       }
     } finally {
@@ -569,46 +575,56 @@ export default class Caisse implements OnInit {
     }
   }
 
-  private async chargerReferentiels(): Promise<void> {
-    const [boutiquesResponse, exploitationsResponse, produitsResponse, modesPaiementResponse] = await Promise.all([
-      firstValueFrom(this.boutiqueService.query({ ...this.paramsIdsBoutiquesAccessibles(), size: 500, sort: ['nom,asc'] })),
-      firstValueFrom(this.exploitationBoutiqueService.query({ ...this.paramsBoutiquesAccessibles(), 'statut.equals': 'ACTIF', size: 500 })),
-      firstValueFrom(this.produitService.query({ ...this.paramsBoutiquesAccessibles(), size: 2000, sort: ['designation,asc'] })),
-      firstValueFrom(this.modePaiementRefService.query({ size: 100, sort: ['libelle,asc'] })),
-    ]);
-    const exploitations = exploitationsResponse.body ?? [];
-    const locataireIds = Array.from(
-      new Set(exploitations.map(exploitation => exploitation.locataire?.id).filter((id): id is number => typeof id === 'number')),
-    );
-    const locatairesResponse = locataireIds.length
-      ? await firstValueFrom(this.locataireService.query({ 'id.in': locataireIds.join(','), size: locataireIds.length, sort: ['nom,asc'] }))
-      : null;
-
-    this.boutiques.set(boutiquesResponse.body ?? []);
-    this.locataires.set(locatairesResponse?.body ?? []);
-    this.exploitations.set(exploitations);
-    this.produits.set(produitsResponse.body ?? []);
-    this.modesPaiement.set((modesPaiementResponse.body ?? []).filter(mode => mode.actif !== false));
-
-    if (!this.boutiqueId() && this.boutiques().length === 1) {
-      this.selectionnerBoutique(this.boutiques()[0].id);
-    }
-    if (!this.paiements()[0]?.modePaiementId && this.modesPaiementActifs().length > 0) {
-      this.paiements.update(paiements =>
-        paiements.map((paiement, index) => (index === 0 ? { ...paiement, modePaiementId: this.modesPaiementActifs()[0].id } : paiement)),
-      );
+  /**
+   * Le serveur reste la seule autorite sur la boutique active, le locataire exploitant et les
+   * articles vendables (`VenteService.getContextePoste`, cote backend) : plus aucun calcul de
+   * perimetre boutique n'est reproduit cote client. Cela evite tout ecart entre ce que l'UI pense
+   * accessible et ce que le backend autorise reellement (source des articles "invisibles" en
+   * caisse alors qu'ils existaient bien en stock).
+   */
+  private async chargerContexte(boutiqueId: number | null): Promise<void> {
+    this.chargementArticles.set(true);
+    try {
+      const contexte = await firstValueFrom(this.venteService.getContextePoste(boutiqueId));
+      this.contexte.set(contexte);
+      this.panier.update(panier => panier.filter(ligne => ligne.article.produitId in this.indexArticles(contexte.articles)));
+      this.ajusterPaiementUniqueAuTotal();
+      if (!this.paiements()[0]?.modePaiementId && this.modesPaiementActifs().length > 0) {
+        this.paiements.update(paiements =>
+          paiements.map((paiement, index) => (index === 0 ? { ...paiement, modePaiementId: this.modesPaiementActifs()[0].id } : paiement)),
+        );
+      }
+      this.message.set(null);
+    } catch {
+      this.contexte.set(null);
+      this.message.set({ type: 'danger', key: 'caisse.messages.contextLoadError' });
+    } finally {
+      this.chargementArticles.set(false);
     }
   }
 
+  private indexArticles(articles: CaissePosteArticle[]): Record<number, true> {
+    const index: Record<number, true> = {};
+    for (const article of articles) {
+      index[article.produitId] = true;
+    }
+    return index;
+  }
+
   private async chargerHistoriqueVentes(): Promise<void> {
-    if (!this.peutVoirHistoriqueSav()) {
+    if (!this.peutVoirHistoriqueVentes()) {
       this.ventesHistorique.set([]);
       return;
     }
 
-    const response = await firstValueFrom(
-      this.venteService.query({ ...this.paramsBoutiquesAccessibles(), size: 120, sort: ['dateHeure,desc'] }),
-    );
+    const ids = this.boutiquesAccessibles().map(boutique => boutique.id);
+    const params = this.permissionsUi.estAdmin() || this.permissionsUi.estProfilAdm() ? {} : { 'boutiqueId.in': ids.join(',') };
+    if (!this.permissionsUi.estAdmin() && !this.permissionsUi.estProfilAdm() && ids.length === 0) {
+      this.ventesHistorique.set([]);
+      return;
+    }
+
+    const response = await firstValueFrom(this.venteService.query({ ...params, size: 120, sort: ['dateHeure,desc'] }));
     this.ventesHistorique.set(response.body ?? []);
   }
 
@@ -677,8 +693,8 @@ export default class Caisse implements OnInit {
     }
   }
 
-  private async resoudreProduitScanne(code: string): Promise<IProduit | null> {
-    const boutique = this.boutiqueSelectionnee();
+  private async resoudreProduitScanne(code: string): Promise<CaissePosteArticle | null> {
+    const boutique = this.boutique();
     if (!boutique) {
       return null;
     }
@@ -686,7 +702,16 @@ export default class Caisse implements OnInit {
     const resultat = await firstValueFrom(this.codeBarresProduitService.scan(code, boutique.id, 'POSTE_CAISSE'));
     this.scanInconnuAffectable.set(!resultat.trouve && resultat.affectationAutorisee);
     if (resultat.trouve && resultat.produit) {
-      return resultat.produit;
+      const article = this.resoudreArticleDepuisProduit(resultat.produit);
+      if (!article || !this.peutAjouterProduit(article)) {
+        this.message.set({
+          type: 'info',
+          key: 'caisse.messages.productOutOfStock',
+          params: { product: this.formatValeur(resultat.produit.designation) },
+        });
+        return null;
+      }
+      return article;
     }
     this.message.set({
       type: 'danger',
@@ -696,12 +721,16 @@ export default class Caisse implements OnInit {
     return null;
   }
 
-  private ajouterProduitAuPanier(produit: IProduit, codeBarresScanne?: string): void {
+  private resoudreArticleDepuisProduit(produit: IProduit): CaissePosteArticle | null {
+    return this.articlesDisponibles().find(article => article.produitId === produit.id) ?? null;
+  }
+
+  private ajouterArticleAuPanier(article: CaissePosteArticle, codeBarresScanne?: string): void {
     this.panier.update(panier => {
-      const ligneExistante = panier.find(ligne => ligne.produit.id === produit.id);
+      const ligneExistante = panier.find(ligne => ligne.article.produitId === article.produitId);
       if (ligneExistante) {
         return panier.map(ligne =>
-          ligne.produit.id === produit.id
+          ligne.article.produitId === article.produitId
             ? {
                 ...ligne,
                 quantite: ligne.quantite + 1,
@@ -714,13 +743,30 @@ export default class Caisse implements OnInit {
       return [
         ...panier,
         {
-          produit,
+          article,
           quantite: 1,
           remise: 0,
           codeBarresScanne: codeBarresScanne ?? null,
         },
       ];
     });
+    this.ajusterPaiementUniqueAuTotal();
+  }
+
+  private ajusterPaiementUniqueAuTotal(): void {
+    if (this.paiements().length !== 1) {
+      return;
+    }
+
+    const modePaiementId = this.paiements()[0]?.modePaiementId ?? this.modesPaiementActifs()[0]?.id ?? null;
+    this.paiements.set([
+      {
+        ...this.paiements()[0],
+        uid: this.paiements()[0]?.uid ?? 1,
+        modePaiementId,
+        montant: this.totalNet() > 0 ? this.totalNet() : null,
+      },
+    ]);
   }
 
   private genererContenuTicket(
@@ -780,6 +826,25 @@ export default class Caisse implements OnInit {
     return Math.round(valeur * 100) / 100;
   }
 
+  private panierStockValide(): boolean {
+    return this.panier().every(ligne => ligne.quantite <= this.stockDisponible(ligne.article.produitId));
+  }
+
+  private messageErreurCheckout(error: unknown): string {
+    const err = error as { error?: { message?: string; errorKey?: string } };
+    const cle = err.error?.errorKey ?? err.error?.message;
+    if (cle === 'insufficientStock') {
+      return 'caisse.messages.insufficientStock';
+    }
+    if (cle === 'paymentMismatch') {
+      return 'caisse.messages.paymentMismatch';
+    }
+    if (cle === 'inactiveTenant') {
+      return 'caisse.messages.inactiveTenant';
+    }
+    return 'caisse.messages.finalizeError';
+  }
+
   statutVenteLabelKey(statut: string | null | undefined): string {
     return statut ? `caisse.statuses.sale.${statut}` : 'caisse.common.notAvailable';
   }
@@ -790,23 +855,5 @@ export default class Caisse implements OnInit {
 
   private localeCourante(): string {
     return this.translateService.getCurrentLang() === 'en' ? 'en-US' : 'fr-FR';
-  }
-
-  private paramsBoutiquesAccessibles(): Record<string, string | number> {
-    if (this.permissionsUi.estAdmin() || this.permissionsUi.estProfilAdm()) {
-      return {};
-    }
-
-    const ids = this.permissionsUi.boutiqueIds();
-    return ids.length ? { 'boutiqueId.in': ids.join(',') } : { 'boutiqueId.equals': -1 };
-  }
-
-  private paramsIdsBoutiquesAccessibles(): Record<string, string | number> {
-    if (this.permissionsUi.estAdmin() || this.permissionsUi.estProfilAdm()) {
-      return {};
-    }
-
-    const ids = this.permissionsUi.boutiqueIds();
-    return ids.length ? { 'id.in': ids.join(',') } : { 'id.equals': -1 };
   }
 }

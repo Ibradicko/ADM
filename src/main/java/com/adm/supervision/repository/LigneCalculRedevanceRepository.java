@@ -16,6 +16,10 @@ import org.springframework.stereotype.Repository;
 public interface LigneCalculRedevanceRepository
     extends JpaRepository<LigneCalculRedevance, Long>, JpaSpecificationExecutor<LigneCalculRedevance>
 {
+    boolean existsByVente_Id(Long venteId);
+
+    List<LigneCalculRedevance> findAllByVente_Id(Long venteId);
+
     default Optional<LigneCalculRedevance> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }

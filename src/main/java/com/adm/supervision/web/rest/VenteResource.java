@@ -5,6 +5,7 @@ import com.adm.supervision.service.BoutiqueCriteriaScopeService;
 import com.adm.supervision.service.VenteQueryService;
 import com.adm.supervision.service.VenteService;
 import com.adm.supervision.service.criteria.VenteCriteria;
+import com.adm.supervision.service.dto.CaissePosteContexteDTO;
 import com.adm.supervision.service.dto.CaisseVenteRequest;
 import com.adm.supervision.service.dto.CaisseVenteResultDTO;
 import com.adm.supervision.service.dto.VenteDTO;
@@ -98,6 +99,20 @@ public class VenteResource {
         LOG.debug("REST request to checkout Vente : {}", request);
         CaisseVenteResultDTO result = venteService.checkout(request);
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * {@code GET  /ventes/poste-caisse} : Resolve the full server-side context (shop, tenant,
+     * sellable articles with aggregated stock, payment modes) for the cash desk screen.
+     *
+     * @param boutiqueId optional shop requested by the client ; ignored if not accessible.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the resolved context.
+     */
+    @GetMapping("/poste-caisse")
+    @PreAuthorize("@businessAuthorizationService.canManageSales() or @businessAuthorizationService.canReadStock()")
+    public ResponseEntity<CaissePosteContexteDTO> getContextePoste(@RequestParam(name = "boutiqueId", required = false) Long boutiqueId) {
+        LOG.debug("REST request to get poste caisse context for boutiqueId: {}", boutiqueId);
+        return ResponseEntity.ok(venteService.getContextePoste(boutiqueId));
     }
 
     /**

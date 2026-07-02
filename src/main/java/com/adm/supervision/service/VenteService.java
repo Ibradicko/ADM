@@ -1,6 +1,7 @@
 package com.adm.supervision.service;
 
 import com.adm.supervision.domain.Boutique;
+import com.adm.supervision.domain.ExploitationBoutique;
 import com.adm.supervision.domain.LigneMouvementStock;
 import com.adm.supervision.domain.LigneVente;
 import com.adm.supervision.domain.Locataire;
@@ -30,12 +31,17 @@ import com.adm.supervision.repository.ProduitRepository;
 import com.adm.supervision.repository.StockProduitRepository;
 import com.adm.supervision.repository.TicketCaisseRepository;
 import com.adm.supervision.repository.VenteRepository;
+import com.adm.supervision.service.dto.CaissePosteArticleDTO;
+import com.adm.supervision.service.dto.CaissePosteContexteDTO;
 import com.adm.supervision.service.dto.CaisseVenteLigneRequest;
 import com.adm.supervision.service.dto.CaisseVentePaiementRequest;
 import com.adm.supervision.service.dto.CaisseVenteRequest;
 import com.adm.supervision.service.dto.CaisseVenteResultDTO;
 import com.adm.supervision.service.dto.VenteDTO;
+import com.adm.supervision.service.mapper.BoutiqueMapper;
 import com.adm.supervision.service.mapper.LigneVenteMapper;
+import com.adm.supervision.service.mapper.LocataireMapper;
+import com.adm.supervision.service.mapper.ModePaiementRefMapper;
 import com.adm.supervision.service.mapper.PaiementVenteMapper;
 import com.adm.supervision.service.mapper.TicketCaisseMapper;
 import com.adm.supervision.service.mapper.VenteMapper;
@@ -45,14 +51,19 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,6 +100,10 @@ public class VenteService {
     private final PaiementVenteRepository paiementVenteRepository;
     private final TicketCaisseRepository ticketCaisseRepository;
     private final ExploitationBoutiqueRepository exploitationBoutiqueRepository;
+    private final RedevanceWorkflowService redevanceWorkflowService;
+    private final BoutiqueMapper boutiqueMapper;
+    private final LocataireMapper locataireMapper;
+    private final ModePaiementRefMapper modePaiementRefMapper;
 
     public VenteService(
         VenteRepository venteRepository,
@@ -108,7 +123,11 @@ public class VenteService {
         ModePaiementRefRepository modePaiementRefRepository,
         PaiementVenteRepository paiementVenteRepository,
         TicketCaisseRepository ticketCaisseRepository,
-        ExploitationBoutiqueRepository exploitationBoutiqueRepository
+        ExploitationBoutiqueRepository exploitationBoutiqueRepository,
+        RedevanceWorkflowService redevanceWorkflowService,
+        BoutiqueMapper boutiqueMapper,
+        LocataireMapper locataireMapper,
+        ModePaiementRefMapper modePaiementRefMapper
     ) {
         this.venteRepository = venteRepository;
         this.venteMapper = venteMapper;
@@ -128,6 +147,10 @@ public class VenteService {
         this.paiementVenteRepository = paiementVenteRepository;
         this.ticketCaisseRepository = ticketCaisseRepository;
         this.exploitationBoutiqueRepository = exploitationBoutiqueRepository;
+        this.redevanceWorkflowService = redevanceWorkflowService;
+        this.boutiqueMapper = boutiqueMapper;
+        this.locataireMapper = locataireMapper;
+        this.modePaiementRefMapper = modePaiementRefMapper;
     }
 
     /**
@@ -276,6 +299,7 @@ public class VenteService {
             boutique,
             vendeur
         );
+        redevanceWorkflowService.generateForValidatedSale(vente);
 
         CaisseVenteResultDTO result = new CaisseVenteResultDTO();
         result.setVente(venteMapper.toDto(vente));
@@ -283,6 +307,114 @@ public class VenteService {
         result.setPaiements(paiements.stream().map(paiementVenteMapper::toDto).toList());
         result.setTicket(ticketCaisseMapper.toDto(ticket));
         return result;
+    }
+
+    /**
+     * Resolve the full server-side context needed by the cash desk screen: the active shop (and
+     * every shop the current user may switch to), its currently exploiting tenant, every active
+     * product of that shop merged with its aggregated stock, and the active payment modes.
+     * <p>
+     * This is the single source of truth for "which shop/articles can this user sell" : it reuses
+     * exactly the same accessible-shop resolution as every other write operation
+     * ({@link ModuleSecurityService#getAccessibleBoutiqueIds()}), so the frontend can no longer
+     * drift out of sync with the backend security scope (a stale/looser client-side computation
+     * was the root cause of articles being invisible at checkout while still visible elsewhere).
+     *
+     * @param boutiqueIdDemande optional shop requested by the client ; ignored if not accessible.
+     * @return the resolved cash desk context.
+     */
+    @Transactional(readOnly = true)
+    public CaissePosteContexteDTO getContextePoste(Long boutiqueIdDemande) {
+        List<Boutique> boutiquesAccessibles = resoudreBoutiquesAccessibles();
+        if (boutiquesAccessibles.isEmpty()) {
+            throw new BusinessValidationException("caisse", "noShopAccess", "Aucune boutique accessible pour ce compte");
+        }
+
+        Boutique boutique = boutiquesAccessibles
+            .stream()
+            .filter(candidate -> boutiqueIdDemande != null && candidate.getId().equals(boutiqueIdDemande))
+            .findFirst()
+            .orElseGet(() -> choisirBoutiqueParDefaut(boutiquesAccessibles));
+
+        Locataire locataire = exploitationBoutiqueRepository
+            .findByBoutique_IdAndStatut(boutique.getId(), StatutGeneral.ACTIF)
+            .stream()
+            .findFirst()
+            .map(ExploitationBoutique::getLocataire)
+            .orElse(null);
+
+        List<Produit> produits = produitRepository.findByBoutique_IdAndStatut(
+            boutique.getId(),
+            StatutGeneral.ACTIF,
+            Sort.by("designation")
+        );
+        Map<Long, BigDecimal> stockParProduit = new HashMap<>();
+        for (StockProduit stock : stockProduitRepository.findByBoutiqueId(boutique.getId())) {
+            if (stock.getProduit() == null || stock.getProduit().getId() == null) {
+                continue;
+            }
+            BigDecimal quantite = stock.getQuantiteTheorique() == null ? BigDecimal.ZERO : stock.getQuantiteTheorique();
+            stockParProduit.merge(stock.getProduit().getId(), quantite, BigDecimal::add);
+        }
+
+        List<CaissePosteArticleDTO> articles = produits
+            .stream()
+            .map(produit -> toArticleDTO(produit, stockParProduit.getOrDefault(produit.getId(), BigDecimal.ZERO)))
+            .toList();
+
+        CaissePosteContexteDTO contexte = new CaissePosteContexteDTO();
+        contexte.setBoutique(boutiqueMapper.toDto(boutique));
+        contexte.setBoutiquesAccessibles(boutiquesAccessibles.stream().map(boutiqueMapper::toDto).toList());
+        contexte.setLocataire(locataire == null ? null : locataireMapper.toDto(locataire));
+        contexte.setArticles(articles);
+        contexte.setModesPaiement(
+            modePaiementRefRepository
+                .findAll()
+                .stream()
+                .filter(mode -> Boolean.TRUE.equals(mode.getActif()))
+                .map(modePaiementRefMapper::toDto)
+                .toList()
+        );
+        return contexte;
+    }
+
+    private List<Boutique> resoudreBoutiquesAccessibles() {
+        if (moduleSecurityService.hasGlobalBoutiqueAccess()) {
+            return boutiqueRepository.findAll(Sort.by("nom"));
+        }
+
+        Set<Long> ids = moduleSecurityService.getAccessibleBoutiqueIds();
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        return boutiqueRepository
+            .findAllById(ids)
+            .stream()
+            .sorted(Comparator.comparing(Boutique::getNom, Comparator.nullsLast(String::compareToIgnoreCase)))
+            .toList();
+    }
+
+    private Boutique choisirBoutiqueParDefaut(List<Boutique> boutiquesAccessibles) {
+        return boutiquesAccessibles
+            .stream()
+            .filter(candidate -> produitRepository.existsByBoutique_IdAndStatut(candidate.getId(), StatutGeneral.ACTIF))
+            .findFirst()
+            .orElse(boutiquesAccessibles.get(0));
+    }
+
+    private CaissePosteArticleDTO toArticleDTO(Produit produit, BigDecimal stockDisponible) {
+        CaissePosteArticleDTO dto = new CaissePosteArticleDTO();
+        dto.setProduitId(produit.getId());
+        dto.setCodeInterne(produit.getCodeInterne());
+        dto.setDesignation(produit.getDesignation());
+        dto.setDescription(produit.getDescription());
+        dto.setPrixVente(produit.getPrixVente());
+        if (produit.getGroupeArticle() != null) {
+            dto.setGroupeArticleId(produit.getGroupeArticle().getId());
+            dto.setGroupeArticleLibelle(produit.getGroupeArticle().getLibelle());
+        }
+        dto.setStockDisponible(stockDisponible);
+        return dto;
     }
 
     /**

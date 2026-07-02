@@ -24,6 +24,22 @@ public interface AffectationUtilisateurRepository
 
     boolean existsByUserIdAndBoutiqueIdAndProfilIdAndActifIsTrue(Long userId, Long boutiqueId, Long profilId);
 
+    @Query(
+        """
+        select count(affectationUtilisateur)
+        from AffectationUtilisateur affectationUtilisateur
+        where affectationUtilisateur.user.id = :userId
+            and affectationUtilisateur.actif = true
+            and affectationUtilisateur.profil.code in :profilCodes
+            and (:excludedId is null or affectationUtilisateur.id <> :excludedId)
+        """
+    )
+    long countActiveAssignmentsForSingleBoutiqueProfiles(
+        @Param("userId") Long userId,
+        @Param("profilCodes") List<String> profilCodes,
+        @Param("excludedId") Long excludedId
+    );
+
     default Optional<AffectationUtilisateur> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }

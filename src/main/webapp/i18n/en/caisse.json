@@ -18,6 +18,10 @@
       "assignBarcode": "Assign barcode",
       "remove": "Remove",
       "addPaymentMode": "Add payment mode",
+      "removePaymentMode": "Remove this payment mode",
+      "settleRemaining": "Settle",
+      "refreshProducts": "Refresh products",
+      "createProduct": "Create a product",
       "reprint": "Reprint",
       "reprinting": "Reprinting...",
       "reprintTicket": "Reprint ticket",
@@ -37,7 +41,8 @@
       "remaining": "Remaining amount",
       "remainingShort": "Remaining",
       "discount": "Discount",
-      "netTotal": "Net total"
+      "netTotal": "Net total",
+      "availableProducts": "Available products"
     },
     "saleContext": {
       "title": "Sale context",
@@ -46,7 +51,8 @@
     },
     "tabs": {
       "caisse": "Checkout",
-      "historique": "History & after-sales"
+      "historique": "History & after-sales",
+      "salesHistory": "Sales history"
     },
     "categories": {
       "all": "All categories"
@@ -90,8 +96,20 @@
       "noScan": "No scan",
       "unknownComment": "Unrecognized scan from the cash desk"
     },
+    "stock": {
+      "available": "{{count}} available",
+      "inStock": "Shop stock: {{count}}"
+    },
+    "products": {
+      "title": "Shop products",
+      "subtitle": "{{count}} active product(s) in this shop"
+    },
     "empty": {
+      "noProductMatchTitle": "No sellable product",
       "noProductMatch": "No active product matches the current search.",
+      "loadingProductsTitle": "Loading products...",
+      "noProductConfiguredTitle": "No product configured for this shop",
+      "noProductConfigured": "This shop has no active product and no stock supplied yet. Ask the shop manager to create products and supply stock before checkout can be used.",
       "noRecentSale": "No recent sale available.",
       "noGeneratedTicket": "No ticket generated in this session yet.",
       "noReference": "No reference",
@@ -122,6 +140,7 @@
     "history": {
       "title": "History, returns and cancellations",
       "subtitle": "Select a sale to view details, reprint the ticket or process after-sales service.",
+      "sellerSubtitle": "Review recent sales for your shop and ticket details.",
       "columns": {
         "ticket": "Ticket",
         "date": "Date",
@@ -193,12 +212,20 @@
     },
     "messages": {
       "accountWithoutId": "The connected account does not expose a usable user identifier. The ticket cannot be validated until this is corrected.",
+      "loadingCounter": "Preparing seller counter...",
       "selectShopBeforeScan": "Select a shop before scanning.",
+      "contextLoadError": "Could not load the shop context. Try again or contact an administrator.",
       "productAdded": "{{product}} has been added to the ticket.",
+      "productOutOfStock": "{{product}} has no stock available in this shop.",
+      "stockLimitReached": "Available stock reached for {{product}}: {{stock}}.",
       "ticketIncomplete": "The ticket cannot be validated until required information and payment are complete.",
       "saleValidated": "Sale {{ticket}} has been registered and the cash ticket has been generated.",
       "partialSaleError": "Sale {{ticket}} was partially created, but a ticket or payment step failed. Check the data before resuming.",
       "finalizeError": "The sale could not be finalized. Check the entered data and try again.",
+      "insufficientStock": "Insufficient stock to validate this sale. Adjust the cart and try again.",
+      "paymentMismatch": "The payment total must match the net total.",
+      "inactiveTenant": "The selected tenant does not actively operate this shop.",
+      "noActiveTenantForShop": "No active tenant operates this shop. The sale cannot be validated.",
       "completeBeforeValidate": "Complete the sale context, cart and payments before validating the ticket.",
       "selectSaleForPreview": "Select a sale to display the ticket large.",
       "selectSaleBeforeAction": "Select a sale before launching this action.",

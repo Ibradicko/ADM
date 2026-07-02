@@ -24,6 +24,11 @@ public interface StockProduitRepository extends JpaRepository<StockProduit, Long
     List<StockProduit> findByProduitIdAndBoutiqueId(@Param("produitId") Long produitId, @Param("boutiqueId") Long boutiqueId);
 
     @Query(
+        "select stockProduit from StockProduit stockProduit join fetch stockProduit.produit join fetch stockProduit.depot depot where depot.boutique.id = :boutiqueId and depot.actif = true"
+    )
+    List<StockProduit> findByBoutiqueId(@Param("boutiqueId") Long boutiqueId);
+
+    @Query(
         "select stockProduit from StockProduit stockProduit join fetch stockProduit.produit join fetch stockProduit.depot depot where depot.id = :depotId"
     )
     List<StockProduit> findByDepotIdWithRelationships(@Param("depotId") Long depotId);

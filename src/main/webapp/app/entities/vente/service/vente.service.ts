@@ -60,6 +60,42 @@ export interface CaisseVenteResult {
   paiements: IPaiementVente[];
 }
 
+export interface CaissePosteBoutique {
+  id: number;
+  nom?: string | null;
+}
+
+export interface CaissePosteLocataire {
+  id: number;
+  nom?: string | null;
+}
+
+export interface CaissePosteArticle {
+  produitId: number;
+  codeInterne?: string | null;
+  designation?: string | null;
+  description?: string | null;
+  prixVente?: number | null;
+  groupeArticleId?: number | null;
+  groupeArticleLibelle?: string | null;
+  stockDisponible?: number | null;
+}
+
+export interface CaissePosteModePaiement {
+  id: number;
+  code?: string | null;
+  libelle?: string | null;
+  actif?: boolean | null;
+}
+
+export interface CaissePosteContexte {
+  boutique: CaissePosteBoutique;
+  boutiquesAccessibles: CaissePosteBoutique[];
+  locataire: CaissePosteLocataire | null;
+  articles: CaissePosteArticle[];
+  modesPaiement: CaissePosteModePaiement[];
+}
+
 @Injectable()
 export class VentesService {
   readonly ventesParams = signal<Record<string, string | number | boolean | readonly (string | number | boolean)[]> | undefined>(undefined);
@@ -115,6 +151,11 @@ export class VenteService extends VentesService {
     return this.http
       .post<RestCaisseVenteResult>(`${this.resourceUrl}/checkout`, payload)
       .pipe(map(res => this.convertCheckoutResponseFromServer(res)));
+  }
+
+  getContextePoste(boutiqueId?: number | null): Observable<CaissePosteContexte> {
+    const params: Record<string, number> = boutiqueId ? { boutiqueId } : {};
+    return this.http.get<CaissePosteContexte>(`${this.resourceUrl}/poste-caisse`, { params });
   }
 
   find(id: number): Observable<IVente> {

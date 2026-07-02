@@ -155,6 +155,72 @@ public class RedevanceWorkflowService {
         return calculRedevanceMapper.toDto(calcul);
     }
 
+    public CalculRedevanceDTO generateForValidatedSale(Vente vente) {
+        if (vente == null || vente.getId() == null || vente.getStatut() != StatutVente.VALIDEE) {
+            throw new BusinessValidationException("calculRedevance", "invalidSale", "La vente doit etre validee avant calcul redevance");
+        }
+        if (ligneCalculRedevanceRepository.existsByVente_Id(vente.getId())) {
+            return calculRedevanceRepository
+                .findOneWithEagerRelationships(
+                    ligneCalculRedevanceRepository.findAllByVente_Id(vente.getId()).getFirst().getCalcul().getId()
+                )
+                .map(calculRedevanceMapper::toDto)
+                .orElseThrow(() ->
+                    new BusinessValidationException("calculRedevance", "notFound", "Calcul de redevance introuvable pour cette vente")
+                );
+        }
+
+        moduleSecurityService.assertBoutiqueAccess(vente.getBoutique().getId(), "Acces refuse au calcul de redevance de la vente");
+        List<RegleRedevance> rules = regleRedevanceRepository.findAllWithEagerRelationships();
+        List<ExploitationBoutique> exploitations = exploitationBoutiqueRepository.findAllWithEagerRelationships();
+        LocalDate saleDate = vente.getDateHeure().atZone(ZoneOffset.UTC).toLocalDate();
+
+        BigDecimal saleBase = BigDecimal.ZERO;
+        BigDecimal saleRoyalty = BigDecimal.ZERO;
+        for (LigneVente line : ligneVenteRepository.findAllByVente_Id(vente.getId())) {
+            BigDecimal base = safe(line.getMontantLigne());
+            BigDecimal rate = resolveRate(rules, exploitations, line.getProduit(), vente, saleDate);
+            saleBase = saleBase.add(base);
+            saleRoyalty = saleRoyalty.add(base.multiply(rate).divide(HUNDRED, 2, RoundingMode.HALF_UP));
+        }
+
+        CalculRedevance calcul = calculRedevanceRepository.save(
+            new CalculRedevance()
+                .reference("RED-VTE-" + vente.getNumeroTicket())
+                .periodeDebut(saleDate)
+                .periodeFin(saleDate)
+                .chiffreAffaires(saleBase)
+                .montantRedevance(saleRoyalty)
+                .statut(StatutRedevance.CALCULEE)
+                .dateCalcul(Instant.now())
+                .boutique(vente.getBoutique())
+                .locataire(vente.getLocataire())
+        );
+
+        if (saleBase.signum() > 0) {
+            BigDecimal effectiveRate =
+                saleRoyalty.signum() == 0 ? BigDecimal.ZERO : saleRoyalty.multiply(HUNDRED).divide(saleBase, 2, RoundingMode.HALF_UP);
+            ligneCalculRedevanceRepository.save(
+                new LigneCalculRedevance()
+                    .calcul(calcul)
+                    .vente(vente)
+                    .baseCalcul(saleBase)
+                    .tauxApplique(effectiveRate)
+                    .montantRedevance(saleRoyalty)
+            );
+        }
+
+        journalAuditService.logAction(
+            TypeActionAudit.CREATION,
+            "CalculRedevance",
+            calcul.getReference(),
+            "Calcul automatique redevance apres vente numero=" + vente.getNumeroTicket() + ", ca=" + saleBase + ", montant=" + saleRoyalty,
+            vente.getBoutique(),
+            moduleSecurityService.getCurrentUser()
+        );
+        return calculRedevanceMapper.toDto(calcul);
+    }
+
     BigDecimal resolveRate(
         List<RegleRedevance> rules,
         List<ExploitationBoutique> exploitations,

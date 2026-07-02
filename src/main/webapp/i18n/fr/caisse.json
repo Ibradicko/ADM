@@ -18,6 +18,10 @@
       "assignBarcode": "Affecter le code-barres",
       "remove": "Retirer",
       "addPaymentMode": "Ajouter un mode",
+      "removePaymentMode": "Supprimer ce mode de paiement",
+      "settleRemaining": "Solder",
+      "refreshProducts": "Rafraichir les articles",
+      "createProduct": "Creer un article",
       "reprint": "Reimprimer",
       "reprinting": "Reimpression...",
       "reprintTicket": "Reimprimer le ticket",
@@ -37,7 +41,8 @@
       "remaining": "Reste a payer",
       "remainingShort": "Reste",
       "discount": "Remise",
-      "netTotal": "Total net"
+      "netTotal": "Total net",
+      "availableProducts": "Articles disponibles"
     },
     "saleContext": {
       "title": "Contexte de vente",
@@ -46,7 +51,8 @@
     },
     "tabs": {
       "caisse": "Caisse",
-      "historique": "Historique & SAV"
+      "historique": "Historique & SAV",
+      "salesHistory": "Historique ventes"
     },
     "categories": {
       "all": "Toutes les categories"
@@ -90,8 +96,20 @@
       "noScan": "Sans scan",
       "unknownComment": "Scan non reconnu depuis le poste caisse"
     },
+    "stock": {
+      "available": "{{count}} dispo",
+      "inStock": "Stock boutique : {{count}}"
+    },
+    "products": {
+      "title": "Articles boutique",
+      "subtitle": "{{count}} article(s) actif(s) dans cette boutique"
+    },
     "empty": {
+      "noProductMatchTitle": "Aucun article a vendre",
       "noProductMatch": "Aucun produit actif ne correspond a la recherche en cours.",
+      "loadingProductsTitle": "Chargement des articles...",
+      "noProductConfiguredTitle": "Aucun article configure pour cette boutique",
+      "noProductConfigured": "Cette boutique n'a pas encore d'article actif ni de stock approvisionne. Demandez au manager boutique de creer les articles puis de les approvisionner avant de pouvoir encaisser.",
       "noRecentSale": "Aucune vente recente disponible.",
       "noGeneratedTicket": "Aucun ticket genere dans cette session pour le moment.",
       "noReference": "Aucune reference",
@@ -122,6 +140,7 @@
     "history": {
       "title": "Historique, retours et annulations",
       "subtitle": "Selectionnez une vente pour consulter son detail, reimprimer le ticket ou traiter un SAV.",
+      "sellerSubtitle": "Consultez les ventes recentes de votre boutique et le detail des tickets.",
       "columns": {
         "ticket": "Ticket",
         "date": "Date",
@@ -193,12 +212,20 @@
     },
     "messages": {
       "accountWithoutId": "Le compte connecte n'expose pas d'identifiant utilisateur exploitable. Le ticket ne pourra pas etre valide tant que ce point n'est pas corrige.",
+      "loadingCounter": "Preparation du poste vendeur...",
       "selectShopBeforeScan": "Selectionnez d'abord une boutique avant de lancer un scan.",
+      "contextLoadError": "Impossible de charger le contexte de la boutique. Reessayez ou contactez un administrateur.",
       "productAdded": "{{product}} a ete ajoute au ticket.",
+      "productOutOfStock": "{{product}} n'a plus de stock disponible dans cette boutique.",
+      "stockLimitReached": "Stock disponible atteint pour {{product}} : {{stock}}.",
       "ticketIncomplete": "Le ticket ne peut pas etre valide tant que les informations obligatoires ou le paiement ne sont pas complets.",
       "saleValidated": "La vente {{ticket}} a ete enregistree et le ticket caisse a ete genere.",
       "partialSaleError": "La vente {{ticket}} a ete creee partiellement, mais une etape du ticket ou du paiement a echoue. Verifiez les donnees avant de reprendre.",
       "finalizeError": "La vente n'a pas pu etre finalisee. Verifiez les donnees saisies puis reessayez.",
+      "insufficientStock": "Stock insuffisant pour valider cette vente. Ajustez le panier puis reessayez.",
+      "paymentMismatch": "Le total des paiements doit etre egal au total net.",
+      "inactiveTenant": "Le locataire selectionne n'exploite pas activement cette boutique.",
+      "noActiveTenantForShop": "Aucun locataire actif n'exploite cette boutique. La vente ne peut pas etre validee.",
       "completeBeforeValidate": "Completez le contexte de vente, le panier et les paiements avant de valider le ticket.",
       "selectSaleForPreview": "Selectionnez une vente pour afficher le ticket en grand.",
       "selectSaleBeforeAction": "Selectionnez une vente avant de lancer cette action.",

@@ -11,6 +11,7 @@ import com.adm.supervision.repository.ProfilMetierRepository;
 import com.adm.supervision.repository.UserRepository;
 import com.adm.supervision.security.AuthoritiesConstants;
 import com.adm.supervision.security.BusinessAuthorizationService;
+import com.adm.supervision.service.AffectationUtilisateurService;
 import com.adm.supervision.service.BusinessValidationException;
 import com.adm.supervision.service.MailService;
 import com.adm.supervision.service.UserService;
@@ -104,6 +105,8 @@ public class UserResource {
 
     private final AffectationUtilisateurRepository affectationUtilisateurRepository;
 
+    private final AffectationUtilisateurService affectationUtilisateurService;
+
     private final BoutiqueRepository boutiqueRepository;
 
     private final ProfilMetierRepository profilMetierRepository;
@@ -114,6 +117,7 @@ public class UserResource {
         MailService mailService,
         BusinessAuthorizationService businessAuthorizationService,
         AffectationUtilisateurRepository affectationUtilisateurRepository,
+        AffectationUtilisateurService affectationUtilisateurService,
         BoutiqueRepository boutiqueRepository,
         ProfilMetierRepository profilMetierRepository
     ) {
@@ -122,6 +126,7 @@ public class UserResource {
         this.mailService = mailService;
         this.businessAuthorizationService = businessAuthorizationService;
         this.affectationUtilisateurRepository = affectationUtilisateurRepository;
+        this.affectationUtilisateurService = affectationUtilisateurService;
         this.boutiqueRepository = boutiqueRepository;
         this.profilMetierRepository = profilMetierRepository;
     }
@@ -376,6 +381,7 @@ public class UserResource {
             .profil(profil)
             .dateDebut(LocalDate.now())
             .actif(true);
+        affectationUtilisateurService.validateSingleBoutiqueAssignment(affectation);
         affectationUtilisateurRepository.save(affectation);
     }
 

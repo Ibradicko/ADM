@@ -32,7 +32,7 @@ public class BusinessAuthorizationService {
     private static final Set<String> USER_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE");
     private static final Set<String> SALES_READ_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE", "VENDEUR");
     private static final Set<String> SALES_MANAGE_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE", "VENDEUR");
-    private static final Set<String> STOCK_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE");
+    private static final Set<String> STOCK_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE", "VENDEUR");
     private static final Set<String> SUPERVISION_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE");
 
     private final AffectationUtilisateurRepository affectationUtilisateurRepository;
@@ -132,11 +132,14 @@ public class BusinessAuthorizationService {
     }
 
     public boolean canReadStock() {
-        return hasProfileAndPermission(STOCK_PROFILE_CODES, BusinessPermissions.STOCK_MANAGE, BusinessPermissions.STOCK_READ);
+        return (
+            hasProfileAndPermission(STOCK_PROFILE_CODES, BusinessPermissions.STOCK_MANAGE, BusinessPermissions.STOCK_READ) ||
+            hasProfileAndPermission(Set.of("VENDEUR"), BusinessPermissions.SALES_MANAGE, BusinessPermissions.SALES_READ)
+        );
     }
 
     public boolean canManageStock() {
-        return hasProfileAndPermission(STOCK_PROFILE_CODES, BusinessPermissions.STOCK_MANAGE);
+        return hasProfileAndPermission(Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE"), BusinessPermissions.STOCK_MANAGE);
     }
 
     public boolean canManageCatalogue() {
