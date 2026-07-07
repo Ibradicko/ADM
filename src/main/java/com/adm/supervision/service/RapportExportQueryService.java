@@ -7,6 +7,7 @@ import com.adm.supervision.service.criteria.RapportExportCriteria;
 import com.adm.supervision.service.dto.RapportExportDTO;
 import com.adm.supervision.service.mapper.RapportExportMapper;
 import jakarta.persistence.criteria.JoinType;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -32,9 +33,16 @@ public class RapportExportQueryService extends QueryService<RapportExport> {
 
     private final RapportExportMapper rapportExportMapper;
 
-    public RapportExportQueryService(RapportExportRepository rapportExportRepository, RapportExportMapper rapportExportMapper) {
+    private final ModuleSecurityService moduleSecurityService;
+
+    public RapportExportQueryService(
+        RapportExportRepository rapportExportRepository,
+        RapportExportMapper rapportExportMapper,
+        ModuleSecurityService moduleSecurityService
+    ) {
         this.rapportExportRepository = rapportExportRepository;
         this.rapportExportMapper = rapportExportMapper;
+        this.moduleSecurityService = moduleSecurityService;
     }
 
     /**
@@ -46,7 +54,7 @@ public class RapportExportQueryService extends QueryService<RapportExport> {
     @Transactional(readOnly = true)
     public Page<RapportExportDTO> findByCriteria(RapportExportCriteria criteria, Pageable page) {
         LOG.debug("find by criteria : {}, page: {}", criteria, page);
-        final Specification<RapportExport> specification = createSpecification(criteria);
+        final Specification<RapportExport> specification = createSpecification(criteria).and(createScopeSpecification());
         return rapportExportRepository.findAll(specification, page).map(rapportExportMapper::toDto);
     }
 
@@ -58,7 +66,7 @@ public class RapportExportQueryService extends QueryService<RapportExport> {
     @Transactional(readOnly = true)
     public long countByCriteria(RapportExportCriteria criteria) {
         LOG.debug("count by criteria : {}", criteria);
-        final Specification<RapportExport> specification = createSpecification(criteria);
+        final Specification<RapportExport> specification = createSpecification(criteria).and(createScopeSpecification());
         return rapportExportRepository.count(specification);
     }
 
@@ -89,5 +97,26 @@ public class RapportExportQueryService extends QueryService<RapportExport> {
             );
         }
         return specification;
+    }
+
+    private Specification<RapportExport> createScopeSpecification() {
+        if (moduleSecurityService.hasGlobalBoutiqueAccess()) {
+            return Specification.unrestricted();
+        }
+
+        Set<Long> boutiqueIds = moduleSecurityService.getAccessibleBoutiqueIds();
+        Long currentUserId = moduleSecurityService.getCurrentUser().getId();
+        return (root, query, builder) -> {
+            var boutiqueJoin = root.join(RapportExport_.boutique, JoinType.LEFT);
+            var utilisateurJoin = root.join(RapportExport_.utilisateur, JoinType.LEFT);
+            var ownUnscopedExport = builder.and(
+                builder.isNull(root.get(RapportExport_.boutique)),
+                builder.equal(utilisateurJoin.get(User_.id), currentUserId)
+            );
+            if (boutiqueIds.isEmpty()) {
+                return ownUnscopedExport;
+            }
+            return builder.or(boutiqueJoin.get(Boutique_.id).in(boutiqueIds), ownUnscopedExport);
+        };
     }
 }

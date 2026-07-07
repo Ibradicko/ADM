@@ -1,60 +1,61 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (ligneTransfertStock(); as ligneTransfertStockRef) {
+@if (ligneTransfertStock(); as ligneTransfertStockRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="ligneTransfertStockDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.detail.title">Ligne Transfert Stock</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ ligneTransfertStockRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.quantite">Quantite</span></dt>
-          <dd>
-            <span>{{ ligneTransfertStockRef.quantite }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.commentaire">Commentaire</span></dt>
-          <dd>
-            <span>{{ ligneTransfertStockRef.commentaire }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.transfert">Transfert</span></dt>
-          <dd>
-            @if (ligneTransfertStock()!.transfert) {
-              <div>
-                <a [routerLink]="['/transfert-stock', ligneTransfertStock()!.transfert?.id, 'view']">{{
-                  ligneTransfertStockRef.transfert?.reference
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.produit">Produit</span></dt>
-          <dd>
-            @if (ligneTransfertStock()!.produit) {
-              <div>
-                <a [routerLink]="['/produit', ligneTransfertStock()!.produit?.id, 'view']">{{
-                  ligneTransfertStockRef.produit?.designation
-                }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/ligne-transfert-stock', ligneTransfertStockRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.detail.title">Ligne Transfert Stock</p>
+        <h1 data-cy="ligneTransfertStockDetailsHeading">
+          {{ ligneTransfertStockRef.produit?.designation || '#' + ligneTransfertStockRef.id }}
+        </h1>
+        <p>{{ ligneTransfertStockRef.transfert?.reference || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/ligne-transfert-stock', ligneTransfertStockRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.detail.title">Ligne Transfert Stock</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.quantite">Quantite</span>
+          <strong>{{ ligneTransfertStockRef.quantite }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.commentaire">Commentaire</span>
+          <strong>{{ ligneTransfertStockRef.commentaire || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.transfert">Transfert</span>
+          @if (ligneTransfertStockRef.transfert) {
+            <a [routerLink]="['/transfert-stock', ligneTransfertStockRef.transfert.id, 'view']">{{
+              ligneTransfertStockRef.transfert.reference
+            }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneTransfertStock.produit">Produit</span>
+          @if (ligneTransfertStockRef.produit) {
+            <a [routerLink]="['/produit', ligneTransfertStockRef.produit.id, 'view']">{{ ligneTransfertStockRef.produit.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

@@ -271,6 +271,8 @@ public class DashboardReportingService {
     }
 
     public RapportExportPreviewDTO generateExport(GenerateRapportExportRequest request) {
+        applyExportScope(request);
+        assertReportTypeAllowed(request);
         assertBoutiqueAccess(request.getBoutiqueId(), "Acces refuse a l'export demande");
         validatePeriodRange(request.getPeriodeDebut(), request.getPeriodeFin());
         Boutique boutique = resolveBoutique(request.getBoutiqueId());
@@ -377,6 +379,7 @@ public class DashboardReportingService {
         return ventes
             .stream()
             .filter(vente -> isBoutiqueVisible(vente.getBoutique().getId()))
+            .filter(this::isSaleVisibleForCurrentSeller)
             .filter(vente -> locataireId == null || Objects.equals(vente.getLocataire().getId(), locataireId))
             .filter(vente -> statutVente == null || vente.getStatut() == statutVente)
             .filter(vente -> minMontantNet == null || safe(vente.getMontantNet()).compareTo(minMontantNet) >= 0)
@@ -437,32 +440,50 @@ public class DashboardReportingService {
 
     private ReportDocument buildStockAlertDocument(GenerateRapportExportRequest request) {
         List<DashboardStockAlertDTO> alerts = getStockAlerts(request.getBoutiqueId(), request.getDepotId(), request.getProduitId());
-        List<String> summary = List.of("Alertes stock: " + alerts.size());
+        BigDecimal totalEcart = sum(
+            alerts
+                .stream()
+                .map(alert -> maxZero(safe(alert.getStockAlerte()).subtract(safe(alert.getQuantiteTheorique()))))
+                .toList()
+        );
+        long critiques = alerts
+            .stream()
+            .filter(alert -> safe(alert.getQuantiteTheorique()).compareTo(ZERO) <= 0)
+            .count();
+        List<String> summary = List.of(
+            "Perimetre: " + scopeLabel(request),
+            "Alertes stock: " + alerts.size(),
+            "Ruptures ou stock nul: " + critiques,
+            "Ecart total sous seuil: " + decimalString(totalEcart)
+        );
         List<List<String>> rows = alerts
             .stream()
             .map(alert ->
                 List.of(
                     nullSafe(alert.getBoutiqueNom()),
                     nullSafe(alert.getDepotCode()),
+                    String.valueOf(alert.getProduitId()),
                     nullSafe(alert.getProduitDesignation()),
                     decimalString(alert.getQuantiteTheorique()),
-                    decimalString(alert.getStockAlerte())
+                    decimalString(alert.getStockAlerte()),
+                    decimalString(maxZero(safe(alert.getStockAlerte()).subtract(safe(alert.getQuantiteTheorique()))))
                 )
             )
             .toList();
+        List<String> headers = List.of("Boutique", "Depot", "Produit ID", "Produit", "Stock theorique", "Seuil alerte", "Ecart");
         return new ReportDocument(
             "Rapport alertes stock",
             summary,
-            List.of("Boutique", "Depot", "Produit", "Stock theorique", "Seuil alerte"),
+            headers,
             rows,
-            buildPreview("Rapport alertes stock", summary, rows)
+            buildPreview("Rapport alertes stock", summary, headers, rows)
         );
     }
 
     private ReportDocument buildSalesDocument(GenerateRapportExportRequest request, Locataire locataire) {
         LocalDate from = request.getPeriodeDebut() == null ? LocalDate.now().minusDays(6) : request.getPeriodeDebut();
         LocalDate to = request.getPeriodeFin() == null ? LocalDate.now() : request.getPeriodeFin();
-        List<DashboardSalesByDayPointDTO> points = getSalesByDay(
+        List<Vente> ventes = loadSales(
             from,
             to,
             request.getBoutiqueId(),
@@ -470,28 +491,60 @@ public class DashboardReportingService {
             request.getStatutVente(),
             request.getMinMontantNet()
         );
+        Map<LocalDate, List<Vente>> ventesParJour = new LinkedHashMap<>();
+        LocalDate cursor = from;
+        while (!cursor.isAfter(to)) {
+            ventesParJour.put(cursor, new ArrayList<>());
+            cursor = cursor.plusDays(1);
+        }
+        ventes.forEach(vente -> {
+            LocalDate day = vente.getDateHeure().atZone(ZoneOffset.UTC).toLocalDate();
+            ventesParJour.computeIfAbsent(day, ignored -> new ArrayList<>()).add(vente);
+        });
+        BigDecimal totalBrut = sum(ventes.stream().map(Vente::getMontantBrut).toList());
+        BigDecimal totalNet = sum(ventes.stream().map(Vente::getMontantNet).toList());
+        BigDecimal totalRemise = totalBrut.subtract(totalNet);
+        BigDecimal ticketMoyen = ventes.isEmpty() ? ZERO : totalNet.divide(BigDecimal.valueOf(ventes.size()), 2, RoundingMode.HALF_UP);
         List<String> summary = List.of(
             "Periode: " + from + " -> " + to,
+            "Perimetre: " + scopeLabel(request),
             locataire == null ? "Locataire: tous" : "Locataire: " + locataire.getNom(),
-            "Montant net minimum: " + (request.getMinMontantNet() == null ? "aucun" : decimalString(request.getMinMontantNet()))
+            "Statut vente: " + (request.getStatutVente() == null ? "tous" : request.getStatutVente().name()),
+            "Montant net minimum: " + (request.getMinMontantNet() == null ? "aucun" : decimalString(request.getMinMontantNet())),
+            "Nombre de ventes: " + ventes.size(),
+            "Total brut: " + decimalString(totalBrut),
+            "Total remise: " + decimalString(totalRemise),
+            "Total net: " + decimalString(totalNet),
+            "Ticket moyen: " + decimalString(ticketMoyen)
         );
-        List<List<String>> rows = points
+        List<List<String>> rows = ventesParJour
+            .entrySet()
             .stream()
-            .map(point ->
-                List.of(
-                    point.getDay().toString(),
-                    String.valueOf(point.getValidatedSalesCount()),
-                    decimalString(point.getGrossAmount()),
-                    decimalString(point.getNetAmount())
-                )
-            )
+            .map(entry -> {
+                List<Vente> ventesDuJour = entry.getValue();
+                BigDecimal brut = sum(ventesDuJour.stream().map(Vente::getMontantBrut).toList());
+                BigDecimal net = sum(ventesDuJour.stream().map(Vente::getMontantNet).toList());
+                BigDecimal remise = brut.subtract(net);
+                BigDecimal moyen = ventesDuJour.isEmpty()
+                    ? ZERO
+                    : net.divide(BigDecimal.valueOf(ventesDuJour.size()), 2, RoundingMode.HALF_UP);
+                return List.of(
+                    entry.getKey().toString(),
+                    String.valueOf(ventesDuJour.size()),
+                    decimalString(brut),
+                    decimalString(remise),
+                    decimalString(net),
+                    decimalString(moyen)
+                );
+            })
             .toList();
+        List<String> headers = List.of("Jour", "Nb ventes", "Montant brut", "Remise", "Montant net", "Ticket moyen");
         return new ReportDocument(
             "Rapport ventes par jour",
             summary,
-            List.of("Jour", "Nb ventes", "Montant brut", "Montant net"),
+            headers,
             rows,
-            buildPreview("Rapport ventes par jour", summary, rows)
+            buildPreview("Rapport ventes par jour", summary, headers, rows)
         );
     }
 
@@ -514,40 +567,61 @@ public class DashboardReportingService {
             .sorted((left, right) -> left.getPeriodeDebut().compareTo(right.getPeriodeDebut()))
             .toList();
 
+        BigDecimal totalCa = ZERO;
         BigDecimal totalDue = ZERO;
         BigDecimal totalPaid = ZERO;
+        long soldes = 0;
+        long partiels = 0;
         List<List<String>> rows = new ArrayList<>();
         for (CalculRedevance calcul : calculs) {
             BigDecimal paid = safe(paidByCalcul.get(calcul.getId()));
             BigDecimal due = safe(calcul.getMontantRedevance());
+            BigDecimal reste = maxZero(due.subtract(paid));
+            totalCa = totalCa.add(safe(calcul.getChiffreAffaires()));
             totalDue = totalDue.add(due);
             totalPaid = totalPaid.add(paid);
+            if (reste.compareTo(ZERO) == 0 && due.compareTo(ZERO) > 0) {
+                soldes++;
+            } else if (paid.compareTo(ZERO) > 0) {
+                partiels++;
+            }
             rows.add(
                 List.of(
                     calcul.getReference(),
+                    calcul.getPeriodeDebut() + " -> " + calcul.getPeriodeFin(),
                     calcul.getBoutique().getNom(),
                     calcul.getLocataire().getNom(),
                     decimalString(calcul.getChiffreAffaires()),
                     decimalString(due),
                     decimalString(paid),
-                    decimalString(maxZero(due.subtract(paid))),
+                    decimalString(reste),
                     calcul.getStatut().name()
                 )
             );
         }
         List<String> summary = List.of(
+            "Periode: " + from + " -> " + to,
+            "Perimetre: " + scopeLabel(request),
             "Calculs: " + calculs.size(),
+            "Total CA: " + decimalString(totalCa),
             "Total redevance: " + decimalString(totalDue),
             "Total paye: " + decimalString(totalPaid),
-            "Reste: " + decimalString(maxZero(totalDue.subtract(totalPaid)))
+            "Reste: " + decimalString(maxZero(totalDue.subtract(totalPaid))),
+            "Soldes: " + soldes,
+            "Paiements partiels: " + partiels
         );
-        return new ReportDocument(
-            "Rapport redevances",
-            summary,
-            List.of("Reference", "Boutique", "Locataire", "CA", "Redevance", "Paye", "Reste", "Statut"),
-            rows,
-            buildPreview("Rapport redevances", summary, rows)
+        List<String> headers = List.of(
+            "Reference",
+            "Periode calcul",
+            "Boutique",
+            "Locataire",
+            "CA",
+            "Redevance",
+            "Paye",
+            "Reste",
+            "Statut"
         );
+        return new ReportDocument("Rapport redevances", summary, headers, rows, buildPreview("Rapport redevances", summary, headers, rows));
     }
 
     private ReportDocument buildUnknownScanDocument(GenerateRapportExportRequest request) {
@@ -573,7 +647,16 @@ public class DashboardReportingService {
             )
             .sorted((left, right) -> left.getDateScan().compareTo(right.getDateScan()))
             .toList();
-        List<String> summary = List.of("Scans inconnus: " + scans.size());
+        long nonResolus = scans
+            .stream()
+            .filter(scan -> !Boolean.TRUE.equals(scan.getResolu()))
+            .count();
+        List<String> summary = List.of(
+            "Perimetre: " + scopeLabel(request),
+            "Scans inconnus: " + scans.size(),
+            "Non resolus: " + nonResolus,
+            "Resolus: " + (scans.size() - nonResolus)
+        );
         List<List<String>> rows = scans
             .stream()
             .map(scan ->
@@ -586,12 +669,13 @@ public class DashboardReportingService {
                 )
             )
             .toList();
+        List<String> headers = List.of("Date scan", "Code", "Boutique", "Produit affecte", "Statut");
         return new ReportDocument(
             "Rapport scans inconnus",
             summary,
-            List.of("Date scan", "Code", "Boutique", "Produit affecte", "Statut"),
+            headers,
             rows,
-            buildPreview("Rapport scans inconnus", summary, rows)
+            buildPreview("Rapport scans inconnus", summary, headers, rows)
         );
     }
 
@@ -610,10 +694,11 @@ public class DashboardReportingService {
         return normalized.isBlank() ? "rapport" : normalized;
     }
 
-    private String buildPreview(String title, List<String> summary, List<List<String>> rows) {
+    private String buildPreview(String title, List<String> summary, List<String> headers, List<List<String>> rows) {
         List<String> lines = new ArrayList<>();
         lines.add(title);
         lines.addAll(summary);
+        lines.add(String.join(" | ", headers));
         int previewRowCount = Math.min(rows.size(), 10);
         for (int i = 0; i < previewRowCount; i++) {
             lines.add(String.join(" | ", rows.get(i)));
@@ -638,6 +723,70 @@ public class DashboardReportingService {
 
     private boolean isBoutiqueVisible(Long boutiqueId) {
         return moduleSecurityService.hasGlobalBoutiqueAccess() || moduleSecurityService.getAccessibleBoutiqueIds().contains(boutiqueId);
+    }
+
+    private void applyExportScope(GenerateRapportExportRequest request) {
+        if (moduleSecurityService.isCurrentUserLocataire()) {
+            Long locataireId = moduleSecurityService.getCurrentLocataireIdOrNull();
+            if (locataireId == null) {
+                throw new org.springframework.security.access.AccessDeniedException("Acces refuse a l'export demande");
+            }
+            request.setLocataireId(locataireId);
+        }
+        if (!moduleSecurityService.hasGlobalBoutiqueAccess() && request.getBoutiqueId() == null) {
+            List<Long> accessibleBoutiqueIds = new ArrayList<>(moduleSecurityService.getAccessibleBoutiqueIds());
+            if (accessibleBoutiqueIds.size() == 1) {
+                request.setBoutiqueId(accessibleBoutiqueIds.get(0));
+            }
+        }
+    }
+
+    private void assertReportTypeAllowed(GenerateRapportExportRequest request) {
+        String normalizedType = normalizeReportType(request.getTypeRapport());
+        boolean allowed =
+            normalizedType.contains("vente") ||
+            ((normalizedType.contains("redevance") || normalizedType.contains("royalty")) && moduleSecurityService.canReadRoyalties()) ||
+            (normalizedType.contains("stock") && moduleSecurityService.canReadStock()) ||
+            (normalizedType.contains("scan") && moduleSecurityService.canReadAudit());
+        if (!allowed || !moduleSecurityService.canAccessReportingExports()) {
+            throw new org.springframework.security.access.AccessDeniedException("Acces refuse au type de rapport demande");
+        }
+    }
+
+    private String scopeLabel(GenerateRapportExportRequest request) {
+        List<String> parts = new ArrayList<>();
+        if (request.getBoutiqueId() != null) {
+            parts.add("boutique #" + request.getBoutiqueId());
+        } else if (!moduleSecurityService.hasGlobalBoutiqueAccess()) {
+            parts.add("boutiques accessibles");
+        } else {
+            parts.add("toutes boutiques");
+        }
+        if (request.getLocataireId() != null) {
+            parts.add("locataire #" + request.getLocataireId());
+        }
+        if (request.getDepotId() != null) {
+            parts.add("depot #" + request.getDepotId());
+        }
+        if (request.getProduitId() != null) {
+            parts.add("produit #" + request.getProduitId());
+        }
+        return String.join(", ", parts);
+    }
+
+    private boolean isSaleVisibleForCurrentSeller(Vente vente) {
+        if (moduleSecurityService.hasGlobalBoutiqueAccess()) {
+            return true;
+        }
+        User currentUser = moduleSecurityService.getCurrentUser();
+        boolean currentUserIsSeller = currentUser
+            .getAuthorities()
+            .stream()
+            .anyMatch(authority -> "ROLE_VENDEUR".equals(authority.getName()));
+        if (!currentUserIsSeller) {
+            return true;
+        }
+        return vente.getVendeur() != null && Objects.equals(vente.getVendeur().getId(), currentUser.getId());
     }
 
     private void auditExportAccess(String description, RapportExport export) {

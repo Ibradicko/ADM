@@ -1,26 +1,33 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (authority(); as authorityRef) {
+@if (authority(); as authorityRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="authorityDetailsHeading"><span jhiTranslate="admSupervisionVentesApp.adminAuthority.detail.title">Authority</span></h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="admSupervisionVentesApp.adminAuthority.name">Name</span></dt>
-          <dd>
-            <span>{{ authorityRef.name }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.adminAuthority.detail.title">Authority</p>
+        <h1 data-cy="authorityDetailsHeading">{{ authorityRef.name }}</h1>
+      </div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
         </button>
       </div>
-    }
-  </div>
-</div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.adminAuthority.detail.title">Authority</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.adminAuthority.name">Name</span>
+          <strong>{{ authorityRef.name }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

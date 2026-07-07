@@ -1,48 +1,57 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (lotEtiquettes(); as lotEtiquettesRef) {
+@if (lotEtiquettes(); as lotEtiquettesRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="lotEtiquettesDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.detail.title">Lot Etiquettes</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ lotEtiquettesRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.reference">Reference</span></dt>
-          <dd>
-            <span>{{ lotEtiquettesRef.reference }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.dateGeneration">Date Generation</span></dt>
-          <dd>
-            <span>{{ lotEtiquettesRef.dateGeneration | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.formatImpression">Format Impression</span></dt>
-          <dd>
-            <span>{{ lotEtiquettesRef.formatImpression }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.nombreEtiquettes">Nombre Etiquettes</span></dt>
-          <dd>
-            <span>{{ lotEtiquettesRef.nombreEtiquettes }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/lot-etiquettes', lotEtiquettesRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.detail.title">Lot Etiquettes</p>
+        <h1 data-cy="lotEtiquettesDetailsHeading">{{ lotEtiquettesRef.reference }}</h1>
+        <p>{{ lotEtiquettesRef.dateGeneration | formatMediumDatetime }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/lot-etiquettes', lotEtiquettesRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.lotEtiquettes.detail.title">Lot Etiquettes</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="global.field.id">ID</span>
+          <strong>{{ lotEtiquettesRef.id }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.reference">Reference</span>
+          <strong>{{ lotEtiquettesRef.reference }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.dateGeneration">Date Generation</span>
+          <strong>{{ lotEtiquettesRef.dateGeneration | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.formatImpression"
+            >Format Impression</span
+          >
+          <strong>{{ lotEtiquettesRef.formatImpression || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.nombreEtiquettes"
+            >Nombre Etiquettes</span
+          >
+          <strong>{{ lotEtiquettesRef.nombreEtiquettes }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

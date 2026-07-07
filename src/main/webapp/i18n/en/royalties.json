@@ -11,8 +11,9 @@
       "update": "Update",
       "addPayment": "Add payment",
       "addAdjustment": "Add adjustment",
-      "creating": "Creating...",
-      "createCalculation": "Create calculation"
+      "printReceipt": "Print receipt",
+      "pay": "Pay",
+      "viewDetail": "View detail"
     },
     "restricted": {
       "title": "Limited access",
@@ -48,11 +49,11 @@
       "code": "Code",
       "type": "Type",
       "rate": "Rate",
-      "priority": "Priority"
+      "priority": "Priority",
+      "actions": "Actions"
     },
     "filters": {
       "allShops": "All shops",
-      "allTenants": "All tenants",
       "allStatuses": "All statuses",
       "searchPlaceholder": "Reference, shop, tenant, status..."
     },
@@ -62,7 +63,31 @@
       "relatedPayments": "Related payments",
       "adjustments": "Adjustments",
       "quickCreation": "Automatic calculation",
-      "activeRules": "Active rules"
+      "activeRules": "Active rules",
+      "paymentHistory": "Payment history"
+    },
+    "tabs": {
+      "calculations": "Calculations ({{count}})",
+      "paymentHistory": "Payment history ({{count}})",
+      "rules": "Active rules ({{count}})"
+    },
+    "scope": {
+      "tenant": "You are viewing the royalties of your shops, read-only.",
+      "seller": "You are viewing the royalties of your shop, read-only.",
+      "shopManager": "You are viewing the royalties of your shop, read-only.",
+      "admin": "Global view: royalties are calculated automatically after each sale; you can record payments."
+    },
+    "payment": {
+      "title": "Record a payment",
+      "description": "Partial payment is accepted; only the entered amount is deducted from the balance.",
+      "remaining": "Remaining balance",
+      "alreadyPaid": "Already paid",
+      "paidOnTotal": "{{paid}} paid out of {{total}}",
+      "progress": "Payment progress",
+      "payBalance": "Pay balance",
+      "maxAmount": "Available maximum: {{amount}}",
+      "noPaymentPossible": "No payment is possible for this calculation.",
+      "readOnlyNote": "Only the administrator and ADM manager can record a payment."
     },
     "count": {
       "calculations": "{{count}} calculation(s) in the selection.",
@@ -80,13 +105,11 @@
       "noPayment": "No payment is linked to this calculation.",
       "noAdjustment": "No adjustment for this calculation.",
       "noSelectedCalculation": "No calculation selected",
-      "noActiveRule": "No active rule."
+      "noActiveRule": "No active rule.",
+      "noPaymentHistory": "No payment recorded yet."
     },
     "messages": {
       "loadFailed": "Royalty data could not be loaded.",
-      "shopAndTenantRequired": "Select a shop and tenant before creating a calculation.",
-      "calculationSaved": "The royalty calculation was saved.",
-      "calculationSaveFailed": "The royalty calculation could not be saved.",
       "statusUpdated": "The calculation status was updated.",
       "statusUpdateFailed": "The status could not be updated.",
       "paymentAmountRequired": "The payment amount is required.",
@@ -95,7 +118,15 @@
       "paymentSaveFailed": "The payment could not be saved.",
       "adjustmentFieldsRequired": "The adjustment amount and reason are required.",
       "adjustmentSaved": "The adjustment was saved.",
-      "adjustmentSaveFailed": "The adjustment could not be saved."
+      "adjustmentSaveFailed": "The adjustment could not be saved.",
+      "printFailed": "Could not open the receipt print window."
+    },
+    "receipt": {
+      "title": "Royalty payment receipt",
+      "subtitle": "Adm Supervision Ventes",
+      "paymentReference": "Payment reference",
+      "calculationReference": "Calculation reference",
+      "printedOn": "Printed on {{date}}"
     },
     "common": {
       "unavailable": "Unavailable"

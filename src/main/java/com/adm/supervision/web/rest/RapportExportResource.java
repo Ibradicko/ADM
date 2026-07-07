@@ -1,7 +1,6 @@
 package com.adm.supervision.web.rest;
 
 import com.adm.supervision.repository.RapportExportRepository;
-import com.adm.supervision.service.BoutiqueCriteriaScopeService;
 import com.adm.supervision.service.RapportExportQueryService;
 import com.adm.supervision.service.RapportExportService;
 import com.adm.supervision.service.criteria.RapportExportCriteria;
@@ -48,18 +47,14 @@ public class RapportExportResource {
 
     private final RapportExportQueryService rapportExportQueryService;
 
-    private final BoutiqueCriteriaScopeService boutiqueCriteriaScopeService;
-
     public RapportExportResource(
         RapportExportService rapportExportService,
         RapportExportRepository rapportExportRepository,
-        RapportExportQueryService rapportExportQueryService,
-        BoutiqueCriteriaScopeService boutiqueCriteriaScopeService
+        RapportExportQueryService rapportExportQueryService
     ) {
         this.rapportExportService = rapportExportService;
         this.rapportExportRepository = rapportExportRepository;
         this.rapportExportQueryService = rapportExportQueryService;
-        this.boutiqueCriteriaScopeService = boutiqueCriteriaScopeService;
     }
 
     /**
@@ -162,16 +157,12 @@ public class RapportExportResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Rapport Exports in body.
      */
     @GetMapping("")
-    @PreAuthorize("@businessAuthorizationService.canReadReporting()")
+    @PreAuthorize("@businessAuthorizationService.canAccessReportingExports()")
     public ResponseEntity<List<RapportExportDTO>> getAllRapportExports(
         RapportExportCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get RapportExports by criteria: {}", criteria);
-        criteria.setBoutiqueId(
-            boutiqueCriteriaScopeService.scopeBoutiqueFilter(criteria.getBoutiqueId(), "Acces refuse aux rapports demandes")
-        );
-
         Page<RapportExportDTO> page = rapportExportQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -184,12 +175,9 @@ public class RapportExportResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
-    @PreAuthorize("@businessAuthorizationService.canReadReporting()")
+    @PreAuthorize("@businessAuthorizationService.canAccessReportingExports()")
     public ResponseEntity<Long> countRapportExports(RapportExportCriteria criteria) {
         LOG.debug("REST request to count RapportExports by criteria: {}", criteria);
-        criteria.setBoutiqueId(
-            boutiqueCriteriaScopeService.scopeBoutiqueFilter(criteria.getBoutiqueId(), "Acces refuse aux rapports demandes")
-        );
         return ResponseEntity.ok().body(rapportExportQueryService.countByCriteria(criteria));
     }
 
@@ -200,7 +188,9 @@ public class RapportExportResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the rapportExportDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    @PreAuthorize("@businessAuthorizationService.canReadReporting() and @resourceBoutiqueSecurityService.canAccessRapportExport(#id)")
+    @PreAuthorize(
+        "@businessAuthorizationService.canAccessReportingExports() and @resourceBoutiqueSecurityService.canAccessRapportExport(#id)"
+    )
     public ResponseEntity<RapportExportDTO> getRapportExport(@PathVariable("id") Long id) {
         LOG.debug("REST request to get RapportExport : {}", id);
         Optional<RapportExportDTO> rapportExportDTO = rapportExportService.findOne(id);

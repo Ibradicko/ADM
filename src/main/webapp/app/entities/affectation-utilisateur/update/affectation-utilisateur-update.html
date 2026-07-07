@@ -1,170 +1,144 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-affectation-utilisateur-heading"
-        data-cy="AffectationUtilisateurCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.home.createOrEditLabel"
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
+      <div>
+        <h2
+          id="jhi-affectation-utilisateur-heading"
+          data-cy="AffectationUtilisateurCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.home.createOrEditLabel"
+        >
+          Create or edit a Affectation Utilisateur
+        </h2>
+      </div>
+    </div>
+
+    <jhi-alert-error />
+
+    @if (validationMessageKey(); as messageKey) {
+      <div class="adm-inline-alert adm-inline-alert--danger">{{ messageKey | translate }}</div>
+    }
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let userRef = editForm.get('user')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.user">User</span>
+        <select id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+          @if (!editForm.get('user')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (userOption of usersSharedCollection(); track $index) {
+            <option [ngValue]="userOption">{{ userOption.login }}</option>
+          }
+        </select>
+        @if (userRef.invalid && (userRef.dirty || userRef.touched) && userRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let boutiqueRef = editForm.get('boutique')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.boutique">Boutique</span>
+        <select id="field_boutique" data-cy="boutique" name="boutique" formControlName="boutique" [compareWith]="compareBoutique">
+          @if (!editForm.get('boutique')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
+            <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
+          }
+        </select>
+        @if (boutiqueRef.invalid && (boutiqueRef.dirty || boutiqueRef.touched) && boutiqueRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let profilRef = editForm.get('profil')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.profil">Profil</span>
+        <select id="field_profil" data-cy="profil" name="profil" formControlName="profil" [compareWith]="compareProfilMetier">
+          @if (!editForm.get('profil')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (profilMetierOption of profilMetiersSharedCollection(); track $index) {
+            <option [ngValue]="profilMetierOption">{{ profilMetierOption.code }}</option>
+          }
+        </select>
+        @if (profilRef.invalid && (profilRef.dirty || profilRef.touched) && profilRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let dateDebutRef = editForm.get('dateDebut')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateDebut">Date Debut</span>
+        <div class="input-group">
+          <input
+            id="field_dateDebut"
+            data-cy="dateDebut"
+            type="text"
+            name="dateDebut"
+            ngbDatepicker
+            #dateDebutDp="ngbDatepicker"
+            formControlName="dateDebut"
+          />
+          <button type="button" class="adm-button adm-button--ghost" (click)="dateDebutDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+        </div>
+        @if (dateDebutRef.invalid && (dateDebutRef.dirty || dateDebutRef.touched) && dateDebutRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateFin">Date Fin</span>
+        <div class="input-group">
+          <input
+            id="field_dateFin"
+            data-cy="dateFin"
+            type="text"
+            name="dateFin"
+            ngbDatepicker
+            #dateFinDp="ngbDatepicker"
+            formControlName="dateFin"
+          />
+          <button type="button" class="adm-button adm-button--ghost" (click)="dateFinDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+        </div>
+      </label>
+
+      @let actifRef = editForm.get('actif')!;
+      <label class="adm-field adm-field--checkbox">
+        <input type="checkbox" name="actif" id="field_actif" data-cy="actif" formControlName="actif" />
+        <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.actif">Actif</span>
+      </label>
+      @if (actifRef.invalid && (actifRef.dirty || actifRef.touched) && actifRef.errors?.required) {
+        <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+      }
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
       >
-        Create or edit a Affectation Utilisateur
-      </h2>
-
-      <div>
-        <jhi-alert-error />
-
-        @if (validationMessageKey(); as messageKey) {
-          <div class="alert alert-danger" role="alert">{{ messageKey | translate }}</div>
-        }
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let dateDebutRef = editForm.get('dateDebut')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateDebut" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateDebut"
-            >Date Debut</label
-          >
-          <div class="input-group">
-            <input
-              id="field_dateDebut"
-              data-cy="dateDebut"
-              type="text"
-              class="form-control"
-              name="dateDebut"
-              ngbDatepicker
-              #dateDebutDp="ngbDatepicker"
-              formControlName="dateDebut"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateDebutDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-          @if (dateDebutRef.invalid && (dateDebutRef.dirty || dateDebutRef.touched)) {
-            <div>
-              @if (editForm.get('dateDebut')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateFin" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateFin"
-            >Date Fin</label
-          >
-          <div class="input-group">
-            <input
-              id="field_dateFin"
-              data-cy="dateFin"
-              type="text"
-              class="form-control"
-              name="dateFin"
-              ngbDatepicker
-              #dateFinDp="ngbDatepicker"
-              formControlName="dateFin"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateFinDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-        </div>
-
-        @let actifRef = editForm.get('actif')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_actif" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.actif">Actif</label>
-          <input type="checkbox" class="form-check" name="actif" id="field_actif" data-cy="actif" formControlName="actif" />
-          @if (actifRef.invalid && (actifRef.dirty || actifRef.touched)) {
-            <div>
-              @if (editForm.get('actif')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_user" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.user">User</label>
-          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
-            @if (!editForm.get('user')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (userOption of usersSharedCollection(); track $index) {
-              <option [ngValue]="userOption">{{ userOption.login }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['user'])!.invalid && (editForm.get(['user'])!.dirty || editForm.get(['user'])!.touched)) {
-          <div>
-            @if (editForm.get(['user'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_boutique" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.boutique"
-            >Boutique</label
-          >
-          <select
-            class="form-control"
-            id="field_boutique"
-            data-cy="boutique"
-            name="boutique"
-            formControlName="boutique"
-            [compareWith]="compareBoutique"
-          >
-            @if (!editForm.get('boutique')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
-              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['boutique'])!.invalid && (editForm.get(['boutique'])!.dirty || editForm.get(['boutique'])!.touched)) {
-          <div>
-            @if (editForm.get(['boutique'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_profil" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.profil">Profil</label>
-          <select
-            class="form-control"
-            id="field_profil"
-            data-cy="profil"
-            name="profil"
-            formControlName="profil"
-            [compareWith]="compareProfilMetier"
-          >
-            @if (!editForm.get('profil')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (profilMetierOption of profilMetiersSharedCollection(); track $index) {
-              <option [ngValue]="profilMetierOption">{{ profilMetierOption.code }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['profil'])!.invalid && (editForm.get(['profil'])!.dirty || editForm.get(['profil'])!.touched)) {
-          <div>
-            @if (editForm.get(['profil'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button type="submit" id="save-entity" data-cy="entityCreateSaveButton" [disabled]="isSaving()" class="btn btn-primary">
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

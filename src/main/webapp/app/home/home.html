@@ -9,9 +9,7 @@
         </p>
         <div class="adm-dashboard-hero__meta">
           <span>{{ periodLabel() }}</span>
-          @if (dashboardMode() !== 'VENDEUR') {
-            <span>{{ dashboardScopeLabel() }}</span>
-          }
+          <span>{{ dashboardScopeLabel() }}</span>
           @if (isTenantDashboard()) {
             <span>{{ activeTenantShops().length }} {{ 'home.dashboard.tenant.activeShops' | translate }}</span>
           }
@@ -41,17 +39,15 @@
     }
 
     <div class="adm-toolbar">
-      @if (dashboardMode() !== 'VENDEUR') {
-        <label class="adm-field">
-          <span jhiTranslate="home.dashboard.filters.startDate">Periode debut</span>
-          <input class="adm-input" type="date" [ngModel]="dateDebut()" (ngModelChange)="dateDebut.set($event)" />
-        </label>
+      <label class="adm-field">
+        <span jhiTranslate="home.dashboard.filters.startDate">Periode debut</span>
+        <input class="adm-input" type="date" [ngModel]="dateDebut()" (ngModelChange)="dateDebut.set($event)" />
+      </label>
 
-        <label class="adm-field">
-          <span jhiTranslate="home.dashboard.filters.endDate">Periode fin</span>
-          <input class="adm-input" type="date" [ngModel]="dateFin()" (ngModelChange)="dateFin.set($event)" />
-        </label>
-      }
+      <label class="adm-field">
+        <span jhiTranslate="home.dashboard.filters.endDate">Periode fin</span>
+        <input class="adm-input" type="date" [ngModel]="dateFin()" (ngModelChange)="dateFin.set($event)" />
+      </label>
 
       @if (dashboardMode() === 'ADMIN' || dashboardMode() === 'LOCATAIRE') {
         <label class="adm-field">
@@ -82,7 +78,7 @@
       }
 
       @if (dashboardMode() === 'VENDEUR') {
-        <span class="adm-pill adm-pill--dark" jhiTranslate="home.dashboard.vendeur.todayPill">Ventes du jour</span>
+        <span class="adm-pill adm-pill--dark" jhiTranslate="home.dashboard.vendeur.scopePill">Mes ventes</span>
       }
 
       <div class="adm-page-header__actions">
@@ -99,7 +95,11 @@
 
     <div class="adm-stats-grid">
       @for (metric of metrics(); track metric.labelKey) {
-        <article class="adm-stat-card" [class]="'adm-stat-card adm-stat-card--' + metric.tone">
+        <article
+          class="adm-stat-card"
+          [class]="'adm-stat-card adm-stat-card--' + metric.tone"
+          [class.adm-stat-card--featured]="metric.featured"
+        >
           <span [jhiTranslate]="metric.labelKey"></span>
           <strong>{{ metric.value }}</strong>
         </article>
@@ -122,7 +122,7 @@
         <div class="adm-card__header">
           <div>
             <h2 jhiTranslate="home.dashboard.vendeur.recentSalesTitle">Mes dernières ventes</h2>
-            <p jhiTranslate="home.dashboard.vendeur.recentSalesSubtitle">Tickets enregistrés aujourd'hui.</p>
+            <p jhiTranslate="home.dashboard.vendeur.recentSalesSubtitle">Tickets enregistres sur la periode filtree.</p>
           </div>
         </div>
 
@@ -145,63 +145,6 @@
           </div>
         }
       </article>
-    }
-
-    @if (dashboardMode() === 'ADMIN' || dashboardMode() === 'BOUTIQUE') {
-      <div class="adm-chart-grid">
-        <article class="adm-card adm-chart-card">
-          <div class="adm-card__header">
-            <div>
-              <h2 jhiTranslate="home.dashboard.charts.netSalesEvolution.title">Evolution du chiffre d affaires net</h2>
-              <p jhiTranslate="home.dashboard.charts.netSalesEvolution.subtitle">Periode selectionnee</p>
-            </div>
-          </div>
-
-          @if (salesTrend().length > 0) {
-            <div class="adm-line-chart">
-              <div class="adm-line-chart__grid"></div>
-              <svg viewBox="0 0 520 220" preserveAspectRatio="none" aria-hidden="true">
-                <polyline [attr.points]="salesPolyline()" class="adm-line-chart__path"></polyline>
-              </svg>
-              <div class="adm-line-chart__labels">
-                @for (point of salesTrend().slice(0, 6); track point.label) {
-                  <span>{{ point.label }}</span>
-                }
-              </div>
-            </div>
-          } @else {
-            <div class="adm-empty-state adm-empty-state--compact">
-              <strong jhiTranslate="home.dashboard.empty.noSalesTitle">Aucune vente sur la période</strong>
-              <p jhiTranslate="home.dashboard.empty.noSalesText">Ajustez les filtres ou vérifiez les droits de consultation.</p>
-            </div>
-          }
-        </article>
-
-        <article class="adm-card adm-chart-card">
-          <div class="adm-card__header">
-            <div>
-              <h2 jhiTranslate="home.dashboard.charts.grossDaily.title">Montant brut journalier</h2>
-              <p jhiTranslate="home.dashboard.charts.grossDaily.subtitle">Repartition du chiffre d affaires brut par jour</p>
-            </div>
-          </div>
-
-          @if (grossTrend().length > 0) {
-            <div class="adm-bar-chart">
-              @for (point of grossTrend().slice(0, 6); track point.label) {
-                <div class="adm-bar-chart__item">
-                  <div class="adm-bar-chart__bar" [style.height.%]="royaltiesBarHeight(point.value)"></div>
-                  <span>{{ point.label }}</span>
-                </div>
-              }
-            </div>
-          } @else {
-            <div class="adm-empty-state adm-empty-state--compact">
-              <strong jhiTranslate="home.dashboard.empty.noGrossTitle">Aucun montant journalier</strong>
-              <p jhiTranslate="home.dashboard.empty.noSalesText">Ajustez les filtres ou vérifiez les droits de consultation.</p>
-            </div>
-          }
-        </article>
-      </div>
     }
 
     @if (isTenantDashboard()) {
@@ -241,7 +184,7 @@
 
         @if (tenantShopSummaries().length > 0) {
           <div class="adm-table-wrapper">
-            <table class="adm-data-table">
+            <table class="adm-table">
               <thead>
                 <tr>
                   <th jhiTranslate="home.dashboard.tenant.columns.shop">Boutique</th>
@@ -252,11 +195,13 @@
                 </tr>
               </thead>
               <tbody>
-                @for (summary of tenantShopSummaries(); track summary.boutiqueId) {
-                  <tr>
+                @for (summary of tenantShopSummaries(); track summary.boutiqueId; let even = $even) {
+                  <tr [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
                     <td>
-                      <strong>{{ summary.name }}</strong>
-                      <small>{{ summary.detail }}</small>
+                      <div class="adm-table-title">
+                        <strong>{{ summary.name }}</strong>
+                        <small>{{ summary.detail }}</small>
+                      </div>
                     </td>
                     <td>{{ summary.netSales }}</td>
                     <td>{{ summary.grossSales }}</td>

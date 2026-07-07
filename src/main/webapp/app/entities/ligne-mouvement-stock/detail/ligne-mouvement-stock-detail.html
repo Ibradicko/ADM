@@ -1,76 +1,77 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (ligneMouvementStock(); as ligneMouvementStockRef) {
+@if (ligneMouvementStock(); as ligneMouvementStockRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="ligneMouvementStockDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.detail.title">Ligne Mouvement Stock</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ ligneMouvementStockRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.quantite">Quantite</span></dt>
-          <dd>
-            <span>{{ ligneMouvementStockRef.quantite }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.stockAvant">Stock Avant</span></dt>
-          <dd>
-            <span>{{ ligneMouvementStockRef.stockAvant }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.stockApres">Stock Apres</span></dt>
-          <dd>
-            <span>{{ ligneMouvementStockRef.stockApres }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.commentaire">Commentaire</span></dt>
-          <dd>
-            <span>{{ ligneMouvementStockRef.commentaire }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.mouvement">Mouvement</span></dt>
-          <dd>
-            @if (ligneMouvementStock()!.mouvement) {
-              <div>
-                <a [routerLink]="['/mouvement-stock', ligneMouvementStock()!.mouvement?.id, 'view']">{{
-                  ligneMouvementStockRef.mouvement?.reference
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.produit">Produit</span></dt>
-          <dd>
-            @if (ligneMouvementStock()!.produit) {
-              <div>
-                <a [routerLink]="['/produit', ligneMouvementStock()!.produit?.id, 'view']">{{
-                  ligneMouvementStockRef.produit?.designation
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.depot">Depot</span></dt>
-          <dd>
-            @if (ligneMouvementStock()!.depot) {
-              <div>
-                <a [routerLink]="['/depot-stock', ligneMouvementStock()!.depot?.id, 'view']">{{ ligneMouvementStockRef.depot?.code }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/ligne-mouvement-stock', ligneMouvementStockRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.detail.title">Ligne Mouvement Stock</p>
+        <h1 data-cy="ligneMouvementStockDetailsHeading">
+          {{ ligneMouvementStockRef.produit?.designation || '#' + ligneMouvementStockRef.id }}
+        </h1>
+        <p>{{ ligneMouvementStockRef.mouvement?.reference || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/ligne-mouvement-stock', ligneMouvementStockRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.detail.title">Ligne Mouvement Stock</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.quantite">Quantite</span>
+          <strong>{{ ligneMouvementStockRef.quantite }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.stockAvant">Stock Avant</span>
+          <strong>{{ ligneMouvementStockRef.stockAvant ?? '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.stockApres">Stock Apres</span>
+          <strong>{{ ligneMouvementStockRef.stockApres ?? '--' }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.commentaire">Commentaire</span>
+          <strong>{{ ligneMouvementStockRef.commentaire || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.mouvement">Mouvement</span>
+          @if (ligneMouvementStockRef.mouvement) {
+            <a [routerLink]="['/mouvement-stock', ligneMouvementStockRef.mouvement.id, 'view']">{{
+              ligneMouvementStockRef.mouvement.reference
+            }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.produit">Produit</span>
+          @if (ligneMouvementStockRef.produit) {
+            <a [routerLink]="['/produit', ligneMouvementStockRef.produit.id, 'view']">{{ ligneMouvementStockRef.produit.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneMouvementStock.depot">Depot</span>
+          @if (ligneMouvementStockRef.depot) {
+            <a [routerLink]="['/depot-stock', ligneMouvementStockRef.depot.id, 'view']">{{ ligneMouvementStockRef.depot.code }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

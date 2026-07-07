@@ -255,6 +255,7 @@ a:hover {
 .adm-app-content {
   min-height: 100vh;
   padding: 88px 24px 32px 280px;
+  transition: padding 0.22s ease;
 }
 
 .adm-app-content--public {
@@ -276,6 +277,9 @@ a:hover {
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(148, 163, 184, 0.18);
+  transition:
+    width 0.22s ease,
+    transform 0.22s ease;
 }
 
 .adm-sidebar__brand {
@@ -407,6 +411,15 @@ a:hover {
   border-bottom: 1px solid var(--adm-border);
   box-shadow: 0 10px 35px rgba(15, 23, 42, 0.05);
   backdrop-filter: blur(14px);
+  transition: left 0.22s ease;
+}
+
+body.adm-sidebar-compact .adm-app-content:not(.adm-app-content--public) {
+  padding-left: 108px;
+}
+
+body.adm-sidebar-compact .adm-topbar {
+  left: 84px;
 }
 
 .adm-search {
@@ -1298,6 +1311,12 @@ a:hover {
 
 .adm-button--block {
   width: 100%;
+}
+
+.adm-button--small {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  border-radius: 0.6rem;
 }
 
 .adm-login {
@@ -2475,9 +2494,17 @@ a:hover {
     padding: 88px 1rem 1.5rem;
   }
 
+  body.adm-sidebar-compact .adm-app-content:not(.adm-app-content--public) {
+    padding: 88px 1rem 1.5rem;
+  }
+
   .adm-topbar {
     left: 0;
     padding-inline: 1rem;
+  }
+
+  body.adm-sidebar-compact .adm-topbar {
+    left: 0;
   }
 
   .adm-sidebar {
@@ -2654,6 +2681,10 @@ a:hover {
 
 @media (max-width: 575.98px) {
   .adm-app-content {
+    padding: 80px 0.75rem 1rem;
+  }
+
+  body.adm-sidebar-compact .adm-app-content:not(.adm-app-content--public) {
     padding: 80px 0.75rem 1rem;
   }
 

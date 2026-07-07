@@ -33,6 +33,7 @@ interface DashboardMetric {
   labelKey: string;
   value: string;
   tone: 'primary' | 'success' | 'warning' | 'neutral';
+  featured?: boolean;
 }
 
 interface TrendPoint {
@@ -157,7 +158,8 @@ export default class Home implements OnInit {
 
     if (mode === 'VENDEUR') {
       return [
-        { labelKey: 'home.dashboard.metrics.netSales', value: this.formatMontant(overview?.netSales), tone: 'success' },
+        { labelKey: 'home.dashboard.metrics.netSales', value: this.formatMontant(overview?.netSales), tone: 'success', featured: true },
+        { labelKey: 'home.dashboard.metrics.grossSales', value: this.formatMontant(overview?.grossSales), tone: 'primary' },
         { labelKey: 'home.dashboard.metrics.validatedSales', value: this.formatNombre(overview?.validatedSalesCount), tone: 'primary' },
       ];
     }
@@ -383,11 +385,14 @@ export default class Home implements OnInit {
         : Promise.resolve<DashboardStockAlertResponse[]>([]);
 
       const shouldLoadRawSales =
-        (this.permissionsUi.estAdmin() || this.permissionsUi.estProfilAdm() || this.permissionsUi.estProfilSupervision()) &&
+        (this.permissionsUi.estAdmin() ||
+          this.permissionsUi.estProfilAdm() ||
+          this.permissionsUi.estProfilSupervision() ||
+          this.dashboardMode() === 'VENDEUR') &&
         this.permissionsUi.peutLireVentes();
 
       const ventesRequest = shouldLoadRawSales
-        ? this.queryOptionnelle(() => firstValueFrom(this.venteService.query({ size: 2000, sort: ['dateHeure,desc'] })), null)
+        ? this.queryOptionnelle(() => firstValueFrom(this.venteService.query(this.rawSalesQueryParams())), null)
         : Promise.resolve(null);
 
       const lignesRequest = shouldLoadRawSales
@@ -478,9 +483,6 @@ export default class Home implements OnInit {
       this.exploitationsLocataire.set([]);
       const boutiqueIdsVendeur = this.permissionsUi.boutiqueIds();
       this.boutiqueId.set(boutiqueIdsVendeur.length > 0 ? boutiqueIdsVendeur[0] : null);
-      const aujourdhui = dayjs().format('YYYY-MM-DD');
-      this.dateDebut.set(aujourdhui);
-      this.dateFin.set(aujourdhui);
       await this.actualiserDashboard();
       return;
     }
@@ -543,6 +545,20 @@ export default class Home implements OnInit {
   private paramsBoutiquesAccessibles(): Record<string, string | number> {
     const ids = this.permissionsUi.boutiqueIds();
     return ids.length ? { 'id.in': ids.join(',') } : { 'id.equals': -1 };
+  }
+
+  private rawSalesQueryParams(): Record<string, string | number | string[]> {
+    const params: Record<string, string | number | string[]> = {
+      size: this.dashboardMode() === 'VENDEUR' ? 100 : 2000,
+      sort: ['dateHeure,desc'],
+    };
+
+    const currentUserId = this.account()?.id;
+    if (this.dashboardMode() === 'VENDEUR' && typeof currentUserId === 'number') {
+      params['vendeurId.equals'] = currentUserId;
+    }
+
+    return params;
   }
 
   private async loadTenantShopSummaries(): Promise<TenantShopSummary[]> {

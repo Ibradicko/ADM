@@ -9,6 +9,7 @@ import com.adm.supervision.repository.PaiementRedevanceRepository;
 import com.adm.supervision.service.dto.PaiementRedevanceDTO;
 import com.adm.supervision.service.mapper.PaiementRedevanceMapper;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,7 @@ public class PaiementRedevanceService {
         LOG.debug("Request to save PaiementRedevance : {}", paiementRedevanceDTO);
         PaiementRedevance paiementRedevance = paiementRedevanceMapper.toEntity(paiementRedevanceDTO);
         validatePayment(paiementRedevance, null);
+        ensureReference(paiementRedevance);
         assertAccessible(paiementRedevance, "Acces refuse au paiement de redevance a creer");
         paiementRedevance = paiementRedevanceRepository.save(paiementRedevance);
         refreshCalculationStatus(paiementRedevance.getCalcul());
@@ -168,6 +170,9 @@ public class PaiementRedevanceService {
     }
 
     private void validatePayment(PaiementRedevance payment, Long excludedPaymentId) {
+        if (payment.getCalcul() == null || payment.getCalcul().getId() == null) {
+            throw new BusinessValidationException("paiementRedevance", "calculationRequired", "Le calcul de redevance est obligatoire");
+        }
         if (payment.getMontant() == null || payment.getMontant().signum() <= 0) {
             throw new BusinessValidationException(
                 "paiementRedevance",
@@ -196,6 +201,12 @@ public class PaiementRedevanceService {
                 "overpayment",
                 "Le total des paiements ne peut pas depasser le montant de la redevance"
             );
+        }
+    }
+
+    private void ensureReference(PaiementRedevance paiementRedevance) {
+        if (paiementRedevance.getReference() == null || paiementRedevance.getReference().isBlank()) {
+            paiementRedevance.setReference("PAY-RED-" + Instant.now().toEpochMilli());
         }
     }
 

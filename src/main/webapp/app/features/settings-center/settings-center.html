@@ -353,6 +353,10 @@
                     }
                   </td>
                 </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" jhiTranslate="settingsCenter.empty.noPaymentMethod">No payment method configured yet.</td>
+                </tr>
               }
             </tbody>
           </table>
@@ -432,6 +436,10 @@
                       </button>
                     }
                   </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" jhiTranslate="settingsCenter.empty.noBarcodeRule">No barcode rule configured yet.</td>
                 </tr>
               }
             </tbody>

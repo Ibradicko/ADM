@@ -1,86 +1,85 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (calculRedevance(); as calculRedevanceRef) {
+@if (calculRedevance(); as calculRedevanceRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="calculRedevanceDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.calculRedevance.detail.title">Calcul Redevance</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ calculRedevanceRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.reference">Reference</span></dt>
-          <dd>
-            <span>{{ calculRedevanceRef.reference }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.periodeDebut">Periode Debut</span></dt>
-          <dd>
-            <span>{{ calculRedevanceRef.periodeDebut | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.periodeFin">Periode Fin</span></dt>
-          <dd>
-            <span>{{ calculRedevanceRef.periodeFin | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.chiffreAffaires">Chiffre Affaires</span></dt>
-          <dd>
-            <span>{{ calculRedevanceRef.chiffreAffaires }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.montantRedevance">Montant Redevance</span></dt>
-          <dd>
-            <span>{{ calculRedevanceRef.montantRedevance }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.statut">Statut</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.StatutRedevance.' + (calculRedevanceRef.statut ?? 'null')">{{
-              {
-                null: '',
-                CALCULEE: 'CALCULEE',
-                VALIDEE: 'VALIDEE',
-                REGULARISEE: 'REGULARISEE',
-                PARTIELLEMENT_PAYEE: 'PARTIELLEMENT_PAYEE',
-                PAYEE: 'PAYEE',
-                ANNULEE: 'ANNULEE',
-              }[calculRedevanceRef.statut ?? 'null']
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.dateCalcul">Date Calcul</span></dt>
-          <dd>
-            <span>{{ calculRedevanceRef.dateCalcul | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.boutique">Boutique</span></dt>
-          <dd>
-            @if (calculRedevance()!.boutique) {
-              <div>
-                <a [routerLink]="['/boutique', calculRedevance()!.boutique?.id, 'view']">{{ calculRedevanceRef.boutique?.nom }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.calculRedevance.locataire">Locataire</span></dt>
-          <dd>
-            @if (calculRedevance()!.locataire) {
-              <div>
-                <a [routerLink]="['/locataire', calculRedevance()!.locataire?.id, 'view']">{{ calculRedevanceRef.locataire?.nom }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/calcul-redevance', calculRedevanceRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.calculRedevance.detail.title">Calcul Redevance</p>
+        <h1 data-cy="calculRedevanceDetailsHeading">{{ calculRedevanceRef.reference }}</h1>
+        <p>{{ calculRedevanceRef.boutique?.nom || '--' }} - {{ calculRedevanceRef.locataire?.nom || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/calcul-redevance', calculRedevanceRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.calculRedevance.detail.title">Calcul Redevance</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="calculRedevanceRef.statut === 'PAYEE'"
+          [class.adm-pill--warning]="
+            calculRedevanceRef.statut === 'PARTIELLEMENT_PAYEE' ||
+            calculRedevanceRef.statut === 'CALCULEE' ||
+            calculRedevanceRef.statut === 'VALIDEE'
+          "
+          [class.adm-pill--danger]="calculRedevanceRef.statut === 'ANNULEE'"
+        >
+          {{ 'admSupervisionVentesApp.StatutRedevance.' + (calculRedevanceRef.statut ?? 'null') | translate }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.calculRedevance.boutique">Boutique</span>
+          @if (calculRedevanceRef.boutique) {
+            <a [routerLink]="['/boutique', calculRedevanceRef.boutique.id, 'view']">{{ calculRedevanceRef.boutique.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.calculRedevance.locataire">Locataire</span>
+          @if (calculRedevanceRef.locataire) {
+            <a [routerLink]="['/locataire', calculRedevanceRef.locataire.id, 'view']">{{ calculRedevanceRef.locataire.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.calculRedevance.periodeDebut">Periode Debut</span>
+          <strong>{{ calculRedevanceRef.periodeDebut | formatMediumDate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.calculRedevance.periodeFin">Periode Fin</span>
+          <strong>{{ calculRedevanceRef.periodeFin | formatMediumDate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.calculRedevance.chiffreAffaires"
+            >Chiffre Affaires</span
+          >
+          <strong>{{ calculRedevanceRef.chiffreAffaires }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.calculRedevance.montantRedevance"
+            >Montant Redevance</span
+          >
+          <strong>{{ calculRedevanceRef.montantRedevance }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.calculRedevance.dateCalcul">Date Calcul</span>
+          <strong>{{ calculRedevanceRef.dateCalcul | formatMediumDatetime }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

@@ -15,6 +15,15 @@
   box-shadow: var(--adm-shadow);
 }
 
+.adm-toolbar {
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 0.75rem 1.75rem rgba(15, 23, 42, 0.06);
+}
+
 .adm-dashboard-hero__content {
   max-width: 42rem;
 }
@@ -113,6 +122,23 @@
   color: var(--adm-text);
 }
 
+.adm-stat-card--featured {
+  grid-column: span 2;
+  min-height: 9rem;
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 58%, #eff6ff 100%);
+  border-color: rgba(16, 185, 129, 0.34);
+}
+
+.adm-stat-card--featured span {
+  font-size: 0.9rem;
+  color: #0f766e;
+}
+
+.adm-stat-card--featured strong {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.05;
+}
+
 .adm-dashboard-vendeur-cta {
   display: flex;
   align-items: center;
@@ -128,4 +154,10 @@
 .adm-dashboard-vendeur-cta p {
   margin-bottom: 0;
   color: var(--adm-text-soft);
+}
+
+@media (max-width: 760px) {
+  .adm-stat-card--featured {
+    grid-column: span 1;
+  }
 }

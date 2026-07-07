@@ -1,102 +1,93 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-parametre-global-heading"
-        data-cy="ParametreGlobalCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.parametreGlobal.home.createOrEditLabel"
-      >
-        Create or edit a Parametre Global
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let codeRef = editForm.get('code')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_code" jhiTranslate="admSupervisionVentesApp.parametreGlobal.code">Code</label>
-          <input type="text" class="form-control" name="code" id="field_code" data-cy="code" formControlName="code" />
-          @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
-            <div>
-              @if (editForm.get('code')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('code')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
-                  >This field cannot be longer than 80 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let valeurRef = editForm.get('valeur')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_valeur" jhiTranslate="admSupervisionVentesApp.parametreGlobal.valeur">Valeur</label>
-          <input type="text" class="form-control" name="valeur" id="field_valeur" data-cy="valeur" formControlName="valeur" />
-          @if (valeurRef.invalid && (valeurRef.dirty || valeurRef.touched)) {
-            <div>
-              @if (editForm.get('valeur')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('valeur')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
-                  >This field cannot be longer than 255 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_description" jhiTranslate="admSupervisionVentesApp.parametreGlobal.description"
-            >Description</label
-          >
-          <textarea
-            class="form-control"
-            name="description"
-            id="field_description"
-            data-cy="description"
-            formControlName="description"
-          ></textarea>
-        </div>
-
-        @let actifRef = editForm.get('actif')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_actif" jhiTranslate="admSupervisionVentesApp.parametreGlobal.actif">Actif</label>
-          <input type="checkbox" class="form-check" name="actif" id="field_actif" data-cy="actif" formControlName="actif" />
-          @if (actifRef.invalid && (actifRef.dirty || actifRef.touched)) {
-            <div>
-              @if (editForm.get('actif')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-parametre-global-heading"
+          data-cy="ParametreGlobalCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.parametreGlobal.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Parametre Global
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let codeRef = editForm.get('code')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.parametreGlobal.code">Code</span>
+        <input type="text" name="code" id="field_code" data-cy="code" formControlName="code" />
+        @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
+          @if (codeRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (codeRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+              >This field cannot be longer than 80 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let valeurRef = editForm.get('valeur')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.parametreGlobal.valeur">Valeur</span>
+        <input type="text" name="valeur" id="field_valeur" data-cy="valeur" formControlName="valeur" />
+        @if (valeurRef.invalid && (valeurRef.dirty || valeurRef.touched)) {
+          @if (valeurRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (valeurRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+              >This field cannot be longer than 255 characters.</small
+            >
+          }
+        }
+      </label>
+
+      <label class="adm-field adm-field--full">
+        <span jhiTranslate="admSupervisionVentesApp.parametreGlobal.description">Description</span>
+        <textarea name="description" id="field_description" data-cy="description" formControlName="description"></textarea>
+      </label>
+
+      @let actifRef = editForm.get('actif')!;
+      <label class="adm-field adm-field--checkbox">
+        <input type="checkbox" name="actif" id="field_actif" data-cy="actif" formControlName="actif" />
+        <span jhiTranslate="admSupervisionVentesApp.parametreGlobal.actif">Actif</span>
+      </label>
+      @if (actifRef.invalid && (actifRef.dirty || actifRef.touched) && actifRef.errors?.required) {
+        <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+      }
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

@@ -1,5 +1,6 @@
 {
   "reporting": {
+    "eyebrow": "Analyse et exports",
     "title": "Centre de reporting",
     "subtitle": "Generation d'exports, apercus rapides et pilotage des rapports reels du backend.",
     "actions": {
@@ -18,7 +19,21 @@
     },
     "filters": {
       "title": "Filtres de generation",
-      "subtitle": "Choisissez le type de rapport et le perimetre de l'export."
+      "subtitle": "Choisissez le type de rapport et le perimetre de l'export.",
+      "reportTypeChoice": "Choix du type de rapport"
+    },
+    "scopeMode": {
+      "label": "Vue active",
+      "admin": "Administration globale",
+      "managerAdm": "Pilotage ADM",
+      "tenant": "Perimetre locataire",
+      "shopManager": "Perimetre boutique",
+      "readOnly": "Lecture limitee"
+    },
+    "roleHint": {
+      "exporter": "Vous pouvez generer, consulter et telecharger les rapports disponibles pour votre role.",
+      "scoped": "Les donnees et les filtres sont limites aux boutiques rattachees a votre compte.",
+      "limited": "Votre profil donne acces a une selection restreinte de rapports en lecture."
     },
     "fields": {
       "reportType": "Type de rapport",

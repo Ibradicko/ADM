@@ -1,183 +1,132 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-ligne-calcul-redevance-heading"
-        data-cy="LigneCalculRedevanceCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.home.createOrEditLabel"
-      >
-        Create or edit a Ligne Calcul Redevance
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let baseCalculRef = editForm.get('baseCalcul')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_baseCalcul" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.baseCalcul"
-            >Base Calcul</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="baseCalcul"
-            id="field_baseCalcul"
-            data-cy="baseCalcul"
-            formControlName="baseCalcul"
-          />
-          @if (baseCalculRef.invalid && (baseCalculRef.dirty || baseCalculRef.touched)) {
-            <div>
-              @if (editForm.get('baseCalcul')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('baseCalcul')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('baseCalcul')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let tauxAppliqueRef = editForm.get('tauxApplique')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_tauxApplique" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.tauxApplique"
-            >Taux Applique</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="tauxApplique"
-            id="field_tauxApplique"
-            data-cy="tauxApplique"
-            formControlName="tauxApplique"
-          />
-          @if (tauxAppliqueRef.invalid && (tauxAppliqueRef.dirty || tauxAppliqueRef.touched)) {
-            <div>
-              @if (editForm.get('tauxApplique')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('tauxApplique')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              @if (editForm.get('tauxApplique')?.errors?.max) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.max" [translateValues]="{ max: '100' }"
-                  >This field cannot be more than 100.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('tauxApplique')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let montantRedevanceRef = editForm.get('montantRedevance')!;
-        <div class="mb-3">
-          <label
-            class="form-label"
-            for="field_montantRedevance"
-            jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.montantRedevance"
-            >Montant Redevance</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="montantRedevance"
-            id="field_montantRedevance"
-            data-cy="montantRedevance"
-            formControlName="montantRedevance"
-          />
-          @if (montantRedevanceRef.invalid && (montantRedevanceRef.dirty || montantRedevanceRef.touched)) {
-            <div>
-              @if (editForm.get('montantRedevance')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('montantRedevance')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('montantRedevance')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_calcul" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.calcul">Calcul</label>
-          <select
-            class="form-control"
-            id="field_calcul"
-            data-cy="calcul"
-            name="calcul"
-            formControlName="calcul"
-            [compareWith]="compareCalculRedevance"
-          >
-            @if (!editForm.get('calcul')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (calculRedevanceOption of calculRedevancesSharedCollection(); track $index) {
-              <option [ngValue]="calculRedevanceOption">{{ calculRedevanceOption.reference }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['calcul'])!.invalid && (editForm.get(['calcul'])!.dirty || editForm.get(['calcul'])!.touched)) {
-          <div>
-            @if (editForm.get(['calcul'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_vente" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.vente">Vente</label>
-          <select class="form-control" id="field_vente" data-cy="vente" name="vente" formControlName="vente" [compareWith]="compareVente">
-            <option [ngValue]="null"></option>
-            @for (venteOption of ventesSharedCollection(); track $index) {
-              <option [ngValue]="venteOption">{{ venteOption.numeroTicket }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-ligne-calcul-redevance-heading"
+          data-cy="LigneCalculRedevanceCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Ligne Calcul Redevance
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let calculRef = editForm.get('calcul')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.calcul">Calcul</span>
+        <select id="field_calcul" data-cy="calcul" name="calcul" formControlName="calcul" [compareWith]="compareCalculRedevance">
+          @if (!editForm.get('calcul')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (calculRedevanceOption of calculRedevancesSharedCollection(); track $index) {
+            <option [ngValue]="calculRedevanceOption">{{ calculRedevanceOption.reference }}</option>
+          }
+        </select>
+        @if (calculRef.invalid && (calculRef.dirty || calculRef.touched) && calculRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.vente">Vente</span>
+        <select id="field_vente" data-cy="vente" name="vente" formControlName="vente" [compareWith]="compareVente">
+          <option [ngValue]="null"></option>
+          @for (venteOption of ventesSharedCollection(); track $index) {
+            <option [ngValue]="venteOption">{{ venteOption.numeroTicket }}</option>
+          }
+        </select>
+      </label>
+
+      @let baseCalculRef = editForm.get('baseCalcul')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.baseCalcul">Base Calcul</span>
+        <input type="number" name="baseCalcul" id="field_baseCalcul" data-cy="baseCalcul" formControlName="baseCalcul" />
+        @if (baseCalculRef.invalid && (baseCalculRef.dirty || baseCalculRef.touched)) {
+          @if (baseCalculRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (baseCalculRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+        }
+      </label>
+
+      @let tauxAppliqueRef = editForm.get('tauxApplique')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.tauxApplique">Taux Applique</span>
+        <input type="number" name="tauxApplique" id="field_tauxApplique" data-cy="tauxApplique" formControlName="tauxApplique" />
+        @if (tauxAppliqueRef.invalid && (tauxAppliqueRef.dirty || tauxAppliqueRef.touched)) {
+          @if (tauxAppliqueRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (tauxAppliqueRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          @if (tauxAppliqueRef.errors?.max) {
+            <small class="text-danger" jhiTranslate="entity.validation.max" [translateValues]="{ max: '100' }"
+              >This field cannot be more than 100.</small
+            >
+          }
+        }
+      </label>
+
+      @let montantRedevanceRef = editForm.get('montantRedevance')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.montantRedevance">Montant Redevance</span>
+        <input
+          type="number"
+          name="montantRedevance"
+          id="field_montantRedevance"
+          data-cy="montantRedevance"
+          formControlName="montantRedevance"
+        />
+        @if (montantRedevanceRef.invalid && (montantRedevanceRef.dirty || montantRedevanceRef.touched)) {
+          @if (montantRedevanceRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (montantRedevanceRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

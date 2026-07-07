@@ -173,7 +173,19 @@ public class ResourceBoutiqueSecurityService {
     }
 
     public void assertRapportExport(Long id) {
-        assertEntity(rapportExportRepository.findById(id), RapportExport::getBoutique);
+        RapportExport rapportExport = rapportExportRepository.findById(id).orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED));
+        Boutique boutique = rapportExport.getBoutique();
+        if (boutique != null && boutique.getId() != null) {
+            moduleSecurityService.assertBoutiqueAccess(boutique.getId(), ACCESS_DENIED);
+            return;
+        }
+        if (
+            !moduleSecurityService.hasGlobalBoutiqueAccess() &&
+            (rapportExport.getUtilisateur() == null ||
+                !Objects.equals(rapportExport.getUtilisateur().getId(), moduleSecurityService.getCurrentUser().getId()))
+        ) {
+            throw new AccessDeniedException(ACCESS_DENIED);
+        }
     }
 
     public void assertCalculRedevance(Long id) {

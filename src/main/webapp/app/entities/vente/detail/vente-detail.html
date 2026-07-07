@@ -1,92 +1,93 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (vente(); as venteRef) {
+@if (vente(); as venteRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="venteDetailsHeading"><span jhiTranslate="admSupervisionVentesApp.vente.detail.title">Vente</span></h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ venteRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.numeroTicket">Numero Ticket</span></dt>
-          <dd>
-            <span>{{ venteRef.numeroTicket }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.dateHeure">Date Heure</span></dt>
-          <dd>
-            <span>{{ venteRef.dateHeure | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.statut">Statut</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.StatutVente.' + (venteRef.statut ?? 'null')">{{
-              { null: '', BROUILLON: 'BROUILLON', VALIDEE: 'VALIDEE', ANNULEE: 'ANNULEE', RETOURNEE: 'RETOURNEE', AJUSTEE: 'AJUSTEE' }[
-                venteRef.statut ?? 'null'
-              ]
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.referencePassager">Reference Passager</span></dt>
-          <dd>
-            <span>{{ venteRef.referencePassager }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.referenceCarteEmbarquement">Reference Carte Embarquement</span></dt>
-          <dd>
-            <span>{{ venteRef.referenceCarteEmbarquement }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.montantBrut">Montant Brut</span></dt>
-          <dd>
-            <span>{{ venteRef.montantBrut }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.montantRemise">Montant Remise</span></dt>
-          <dd>
-            <span>{{ venteRef.montantRemise }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.montantNet">Montant Net</span></dt>
-          <dd>
-            <span>{{ venteRef.montantNet }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.commentaire">Commentaire</span></dt>
-          <dd>
-            <span>{{ venteRef.commentaire }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.boutique">Boutique</span></dt>
-          <dd>
-            @if (vente()!.boutique) {
-              <div>
-                <a [routerLink]="['/boutique', vente()!.boutique?.id, 'view']">{{ venteRef.boutique?.nom }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.locataire">Locataire</span></dt>
-          <dd>
-            @if (vente()!.locataire) {
-              <div>
-                <a [routerLink]="['/locataire', vente()!.locataire?.id, 'view']">{{ venteRef.locataire?.nom }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.vente.vendeur">Vendeur</span></dt>
-          <dd>
-            <span>{{ venteRef.vendeur?.login }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.vente.detail.title">Vente</p>
+        <h1 data-cy="venteDetailsHeading">{{ venteRef.numeroTicket }}</h1>
+        <p>{{ venteRef.boutique?.nom || '--' }} - {{ venteRef.locataire?.nom || '--' }}</p>
+      </div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
         </button>
-
         @if (venteRef.statut === 'BROUILLON') {
-          <button type="button" [routerLink]="['/vente', venteRef.id, 'edit']" class="btn btn-primary">
-            <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-          </button>
+          <a [routerLink]="['/vente', venteRef.id, 'edit']" class="adm-button">
+            <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+          </a>
         }
       </div>
-    }
-  </div>
-</div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.vente.detail.title">Vente</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="venteRef.statut === 'VALIDEE' || venteRef.statut === 'AJUSTEE'"
+          [class.adm-pill--warning]="venteRef.statut === 'BROUILLON'"
+          [class.adm-pill--danger]="venteRef.statut === 'ANNULEE' || venteRef.statut === 'RETOURNEE'"
+        >
+          {{ 'admSupervisionVentesApp.StatutVente.' + (venteRef.statut ?? 'null') | translate }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.dateHeure">Date Heure</span>
+          <strong>{{ venteRef.dateHeure | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.referencePassager">Reference Passager</span>
+          <strong>{{ venteRef.referencePassager || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.referenceCarteEmbarquement"
+            >Reference Carte Embarquement</span
+          >
+          <strong>{{ venteRef.referenceCarteEmbarquement || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.montantBrut">Montant Brut</span>
+          <strong>{{ venteRef.montantBrut }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.montantRemise">Montant Remise</span>
+          <strong>{{ venteRef.montantRemise }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.montantNet">Montant Net</span>
+          <strong>{{ venteRef.montantNet }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.commentaire">Commentaire</span>
+          <strong>{{ venteRef.commentaire || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.boutique">Boutique</span>
+          @if (venteRef.boutique) {
+            <a [routerLink]="['/boutique', venteRef.boutique.id, 'view']">{{ venteRef.boutique.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.locataire">Locataire</span>
+          @if (venteRef.locataire) {
+            <a [routerLink]="['/locataire', venteRef.locataire.id, 'view']">{{ venteRef.locataire.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.vente.vendeur">Vendeur</span>
+          <strong>{{ venteRef.vendeur?.login || '--' }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

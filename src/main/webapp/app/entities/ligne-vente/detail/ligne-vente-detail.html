@@ -1,66 +1,69 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (ligneVente(); as ligneVenteRef) {
+@if (ligneVente(); as ligneVenteRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="ligneVenteDetailsHeading"><span jhiTranslate="admSupervisionVentesApp.ligneVente.detail.title">Ligne Vente</span></h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ ligneVenteRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.quantite">Quantite</span></dt>
-          <dd>
-            <span>{{ ligneVenteRef.quantite }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.prixUnitaire">Prix Unitaire</span></dt>
-          <dd>
-            <span>{{ ligneVenteRef.prixUnitaire }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.remise">Remise</span></dt>
-          <dd>
-            <span>{{ ligneVenteRef.remise }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.montantLigne">Montant Ligne</span></dt>
-          <dd>
-            <span>{{ ligneVenteRef.montantLigne }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.codeBarresScanne">Code Barres Scanne</span></dt>
-          <dd>
-            <span>{{ ligneVenteRef.codeBarresScanne }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.vente">Vente</span></dt>
-          <dd>
-            @if (ligneVente()!.vente) {
-              <div>
-                <a [routerLink]="['/vente', ligneVente()!.vente?.id, 'view']">{{ ligneVenteRef.vente?.numeroTicket }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneVente.produit">Produit</span></dt>
-          <dd>
-            @if (ligneVente()!.produit) {
-              <div>
-                <a [routerLink]="['/produit', ligneVente()!.produit?.id, 'view']">{{ ligneVenteRef.produit?.designation }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/ligne-vente', ligneVenteRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.ligneVente.detail.title">Ligne Vente</p>
+        <h1 data-cy="ligneVenteDetailsHeading">{{ ligneVenteRef.produit?.designation || '--' }}</h1>
+        <p>{{ ligneVenteRef.vente?.numeroTicket || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/ligne-vente', ligneVenteRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.ligneVente.detail.title">Ligne Vente</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneVente.quantite">Quantite</span>
+          <strong>{{ ligneVenteRef.quantite }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneVente.prixUnitaire">Prix Unitaire</span>
+          <strong>{{ ligneVenteRef.prixUnitaire }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneVente.remise">Remise</span>
+          <strong>{{ ligneVenteRef.remise }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneVente.montantLigne">Montant Ligne</span>
+          <strong>{{ ligneVenteRef.montantLigne }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneVente.codeBarresScanne">Code Barres Scanne</span>
+          <strong>{{ ligneVenteRef.codeBarresScanne || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneVente.vente">Vente</span>
+          @if (ligneVenteRef.vente) {
+            <a [routerLink]="['/vente', ligneVenteRef.vente.id, 'view']">{{ ligneVenteRef.vente.numeroTicket }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneVente.produit">Produit</span>
+          @if (ligneVenteRef.produit) {
+            <a [routerLink]="['/produit', ligneVenteRef.produit.id, 'view']">{{ ligneVenteRef.produit.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

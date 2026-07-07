@@ -18,6 +18,8 @@
       "mainNavigation": "Navigation principale",
       "openMenu": "Ouvrir le menu",
       "closeMenu": "Fermer le menu",
+      "reduceMenu": "Reduire le menu",
+      "expandMenu": "Afficher le menu complet",
       "search": "Rechercher...",
       "notifications": "Notifications",
       "currentModule": "Module actif",

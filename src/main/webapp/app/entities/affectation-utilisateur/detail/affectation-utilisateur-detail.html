@@ -1,68 +1,72 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (affectationUtilisateur(); as affectationUtilisateurRef) {
+@if (affectationUtilisateur(); as affectationUtilisateurRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="affectationUtilisateurDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.detail.title">Affectation Utilisateur</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ affectationUtilisateurRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateDebut">Date Debut</span></dt>
-          <dd>
-            <span>{{ affectationUtilisateurRef.dateDebut | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateFin">Date Fin</span></dt>
-          <dd>
-            <span>{{ affectationUtilisateurRef.dateFin | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.actif">Actif</span></dt>
-          <dd>
-            <span>{{ affectationUtilisateurRef.actif }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.user">User</span></dt>
-          <dd>
-            <span>{{ affectationUtilisateurRef.user?.login }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.boutique">Boutique</span></dt>
-          <dd>
-            @if (affectationUtilisateur()!.boutique) {
-              <div>
-                <a [routerLink]="['/boutique', affectationUtilisateur()!.boutique?.id, 'view']">{{
-                  affectationUtilisateurRef.boutique?.nom
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.profil">Profil</span></dt>
-          <dd>
-            @if (affectationUtilisateur()!.profil) {
-              <div>
-                <a [routerLink]="['/profil-metier', affectationUtilisateur()!.profil?.id, 'view']">{{
-                  affectationUtilisateurRef.profil?.code
-                }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/affectation-utilisateur', affectationUtilisateurRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.detail.title">Affectation Utilisateur</p>
+        <h1 data-cy="affectationUtilisateurDetailsHeading">
+          {{ affectationUtilisateurRef.user?.login || '#' + affectationUtilisateurRef.id }}
+        </h1>
+        <p>{{ affectationUtilisateurRef.boutique?.nom || '--' }} - {{ affectationUtilisateurRef.profil?.code || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/affectation-utilisateur', affectationUtilisateurRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.detail.title">Affectation Utilisateur</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="affectationUtilisateurRef.actif"
+          [class.adm-pill--warning]="!affectationUtilisateurRef.actif"
+        >
+          {{ affectationUtilisateurRef.actif ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.user">User</span>
+          <strong>{{ affectationUtilisateurRef.user?.login || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.boutique">Boutique</span>
+          @if (affectationUtilisateurRef.boutique) {
+            <a [routerLink]="['/boutique', affectationUtilisateurRef.boutique.id, 'view']">{{ affectationUtilisateurRef.boutique.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.profil">Profil</span>
+          @if (affectationUtilisateurRef.profil) {
+            <a [routerLink]="['/profil-metier', affectationUtilisateurRef.profil.id, 'view']">{{
+              affectationUtilisateurRef.profil.code
+            }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateDebut">Date Debut</span>
+          <strong>{{ affectationUtilisateurRef.dateDebut | formatMediumDate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.affectationUtilisateur.dateFin">Date Fin</span>
+          <strong>{{ affectationUtilisateurRef.dateFin | formatMediumDate }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

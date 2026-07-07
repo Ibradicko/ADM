@@ -1,5 +1,6 @@
 {
   "reporting": {
+    "eyebrow": "Analytics and exports",
     "title": "Reporting center",
     "subtitle": "Export generation, quick previews and steering of real backend reports.",
     "actions": {
@@ -18,7 +19,21 @@
     },
     "filters": {
       "title": "Generation filters",
-      "subtitle": "Choose the report type and export scope."
+      "subtitle": "Choose the report type and export scope.",
+      "reportTypeChoice": "Report type choice"
+    },
+    "scopeMode": {
+      "label": "Active view",
+      "admin": "Global administration",
+      "managerAdm": "ADM steering",
+      "tenant": "Tenant scope",
+      "shopManager": "Shop scope",
+      "readOnly": "Limited read-only"
+    },
+    "roleHint": {
+      "exporter": "You can generate, preview and download the reports available for your role.",
+      "scoped": "Data and filters are limited to the shops linked to your account.",
+      "limited": "Your profile gives access to a restricted read-only report selection."
     },
     "fields": {
       "reportType": "Report type",

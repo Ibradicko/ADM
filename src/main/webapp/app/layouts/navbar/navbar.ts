@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { Event, NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -61,6 +61,7 @@ export default class Navbar implements OnInit {
   readonly account = inject(AccountService).account;
   readonly inProduction = signal(true);
   readonly isNavbarCollapsed = signal(true);
+  readonly isSidebarCompact = signal(false);
   readonly openAPIEnabled = signal(false);
   readonly languages = LANGUAGES;
   readonly currentLanguage = signal('fr');
@@ -127,8 +128,6 @@ export default class Navbar implements OnInit {
         'contracts',
         'locataires',
         'groupesArticles',
-        'caisse',
-        'stocks',
         'redevances',
         'reporting',
         'audit',
@@ -172,7 +171,7 @@ export default class Navbar implements OnInit {
     }
 
     if (profils.has('VENDEUR')) {
-      return new Set(['dashboard', 'caisse']);
+      return new Set(['dashboard', 'caisse', 'redevances']);
     }
 
     return new Set(['dashboard']);
@@ -277,6 +276,10 @@ export default class Navbar implements OnInit {
     } else {
       this.version = '';
     }
+
+    effect(() => {
+      document.body.classList.toggle('adm-sidebar-compact', this.isSidebarCompact());
+    });
   }
 
   ngOnInit(): void {
@@ -321,6 +324,10 @@ export default class Navbar implements OnInit {
 
   toggleNavbar(): void {
     this.isNavbarCollapsed.update(isCollapsed => !isCollapsed);
+  }
+
+  toggleSidebarCompact(): void {
+    this.isSidebarCompact.update(isCompact => !isCompact);
   }
 
   login(): void {

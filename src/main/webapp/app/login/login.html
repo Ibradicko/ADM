@@ -18,12 +18,6 @@
           Un espace de pilotage clair pour suivre les operations commerciales et garder la maitrise des flux.
         </p>
       </div>
-
-      <div class="adm-login__signals" [attr.aria-label]="'login.hero.modules' | translate">
-        <span><fa-icon icon="cash-register" /> <span jhiTranslate="global.navbar.caisse">Ventes</span></span>
-        <span><fa-icon icon="database" /> <span jhiTranslate="global.navbar.stocks">Stocks</span></span>
-        <span><fa-icon icon="book" /> <span jhiTranslate="global.navbar.reporting">Rapports</span></span>
-      </div>
     </div>
   </div>
 
@@ -31,7 +25,7 @@
     <div class="adm-login__card">
       <img src="content/images/logo-adm.png" alt="Aeroports du Mali" class="adm-login__card-logo" />
       <h1 data-cy="loginTitle" jhiTranslate="login.title">Connexion</h1>
-      <p jhiTranslate="login.description">Accedez a votre espace securise.</p>
+      <p jhiTranslate="login.description">Accedez à votre espace securise.</p>
 
       @if (authenticationError()) {
         <div class="adm-inline-alert adm-inline-alert--danger" data-cy="loginError" jhiTranslate="login.messages.error.authentication">

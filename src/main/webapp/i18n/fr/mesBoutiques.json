@@ -1,9 +1,10 @@
 {
   "mesBoutiques": {
     "title": "Mes boutiques",
+    "eyebrow": "Espace locataire",
     "subtitle": "Bienvenue {{ nom }} - gérez vos boutiques et vos équipes.",
     "loading": "Chargement de vos boutiques...",
-    "retry": "Réessayer",
+    "retry": "Actualiser",
     "emptyTitle": "Aucune boutique ne vous est encore affectée.",
     "emptyHint": "Contactez votre responsable ADM pour obtenir un contrat d'exploitation.",
     "contractNumber": "Contrat : {{ numero }}",
@@ -35,7 +36,11 @@
     "lastNameLabel": "Nom",
     "cancel": "Annuler",
     "confirmAdd": "Confirmer l'ajout",
+    "currentTenantAccount": "Compte locataire",
+    "noShopCode": "Code boutique indisponible",
     "statsTitle": "Statistiques de la boutique",
+    "statsSubtitle": "Périmètre courant de cette boutique.",
+    "statsOpenHint": "Ouvrez la carte pour charger les statistiques.",
     "statsNetSales": "CA net",
     "statsGrossSales": "CA brut",
     "statsValidatedSales": "Ventes validées",
@@ -49,6 +54,13 @@
     "columnAction": "Action",
     "columnDescription": "Description",
     "columnUser": "Utilisateur",
+    "metrics": {
+      "activeShops": "Boutiques actives",
+      "totalShops": "Contrats",
+      "teamMembers": "Membres chargés",
+      "loadedNetSales": "CA net chargé",
+      "loadedRoyalties": "Redevance restante"
+    },
     "errors": {
       "loadFailed": "Impossible de charger vos boutiques. Veuillez réessayer.",
       "statsFailed": "Impossible de charger les statistiques de cette boutique.",

@@ -1,258 +1,194 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-rapport-export-heading"
-        data-cy="RapportExportCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.rapportExport.home.createOrEditLabel"
-      >
-        Create or edit a Rapport Export
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let referenceRef = editForm.get('reference')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_reference" jhiTranslate="admSupervisionVentesApp.rapportExport.reference">Reference</label>
-          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
-          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
-            <div>
-              @if (editForm.get('reference')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('reference')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
-                  >This field cannot be longer than 80 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let typeRapportRef = editForm.get('typeRapport')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_typeRapport" jhiTranslate="admSupervisionVentesApp.rapportExport.typeRapport"
-            >Type Rapport</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            name="typeRapport"
-            id="field_typeRapport"
-            data-cy="typeRapport"
-            formControlName="typeRapport"
-          />
-          @if (typeRapportRef.invalid && (typeRapportRef.dirty || typeRapportRef.touched)) {
-            <div>
-              @if (editForm.get('typeRapport')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('typeRapport')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '100' }"
-                  >This field cannot be longer than 100 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let formatRef = editForm.get('format')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_format" jhiTranslate="admSupervisionVentesApp.rapportExport.format">Format</label>
-          <select class="form-control" name="format" formControlName="format" id="field_format" data-cy="format">
-            <option [ngValue]="null">{{ 'admSupervisionVentesApp.FormatExport.null' | translate }}</option>
-            @for (formatExport of formatExportValues; track $index) {
-              <option [value]="formatExport">{{ 'admSupervisionVentesApp.FormatExport.' + formatExport | translate }}</option>
-            }
-          </select>
-          @if (formatRef.invalid && (formatRef.dirty || formatRef.touched)) {
-            <div>
-              @if (editForm.get('format')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_periodeDebut" jhiTranslate="admSupervisionVentesApp.rapportExport.periodeDebut"
-            >Periode Debut</label
-          >
-          <div class="input-group">
-            <input
-              id="field_periodeDebut"
-              data-cy="periodeDebut"
-              type="text"
-              class="form-control"
-              name="periodeDebut"
-              ngbDatepicker
-              #periodeDebutDp="ngbDatepicker"
-              formControlName="periodeDebut"
-            />
-            <button type="button" class="btn btn-secondary" (click)="periodeDebutDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_periodeFin" jhiTranslate="admSupervisionVentesApp.rapportExport.periodeFin"
-            >Periode Fin</label
-          >
-          <div class="input-group">
-            <input
-              id="field_periodeFin"
-              data-cy="periodeFin"
-              type="text"
-              class="form-control"
-              name="periodeFin"
-              ngbDatepicker
-              #periodeFinDp="ngbDatepicker"
-              formControlName="periodeFin"
-            />
-            <button type="button" class="btn btn-secondary" (click)="periodeFinDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-        </div>
-
-        @let cheminFichierRef = editForm.get('cheminFichier')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_cheminFichier" jhiTranslate="admSupervisionVentesApp.rapportExport.cheminFichier"
-            >Chemin Fichier</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            name="cheminFichier"
-            id="field_cheminFichier"
-            data-cy="cheminFichier"
-            formControlName="cheminFichier"
-          />
-          @if (cheminFichierRef.invalid && (cheminFichierRef.dirty || cheminFichierRef.touched)) {
-            <div>
-              @if (editForm.get('cheminFichier')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
-                  >This field cannot be longer than 255 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let dateGenerationRef = editForm.get('dateGeneration')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateGeneration" jhiTranslate="admSupervisionVentesApp.rapportExport.dateGeneration"
-            >Date Generation</label
-          >
-          <div class="d-flex">
-            <input
-              id="field_dateGeneration"
-              data-cy="dateGeneration"
-              type="datetime-local"
-              class="form-control"
-              name="dateGeneration"
-              formControlName="dateGeneration"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          @if (dateGenerationRef.invalid && (dateGenerationRef.dirty || dateGenerationRef.touched)) {
-            <div>
-              @if (editForm.get('dateGeneration')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('dateGeneration')?.errors?.datetimelocal"
-                jhiTranslate="entity.validation.datetimelocal"
-                >This field should be a date and time.</small
-              >
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_boutique" jhiTranslate="admSupervisionVentesApp.rapportExport.boutique">Boutique</label>
-          <select
-            class="form-control"
-            id="field_boutique"
-            data-cy="boutique"
-            name="boutique"
-            formControlName="boutique"
-            [compareWith]="compareBoutique"
-          >
-            <option [ngValue]="null"></option>
-            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
-              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_locataire" jhiTranslate="admSupervisionVentesApp.rapportExport.locataire">Locataire</label>
-          <select
-            class="form-control"
-            id="field_locataire"
-            data-cy="locataire"
-            name="locataire"
-            formControlName="locataire"
-            [compareWith]="compareLocataire"
-          >
-            <option [ngValue]="null"></option>
-            @for (locataireOption of locatairesSharedCollection(); track $index) {
-              <option [ngValue]="locataireOption">{{ locataireOption.nom }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_utilisateur" jhiTranslate="admSupervisionVentesApp.rapportExport.utilisateur"
-            >Utilisateur</label
-          >
-          <select
-            class="form-control"
-            id="field_utilisateur"
-            data-cy="utilisateur"
-            name="utilisateur"
-            formControlName="utilisateur"
-            [compareWith]="compareUser"
-          >
-            @if (!editForm.get('utilisateur')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (userOption of usersSharedCollection(); track $index) {
-              <option [ngValue]="userOption">{{ userOption.login }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
-          <div>
-            @if (editForm.get(['utilisateur'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-rapport-export-heading"
+          data-cy="RapportExportCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.rapportExport.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Rapport Export
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let referenceRef = editForm.get('reference')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.reference">Reference</span>
+        <input type="text" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+        @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+          @if (referenceRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (referenceRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+              >This field cannot be longer than 80 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let typeRapportRef = editForm.get('typeRapport')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.typeRapport">Type Rapport</span>
+        <input type="text" name="typeRapport" id="field_typeRapport" data-cy="typeRapport" formControlName="typeRapport" />
+        @if (typeRapportRef.invalid && (typeRapportRef.dirty || typeRapportRef.touched)) {
+          @if (typeRapportRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (typeRapportRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '100' }"
+              >This field cannot be longer than 100 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let formatRef = editForm.get('format')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.format">Format</span>
+        <select name="format" formControlName="format" id="field_format" data-cy="format">
+          <option [ngValue]="null">{{ 'admSupervisionVentesApp.FormatExport.null' | translate }}</option>
+          @for (formatExport of formatExportValues; track $index) {
+            <option [value]="formatExport">{{ 'admSupervisionVentesApp.FormatExport.' + formatExport | translate }}</option>
+          }
+        </select>
+        @if (formatRef.invalid && (formatRef.dirty || formatRef.touched) && formatRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.periodeDebut">Periode Debut</span>
+        <div class="input-group">
+          <input
+            id="field_periodeDebut"
+            data-cy="periodeDebut"
+            type="text"
+            name="periodeDebut"
+            ngbDatepicker
+            #periodeDebutDp="ngbDatepicker"
+            formControlName="periodeDebut"
+          />
+          <button type="button" class="adm-button adm-button--ghost" (click)="periodeDebutDp.toggle()">
+            <fa-icon icon="calendar-alt" />
+          </button>
+        </div>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.periodeFin">Periode Fin</span>
+        <div class="input-group">
+          <input
+            id="field_periodeFin"
+            data-cy="periodeFin"
+            type="text"
+            name="periodeFin"
+            ngbDatepicker
+            #periodeFinDp="ngbDatepicker"
+            formControlName="periodeFin"
+          />
+          <button type="button" class="adm-button adm-button--ghost" (click)="periodeFinDp.toggle()">
+            <fa-icon icon="calendar-alt" />
+          </button>
+        </div>
+      </label>
+
+      @let cheminFichierRef = editForm.get('cheminFichier')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.cheminFichier">Chemin Fichier</span>
+        <input type="text" name="cheminFichier" id="field_cheminFichier" data-cy="cheminFichier" formControlName="cheminFichier" />
+        @if (cheminFichierRef.invalid && (cheminFichierRef.dirty || cheminFichierRef.touched) && cheminFichierRef.errors?.maxlength) {
+          <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+            >This field cannot be longer than 255 characters.</small
+          >
+        }
+      </label>
+
+      @let dateGenerationRef = editForm.get('dateGeneration')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.dateGeneration">Date Generation</span>
+        <input
+          type="datetime-local"
+          name="dateGeneration"
+          id="field_dateGeneration"
+          data-cy="dateGeneration"
+          formControlName="dateGeneration"
+          placeholder="YYYY-MM-DD HH:mm"
+        />
+        @if (dateGenerationRef.invalid && (dateGenerationRef.dirty || dateGenerationRef.touched)) {
+          @if (dateGenerationRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+        }
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.boutique">Boutique</span>
+        <select id="field_boutique" data-cy="boutique" name="boutique" formControlName="boutique" [compareWith]="compareBoutique">
+          <option [ngValue]="null"></option>
+          @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
+            <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.locataire">Locataire</span>
+        <select id="field_locataire" data-cy="locataire" name="locataire" formControlName="locataire" [compareWith]="compareLocataire">
+          <option [ngValue]="null"></option>
+          @for (locataireOption of locatairesSharedCollection(); track $index) {
+            <option [ngValue]="locataireOption">{{ locataireOption.nom }}</option>
+          }
+        </select>
+      </label>
+
+      @let utilisateurRef = editForm.get('utilisateur')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.rapportExport.utilisateur">Utilisateur</span>
+        <select id="field_utilisateur" data-cy="utilisateur" name="utilisateur" formControlName="utilisateur" [compareWith]="compareUser">
+          @if (!editForm.get('utilisateur')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (userOption of usersSharedCollection(); track $index) {
+            <option [ngValue]="userOption">{{ userOption.login }}</option>
+          }
+        </select>
+        @if (utilisateurRef.invalid && (utilisateurRef.dirty || utilisateurRef.touched) && utilisateurRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

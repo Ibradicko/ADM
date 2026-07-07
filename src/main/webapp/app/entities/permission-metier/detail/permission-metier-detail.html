@@ -1,57 +1,62 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (permissionMetier(); as permissionMetierRef) {
+@if (permissionMetier(); as permissionMetierRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="permissionMetierDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.permissionMetier.detail.title">Permission Metier</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ permissionMetierRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.code">Code</span></dt>
-          <dd>
-            <span>{{ permissionMetierRef.code }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.libelle">Libelle</span></dt>
-          <dd>
-            <span>{{ permissionMetierRef.libelle }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.module">Module</span></dt>
-          <dd>
-            <span>{{ permissionMetierRef.module }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.description">Description</span></dt>
-          <dd>
-            <span>{{ permissionMetierRef.description }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.permissionMetier.profils">Profils</span></dt>
-          <dd>
-            @for (profils of permissionMetierRef.profilses; track $index; let last = $last) {
-              <span>
-                <a [routerLink]="['/profil-metier', profils.id, 'view']">{{ profils?.code }}</a
-                >{{ last ? '' : ', ' }}
-              </span>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/permission-metier', permissionMetierRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.permissionMetier.detail.title">Permission Metier</p>
+        <h1 data-cy="permissionMetierDetailsHeading">{{ permissionMetierRef.code }}</h1>
+        <p>{{ permissionMetierRef.module || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/permission-metier', permissionMetierRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.permissionMetier.detail.title">Permission Metier</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.permissionMetier.code">Code</span>
+          <strong>{{ permissionMetierRef.code }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.permissionMetier.libelle">Libelle</span>
+          <strong>{{ permissionMetierRef.libelle }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.permissionMetier.module">Module</span>
+          <strong>{{ permissionMetierRef.module }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.permissionMetier.description">Description</span>
+          <strong>{{ permissionMetierRef.description || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.permissionMetier.profils">Profils</span>
+          @if (permissionMetierRef.profilses && permissionMetierRef.profilses.length > 0) {
+            <strong>
+              @for (profils of permissionMetierRef.profilses; track $index; let last = $last) {
+                <a [routerLink]="['/profil-metier', profils.id, 'view']">{{ profils.code }}</a
+                >{{ last ? '' : ', ' }}
+              }
+            </strong>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

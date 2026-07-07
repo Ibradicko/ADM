@@ -79,6 +79,8 @@
       "mainNavigation": "Main navigation",
       "openMenu": "Open menu",
       "closeMenu": "Close menu",
+      "reduceMenu": "Collapse menu",
+      "expandMenu": "Expand full menu",
       "search": "Search...",
       "notifications": "Notifications",
       "currentModule": "Active module",

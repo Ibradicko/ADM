@@ -105,7 +105,9 @@
       "noAvailableShop": "No shop is available for your current profile.",
       "noSearchResult": "No result found.",
       "noPermission": "No permission",
-      "noAssignment": "No assignment found."
+      "noAssignment": "No assignment found.",
+      "noPaymentMethod": "No payment method configured yet.",
+      "noBarcodeRule": "No barcode rule configured yet."
     },
     "readOnly": {
       "paymentMethods": "You have read-only access to payment methods.",

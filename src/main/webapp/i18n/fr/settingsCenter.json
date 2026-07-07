@@ -108,7 +108,9 @@
       "noAvailableShop": "Aucune boutique disponible pour votre profil courant.",
       "noSearchResult": "Aucun resultat trouve.",
       "noPermission": "Aucune permission",
-      "noAssignment": "Aucune affectation trouvée."
+      "noAssignment": "Aucune affectation trouvée.",
+      "noPaymentMethod": "Aucun mode de paiement configuré pour le moment.",
+      "noBarcodeRule": "Aucune règle code-barres configurée pour le moment."
     },
     "readOnly": {
       "paymentMethods": "Vous êtes en lecture seule sur les moyens de paiement.",

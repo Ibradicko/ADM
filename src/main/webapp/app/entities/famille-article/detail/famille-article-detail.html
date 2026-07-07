@@ -1,56 +1,67 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (familleArticle(); as familleArticleRef) {
+@if (familleArticle(); as familleArticleRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="familleArticleDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.familleArticle.detail.title">Famille Article</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ familleArticleRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.code">Code</span></dt>
-          <dd>
-            <span>{{ familleArticleRef.code }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.libelle">Libelle</span></dt>
-          <dd>
-            <span>{{ familleArticleRef.libelle }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.statut">Statut</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.StatutGeneral.' + (familleArticleRef.statut ?? 'null')">{{
-              { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[familleArticleRef.statut ?? 'null']
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.familleArticle.groupeArticle">Groupe Article</span></dt>
-          <dd>
-            @if (familleArticle()!.groupeArticle) {
-              <div>
-                <a [routerLink]="['/groupe-article', familleArticle()!.groupeArticle?.id, 'view']">{{
-                  familleArticleRef.groupeArticle?.libelle
-                }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/famille-article', familleArticleRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.familleArticle.detail.title">Famille Article</p>
+        <h1 data-cy="familleArticleDetailsHeading">{{ familleArticleRef.libelle }}</h1>
+        <p>{{ familleArticleRef.code || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/famille-article', familleArticleRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.familleArticle.detail.title">Famille Article</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="familleArticleRef.statut === 'ACTIF'"
+          [class.adm-pill--warning]="familleArticleRef.statut === 'INACTIF'"
+          [class.adm-pill--danger]="familleArticleRef.statut === 'SUSPENDU'"
+        >
+          {{ 'admSupervisionVentesApp.StatutGeneral.' + (familleArticleRef.statut ?? 'null') | translate }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="global.field.id">ID</span>
+          <strong>{{ familleArticleRef.id }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.familleArticle.code">Code</span>
+          <strong>{{ familleArticleRef.code }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.familleArticle.libelle">Libelle</span>
+          <strong>{{ familleArticleRef.libelle }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.familleArticle.statut">Statut</span>
+          <strong>{{ 'admSupervisionVentesApp.StatutGeneral.' + (familleArticleRef.statut ?? 'null') | translate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.familleArticle.groupeArticle">Groupe Article</span>
+          @if (familleArticleRef.groupeArticle) {
+            <a [routerLink]="['/groupe-article', familleArticleRef.groupeArticle.id, 'view']">{{
+              familleArticleRef.groupeArticle.libelle
+            }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

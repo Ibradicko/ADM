@@ -1,9 +1,10 @@
 {
   "mesBoutiques": {
     "title": "My stores",
+    "eyebrow": "Tenant workspace",
     "subtitle": "Welcome {{ nom }} - manage your stores and your teams.",
     "loading": "Loading your stores...",
-    "retry": "Retry",
+    "retry": "Refresh",
     "emptyTitle": "No store has been assigned to you yet.",
     "emptyHint": "Contact your ADM manager to get an operating contract.",
     "contractNumber": "Contract: {{ numero }}",
@@ -35,7 +36,11 @@
     "lastNameLabel": "Last name",
     "cancel": "Cancel",
     "confirmAdd": "Confirm addition",
+    "currentTenantAccount": "Tenant account",
+    "noShopCode": "Store code unavailable",
     "statsTitle": "Store statistics",
+    "statsSubtitle": "Current scope for this store.",
+    "statsOpenHint": "Open the card to load statistics.",
     "statsNetSales": "Net sales",
     "statsGrossSales": "Gross sales",
     "statsValidatedSales": "Validated sales",
@@ -49,6 +54,13 @@
     "columnAction": "Action",
     "columnDescription": "Description",
     "columnUser": "User",
+    "metrics": {
+      "activeShops": "Active stores",
+      "totalShops": "Contracts",
+      "teamMembers": "Loaded members",
+      "loadedNetSales": "Loaded net sales",
+      "loadedRoyalties": "Outstanding royalties"
+    },
     "errors": {
       "loadFailed": "Unable to load your stores. Please try again.",
       "statsFailed": "Unable to load statistics for this store.",

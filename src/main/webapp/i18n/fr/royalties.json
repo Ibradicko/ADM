@@ -11,8 +11,9 @@
       "update": "Mettre à jour",
       "addPayment": "Ajouter un paiement",
       "addAdjustment": "Ajouter une régularisation",
-      "creating": "Création...",
-      "createCalculation": "Créer le calcul"
+      "printReceipt": "Imprimer le reçu",
+      "pay": "Payer",
+      "viewDetail": "Voir le détail"
     },
     "restricted": {
       "title": "Accès limité",
@@ -48,11 +49,11 @@
       "code": "Code",
       "type": "Type",
       "rate": "Taux",
-      "priority": "Priorité"
+      "priority": "Priorité",
+      "actions": "Actions"
     },
     "filters": {
       "allShops": "Toutes les boutiques",
-      "allTenants": "Tous les locataires",
       "allStatuses": "Tous les statuts",
       "searchPlaceholder": "Référence, boutique, locataire, statut..."
     },
@@ -62,7 +63,31 @@
       "relatedPayments": "Paiements associés",
       "adjustments": "Régularisations",
       "quickCreation": "Calcul automatique",
-      "activeRules": "Règles actives"
+      "activeRules": "Règles actives",
+      "paymentHistory": "Historique des paiements"
+    },
+    "tabs": {
+      "calculations": "Calculs ({{count}})",
+      "paymentHistory": "Historique des paiements ({{count}})",
+      "rules": "Règles actives ({{count}})"
+    },
+    "scope": {
+      "tenant": "Vous consultez les redevances de vos boutiques, en lecture seule.",
+      "seller": "Vous consultez les redevances de votre boutique, en lecture seule.",
+      "shopManager": "Vous consultez les redevances de votre boutique, en lecture seule.",
+      "admin": "Vue globale : les redevances sont calculées automatiquement après chaque vente ; vous pouvez encaisser les paiements."
+    },
+    "payment": {
+      "title": "Enregistrer un paiement",
+      "description": "Le paiement partiel est accepté ; seul le montant saisi est déduit du solde.",
+      "remaining": "Reste à payer",
+      "alreadyPaid": "Déjà payé",
+      "paidOnTotal": "{{paid}} payé sur {{total}}",
+      "progress": "Progression du paiement",
+      "payBalance": "Payer le solde",
+      "maxAmount": "Maximum disponible : {{amount}}",
+      "noPaymentPossible": "Aucun paiement n'est possible pour ce calcul.",
+      "readOnlyNote": "Seuls l'administrateur et le manager ADM peuvent encaisser un paiement."
     },
     "count": {
       "calculations": "{{count}} calcul(s) dans la sélection.",
@@ -80,13 +105,11 @@
       "noPayment": "Aucun paiement lié à ce calcul.",
       "noAdjustment": "Aucune régularisation pour ce calcul.",
       "noSelectedCalculation": "Aucun calcul sélectionné",
-      "noActiveRule": "Aucune règle active."
+      "noActiveRule": "Aucune règle active.",
+      "noPaymentHistory": "Aucun paiement enregistré pour l'instant."
     },
     "messages": {
       "loadFailed": "Le chargement des données de redevances a échoué.",
-      "shopAndTenantRequired": "Sélectionnez une boutique et un locataire avant de créer un calcul.",
-      "calculationSaved": "Le calcul de redevance a été enregistré.",
-      "calculationSaveFailed": "Impossible d’enregistrer le calcul de redevance.",
       "statusUpdated": "Le statut du calcul a été mis à jour.",
       "statusUpdateFailed": "La mise à jour du statut a échoué.",
       "paymentAmountRequired": "Le montant du paiement est obligatoire.",
@@ -95,7 +118,15 @@
       "paymentSaveFailed": "Impossible d’enregistrer le paiement.",
       "adjustmentFieldsRequired": "Le montant et le motif de régularisation sont obligatoires.",
       "adjustmentSaved": "La régularisation a été enregistrée.",
-      "adjustmentSaveFailed": "Impossible d’enregistrer la régularisation."
+      "adjustmentSaveFailed": "Impossible d’enregistrer la régularisation.",
+      "printFailed": "Impossible d’ouvrir la fenêtre d’impression du reçu."
+    },
+    "receipt": {
+      "title": "Reçu de paiement de redevance",
+      "subtitle": "Adm Supervision Ventes",
+      "paymentReference": "Référence paiement",
+      "calculationReference": "Référence calcul",
+      "printedOn": "Imprimé le {{date}}"
     },
     "common": {
       "unavailable": "Indisponible"

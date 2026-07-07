@@ -1,297 +1,292 @@
-<div class="adm-page-container mes-boutiques">
-  <div class="mes-boutiques__header">
-    <div class="mes-boutiques__header-icon">
-      <fa-icon icon="store" />
-    </div>
-    <div>
-      <h1 class="mes-boutiques__title" jhiTranslate="mesBoutiques.title">Mes boutiques</h1>
-      <p class="mes-boutiques__subtitle" jhiTranslate="mesBoutiques.subtitle" [translateValues]="{ nom: nomLocataire() }">
+<section class="adm-page mes-boutiques-page">
+  <header class="adm-page-header mes-boutiques-hero">
+    <div class="mes-boutiques-hero__content">
+      <span class="adm-page__eyebrow" jhiTranslate="mesBoutiques.eyebrow">Espace locataire</span>
+      <h1 jhiTranslate="mesBoutiques.title">Mes boutiques</h1>
+      <p jhiTranslate="mesBoutiques.subtitle" [translateValues]="{ nom: nomLocataire() }">
         Bienvenue {{ nomLocataire() }} - gérez vos boutiques et vos équipes.
       </p>
     </div>
-  </div>
+    <div class="adm-page-header__actions">
+      <button type="button" class="adm-button adm-button--ghost" (click)="chargerMesExploitations()" [disabled]="chargement()">
+        <fa-icon icon="sync" [animation]="chargement() ? 'spin' : undefined" />
+        <span jhiTranslate="mesBoutiques.retry">Réessayer</span>
+      </button>
+    </div>
+  </header>
 
   @if (chargement()) {
-    <div class="mes-boutiques__loading">
+    <div class="adm-inline-alert adm-inline-alert--info">
       <fa-icon icon="spinner" animation="spin" />
       <span jhiTranslate="mesBoutiques.loading">Chargement de vos boutiques...</span>
     </div>
   }
 
   @if (erreur()) {
-    <div class="mes-boutiques__error">
+    <div class="adm-inline-alert adm-inline-alert--danger">
       <fa-icon icon="exclamation-circle" />
       <span>{{ erreur() }}</span>
-      <button type="button" class="adm-btn adm-btn--sm adm-btn--outline" (click)="chargerMesExploitations()">
-        {{ 'mesBoutiques.retry' | translate }}
-      </button>
     </div>
   }
 
   @if (!chargement() && !erreur() && panneaux().length === 0) {
-    <div class="mes-boutiques__empty">
-      <fa-icon icon="store" class="mes-boutiques__empty-icon" />
-      <p jhiTranslate="mesBoutiques.emptyTitle">Aucune boutique ne vous est encore affectée.</p>
-      <p class="mes-boutiques__empty-hint" jhiTranslate="mesBoutiques.emptyHint">
-        Contactez votre responsable ADM pour obtenir un contrat d'exploitation.
-      </p>
+    <div class="adm-empty-state">
+      <fa-icon icon="store" class="mes-boutiques-page__empty-icon" />
+      <strong jhiTranslate="mesBoutiques.emptyTitle">Aucune boutique ne vous est encore affectée.</strong>
+      <p jhiTranslate="mesBoutiques.emptyHint">Contactez votre responsable ADM pour obtenir un contrat d'exploitation.</p>
     </div>
   }
 
-  @for (panneau of panneaux(); track panneau.exploitation.id) {
-    <div class="mes-boutiques__card" [class.mes-boutiques__card--actif]="panneau.exploitation.statut === 'ACTIF'">
-      <div
-        class="mes-boutiques__card-header"
-        (click)="togglePanneau(panneau)"
-        role="button"
-        tabindex="0"
-        (keydown.enter)="togglePanneau(panneau)"
-        (keydown.space)="togglePanneau(panneau)"
+  @if (!chargement() && !erreur() && panneaux().length > 0) {
+    <section class="adm-kpi-grid mes-boutiques-kpis">
+      @for (metric of metrics(); track metric.labelKey) {
+        <article class="adm-kpi-card" [class]="'adm-kpi-card adm-kpi-card--' + metric.tone">
+          <span class="adm-kpi-card__label">{{ metric.labelKey | translate }}</span>
+          <strong>{{ metric.value }}</strong>
+        </article>
+      }
+    </section>
+  }
+
+  <section class="mes-boutiques-list">
+    @for (panneau of panneaux(); track panneau.exploitation.id) {
+      <article
+        class="adm-card adm-card--table mes-boutique-card"
+        [class.mes-boutique-card--active]="panneau.exploitation.statut === 'ACTIF'"
       >
-        <div class="mes-boutiques__card-info">
-          <span class="mes-boutiques__boutique-nom">{{ panneau.exploitation.boutique?.nom ?? '-' }}</span>
-          <span class="mes-boutiques__contrat-num">{{
-            'mesBoutiques.contractNumber' | translate: { numero: panneau.exploitation.numeroContrat ?? '-' }
-          }}</span>
-          <span
-            class="mes-boutiques__badge"
-            [class.mes-boutiques__badge--actif]="panneau.exploitation.statut === 'ACTIF'"
-            [class.mes-boutiques__badge--inactif]="panneau.exploitation.statut !== 'ACTIF'"
-          >
+        <button type="button" class="mes-boutique-card__summary" (click)="togglePanneau(panneau)" [attr.aria-expanded]="panneau.ouvert">
+          <div class="adm-table-title">
+            <strong>{{ panneau.exploitation.boutique?.nom ?? '-' }}</strong>
+            <small>{{ panneau.exploitation.boutique?.code ?? ('mesBoutiques.noShopCode' | translate) }}</small>
+          </div>
+          <span class="adm-code">{{ panneau.exploitation.numeroContrat ?? '-' }}</span>
+          <span [class]="statutClasse(panneau.exploitation.statut)">
             {{ 'admSupervisionVentesApp.StatutGeneral.' + (panneau.exploitation.statut ?? 'null') | translate }}
           </span>
-        </div>
-        <div class="mes-boutiques__card-dates">
-          <span>{{ 'mesBoutiques.since' | translate: { date: panneau.exploitation.dateDebut?.format('DD/MM/YYYY') ?? '-' } }}</span>
-          @if (panneau.exploitation.dateFin) {
-            <span>{{ 'mesBoutiques.until' | translate: { date: panneau.exploitation.dateFin.format('DD/MM/YYYY') } }}</span>
-          }
-        </div>
-        <fa-icon [icon]="panneau.ouvert ? 'chevron-up' : 'chevron-down'" class="mes-boutiques__card-chevron" />
-      </div>
+          <span class="mes-boutique-card__date">{{
+            'mesBoutiques.since' | translate: { date: panneau.exploitation.dateDebut?.format('DD/MM/YYYY') ?? '-' }
+          }}</span>
+          <fa-icon [icon]="panneau.ouvert ? 'chevron-up' : 'chevron-down'" />
+        </button>
 
-      <div [ngbCollapse]="!panneau.ouvert" class="mes-boutiques__card-body">
-        @if (panneau.chargementAffectations) {
-          <div class="mes-boutiques__mini-loader">
-            <fa-icon icon="spinner" animation="spin" />
-            {{ 'mesBoutiques.loadingTeam' | translate }}
-          </div>
-        }
-
-        @if (!panneau.chargementAffectations) {
-          <div class="mes-boutiques__team-section">
-            <h3 class="mes-boutiques__team-title">
-              <fa-icon icon="users" />
-              {{ 'mesBoutiques.teamTitle' | translate }}
-              <span class="mes-boutiques__team-count">{{
-                'mesBoutiques.memberCount' | translate: { count: panneau.affectations.length }
-              }}</span>
-            </h3>
-
-            @if (panneau.affectations.length === 0) {
-              <p class="mes-boutiques__team-empty" jhiTranslate="mesBoutiques.teamEmpty">
-                Aucun responsable ni vendeur assigné à cette boutique.
-              </p>
-            } @else {
-              <table class="adm-table">
-                <thead>
-                  <tr>
-                    <th>{{ 'mesBoutiques.columnLogin' | translate }}</th>
-                    <th>{{ 'mesBoutiques.columnName' | translate }}</th>
-                    <th>{{ 'mesBoutiques.columnProfile' | translate }}</th>
-                    <th>{{ 'mesBoutiques.columnSince' | translate }}</th>
-                    <th>{{ 'mesBoutiques.columnActions' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (aff of panneau.affectations; track aff.id; let even = $even) {
-                    <tr [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
-                      <td class="adm-table__cell--login">{{ aff.user?.login ?? '-' }}</td>
-                      <td>{{ nomUtilisateur(aff.user) }}</td>
-                      <td>
-                        <span class="mes-boutiques__profil-badge">{{ aff.profil?.code ?? '-' }}</span>
-                      </td>
-                      <td>{{ aff.dateDebut?.format('DD/MM/YYYY') ?? '-' }}</td>
-                      <td>
-                        @if (!estAffectationCompteCourant(aff)) {
-                          <button
-                            type="button"
-                            class="adm-btn adm-btn--sm adm-btn--danger-outline"
-                            (click)="desactiverAffectation(panneau, aff)"
-                          >
-                            <fa-icon icon="user-minus" />
-                            {{ 'mesBoutiques.remove' | translate }}
-                          </button>
-                        } @else {
-                          <span class="mes-boutiques__team-empty">Compte locataire</span>
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            }
-
-            @if (!panneau.formulaireOuvert) {
-              <button
-                type="button"
-                class="adm-btn adm-btn--primary mes-boutiques__add-btn"
-                (click)="ouvrirFormulaire(panneau)"
-                [disabled]="panneau.exploitation.statut !== 'ACTIF'"
-              >
-                <fa-icon icon="user-plus" />
-                {{ 'mesBoutiques.addMember' | translate }}
-              </button>
-            }
-
-            @if (panneau.formulaireOuvert) {
-              <div class="mes-boutiques__form-ajout">
-                <h4 class="mes-boutiques__form-title">{{ 'mesBoutiques.addMemberTitle' | translate }}</h4>
-                <p class="mes-boutiques__form-hint">
-                  {{ 'mesBoutiques.newAccountHint' | translate }}
-                </p>
-
-                <div class="mes-boutiques__form-row">
-                  <div class="adm-form-field">
-                    <label class="adm-form-field__label"
-                      >{{ 'mesBoutiques.loginLabel' | translate }} <span class="adm-required">*</span></label
-                    >
-                    <input
-                      type="text"
-                      class="form-control"
-                      [placeholder]="'mesBoutiques.loginPlaceholder' | translate"
-                      [(ngModel)]="panneau.nouvelUtilisateur.login"
-                      name="nouveauLogin_{{ panneau.exploitation.id }}"
-                    />
-                  </div>
-
-                  <div class="adm-form-field">
-                    <label class="adm-form-field__label"
-                      >{{ 'mesBoutiques.emailLabel' | translate }} <span class="adm-required">*</span></label
-                    >
-                    <input
-                      type="email"
-                      class="form-control"
-                      [placeholder]="'mesBoutiques.emailPlaceholder' | translate"
-                      [(ngModel)]="panneau.nouvelUtilisateur.email"
-                      name="nouveauEmail_{{ panneau.exploitation.id }}"
-                    />
-                  </div>
+        <div [ngbCollapse]="!panneau.ouvert" class="mes-boutique-card__body">
+          <div class="mes-boutique-card__grid">
+            <section class="mes-boutique-card__section">
+              <div class="adm-card__header">
+                <div>
+                  <h2>
+                    <fa-icon icon="users" />
+                    <span jhiTranslate="mesBoutiques.teamTitle">Équipe de la boutique</span>
+                  </h2>
+                  <p>{{ 'mesBoutiques.memberCount' | translate: { count: panneau.affectations.length } }}</p>
                 </div>
-
-                <div class="mes-boutiques__form-row">
-                  <div class="adm-form-field">
-                    <label class="adm-form-field__label">{{ 'mesBoutiques.firstNameLabel' | translate }}</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      [(ngModel)]="panneau.nouvelUtilisateur.firstName"
-                      name="nouveauPrenom_{{ panneau.exploitation.id }}"
-                    />
-                  </div>
-
-                  <div class="adm-form-field">
-                    <label class="adm-form-field__label">{{ 'mesBoutiques.lastNameLabel' | translate }}</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      [(ngModel)]="panneau.nouvelUtilisateur.lastName"
-                      name="nouveauNom_{{ panneau.exploitation.id }}"
-                    />
-                  </div>
-
-                  <div class="adm-form-field">
-                    <label class="adm-form-field__label"
-                      >{{ 'mesBoutiques.profileLabel' | translate }} <span class="adm-required">*</span></label
-                    >
-                    <select
-                      class="form-select"
-                      [(ngModel)]="panneau.nouvelUtilisateur.profilId"
-                      name="nouveauProfil_{{ panneau.exploitation.id }}"
-                    >
-                      <option [ngValue]="null">{{ 'mesBoutiques.profileChoose' | translate }}</option>
-                      @for (profil of profilsDisponibles(); track profil.id) {
-                        <option [ngValue]="profil.id">{{ profil.code }}</option>
-                      }
-                    </select>
-                  </div>
-                </div>
-
-                @if (panneau.erreurAjout) {
-                  <div class="mes-boutiques__form-error">
-                    <fa-icon icon="exclamation-triangle" />
-                    {{ panneau.erreurAjout }}
-                  </div>
-                }
-
-                <div class="mes-boutiques__form-actions">
-                  <button type="button" class="adm-btn adm-btn--secondary" (click)="fermerFormulaire(panneau)">
-                    {{ 'mesBoutiques.cancel' | translate }}
-                  </button>
+                @if (!panneau.formulaireOuvert) {
                   <button
                     type="button"
-                    class="adm-btn adm-btn--primary"
-                    (click)="ajouterResponsable(panneau)"
-                    [disabled]="panneau.ajoutEnCours"
+                    class="adm-button adm-button--primary"
+                    (click)="ouvrirFormulaire(panneau)"
+                    [disabled]="panneau.exploitation.statut !== 'ACTIF'"
                   >
-                    @if (panneau.ajoutEnCours) {
-                      <fa-icon icon="spinner" animation="spin" />
-                    } @else {
-                      <fa-icon icon="check" />
-                    }
-                    {{ 'mesBoutiques.confirmAdd' | translate }}
+                    <fa-icon icon="user-plus" />
+                    <span jhiTranslate="mesBoutiques.addMember">Ajouter un responsable / vendeur</span>
                   </button>
-                </div>
+                }
               </div>
-            }
-          </div>
-        }
 
-        @if (!panneau.chargementAffectations) {
-          <div class="mes-boutiques__stats-section">
-            <h3 class="mes-boutiques__team-title">
-              <fa-icon icon="chart-line" />
-              {{ 'mesBoutiques.statsTitle' | translate }}
-            </h3>
+              @if (panneau.chargementAffectations) {
+                <div class="adm-empty-inline">
+                  <fa-icon icon="spinner" animation="spin" />
+                  <span jhiTranslate="mesBoutiques.loadingTeam">Chargement de l'équipe...</span>
+                </div>
+              } @else if (panneau.affectations.length === 0) {
+                <div class="adm-empty-state adm-empty-state--compact">
+                  <strong jhiTranslate="mesBoutiques.teamEmpty">Aucun responsable ni vendeur assigné à cette boutique.</strong>
+                </div>
+              } @else {
+                <div class="adm-table-wrapper">
+                  <table class="adm-table">
+                    <thead>
+                      <tr>
+                        <th>{{ 'mesBoutiques.columnLogin' | translate }}</th>
+                        <th>{{ 'mesBoutiques.columnName' | translate }}</th>
+                        <th>{{ 'mesBoutiques.columnProfile' | translate }}</th>
+                        <th>{{ 'mesBoutiques.columnSince' | translate }}</th>
+                        <th class="text-end">{{ 'mesBoutiques.columnActions' | translate }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (aff of panneau.affectations; track aff.id; let even = $even) {
+                        <tr [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                          <td>
+                            <span class="adm-code">{{ aff.user?.login ?? '-' }}</span>
+                          </td>
+                          <td>
+                            <div class="adm-table-title">
+                              <strong>{{ nomUtilisateur(aff.user) }}</strong>
+                              <small>{{ aff.user?.email ?? '-' }}</small>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="adm-pill adm-pill--dark">{{ aff.profil?.code ?? '-' }}</span>
+                          </td>
+                          <td>{{ aff.dateDebut?.format('DD/MM/YYYY') ?? '-' }}</td>
+                          <td class="text-end">
+                            @if (!estAffectationCompteCourant(aff)) {
+                              <button
+                                type="button"
+                                class="adm-icon-button adm-icon-button--danger"
+                                (click)="desactiverAffectation(panneau, aff)"
+                                [attr.aria-label]="'mesBoutiques.remove' | translate"
+                                [title]="'mesBoutiques.remove' | translate"
+                              >
+                                <fa-icon icon="user-minus" />
+                              </button>
+                            } @else {
+                              <span class="adm-pill adm-pill--success" jhiTranslate="mesBoutiques.currentTenantAccount"
+                                >Compte locataire</span
+                              >
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
 
-            @if (panneau.statsChargement) {
-              <div class="mes-boutiques__mini-loader">
-                <fa-icon icon="spinner" animation="spin" />
-                {{ 'mesBoutiques.loading' | translate }}
+              @if (panneau.formulaireOuvert) {
+                <form class="adm-card mes-boutique-card__form" (submit)="$event.preventDefault(); ajouterResponsable(panneau)">
+                  <div class="adm-card__header">
+                    <div>
+                      <h2 jhiTranslate="mesBoutiques.addMemberTitle">Ajouter un membre à l'équipe</h2>
+                      <p jhiTranslate="mesBoutiques.newAccountHint">
+                        Un nouveau compte sera créé et un email d'activation sera envoyé à l'utilisateur.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="adm-form-grid">
+                    <label class="adm-field">
+                      <span>{{ 'mesBoutiques.loginLabel' | translate }} <span class="adm-required">*</span></span>
+                      <input
+                        class="adm-input"
+                        type="text"
+                        [placeholder]="'mesBoutiques.loginPlaceholder' | translate"
+                        [(ngModel)]="panneau.nouvelUtilisateur.login"
+                        name="nouveauLogin_{{ panneau.exploitation.id }}"
+                      />
+                    </label>
+                    <label class="adm-field">
+                      <span>{{ 'mesBoutiques.emailLabel' | translate }} <span class="adm-required">*</span></span>
+                      <input
+                        class="adm-input"
+                        type="email"
+                        [placeholder]="'mesBoutiques.emailPlaceholder' | translate"
+                        [(ngModel)]="panneau.nouvelUtilisateur.email"
+                        name="nouveauEmail_{{ panneau.exploitation.id }}"
+                      />
+                    </label>
+                    <label class="adm-field">
+                      <span jhiTranslate="mesBoutiques.firstNameLabel">Prénom</span>
+                      <input
+                        class="adm-input"
+                        type="text"
+                        [(ngModel)]="panneau.nouvelUtilisateur.firstName"
+                        name="nouveauPrenom_{{ panneau.exploitation.id }}"
+                      />
+                    </label>
+                    <label class="adm-field">
+                      <span jhiTranslate="mesBoutiques.lastNameLabel">Nom</span>
+                      <input
+                        class="adm-input"
+                        type="text"
+                        [(ngModel)]="panneau.nouvelUtilisateur.lastName"
+                        name="nouveauNom_{{ panneau.exploitation.id }}"
+                      />
+                    </label>
+                    <label class="adm-field">
+                      <span>{{ 'mesBoutiques.profileLabel' | translate }} <span class="adm-required">*</span></span>
+                      <select
+                        class="adm-select"
+                        [(ngModel)]="panneau.nouvelUtilisateur.profilId"
+                        name="nouveauProfil_{{ panneau.exploitation.id }}"
+                      >
+                        <option [ngValue]="null">{{ 'mesBoutiques.profileChoose' | translate }}</option>
+                        @for (profil of profilsDisponibles(); track profil.id) {
+                          <option [ngValue]="profil.id">{{ profil.code }}</option>
+                        }
+                      </select>
+                    </label>
+                  </div>
+
+                  @if (panneau.erreurAjout) {
+                    <div class="adm-inline-alert adm-inline-alert--danger">
+                      <fa-icon icon="exclamation-triangle" />
+                      <span>{{ panneau.erreurAjout }}</span>
+                    </div>
+                  }
+
+                  <div class="adm-page-header__actions">
+                    <button type="button" class="adm-button adm-button--ghost" (click)="fermerFormulaire(panneau)">
+                      {{ 'mesBoutiques.cancel' | translate }}
+                    </button>
+                    <button type="submit" class="adm-button adm-button--primary" [disabled]="panneau.ajoutEnCours">
+                      @if (panneau.ajoutEnCours) {
+                        <fa-icon icon="spinner" animation="spin" />
+                      } @else {
+                        <fa-icon icon="check" />
+                      }
+                      <span>{{ 'mesBoutiques.confirmAdd' | translate }}</span>
+                    </button>
+                  </div>
+                </form>
+              }
+            </section>
+
+            <aside class="mes-boutique-card__section mes-boutique-card__section--stats">
+              <div class="adm-card__header">
+                <div>
+                  <h2>
+                    <fa-icon icon="chart-line" />
+                    <span jhiTranslate="mesBoutiques.statsTitle">Statistiques de la boutique</span>
+                  </h2>
+                  <p jhiTranslate="mesBoutiques.statsSubtitle">Périmètre courant de cette boutique.</p>
+                </div>
               </div>
-            } @else if (panneau.statsErreur) {
-              <p class="mes-boutiques__team-empty">{{ panneau.statsErreur }}</p>
-            } @else if (panneau.stats) {
-              <div class="mes-boutiques__stats-grid">
-                <div class="mes-boutiques__stat-card">
-                  <span class="mes-boutiques__stat-label">{{ 'mesBoutiques.statsNetSales' | translate }}</span>
-                  <span class="mes-boutiques__stat-value">{{ formatMontant(panneau.stats.netSales) }}</span>
+
+              @if (panneau.statsChargement) {
+                <div class="adm-empty-inline">
+                  <fa-icon icon="spinner" animation="spin" />
+                  <span jhiTranslate="mesBoutiques.loading">Chargement de vos boutiques...</span>
                 </div>
-                <div class="mes-boutiques__stat-card">
-                  <span class="mes-boutiques__stat-label">{{ 'mesBoutiques.statsGrossSales' | translate }}</span>
-                  <span class="mes-boutiques__stat-value">{{ formatMontant(panneau.stats.grossSales) }}</span>
+              } @else if (panneau.statsErreur) {
+                <div class="adm-empty-inline">{{ panneau.statsErreur }}</div>
+              } @else if (panneau.stats) {
+                <div class="mes-boutique-card__stats">
+                  <div>
+                    <span jhiTranslate="mesBoutiques.statsNetSales">CA net</span>
+                    <strong>{{ formatMontant(panneau.stats.netSales) }}</strong>
+                  </div>
+                  <div>
+                    <span jhiTranslate="mesBoutiques.statsGrossSales">CA brut</span>
+                    <strong>{{ formatMontant(panneau.stats.grossSales) }}</strong>
+                  </div>
+                  <div>
+                    <span jhiTranslate="mesBoutiques.statsValidatedSales">Ventes validées</span>
+                    <strong>{{ panneau.stats.validatedSalesCount ?? 0 }}</strong>
+                  </div>
+                  <div>
+                    <span jhiTranslate="mesBoutiques.statsRoyaltyDue">Redevance due</span>
+                    <strong>{{ formatMontant(panneau.stats.royaltyOutstandingAmount) }}</strong>
+                  </div>
                 </div>
-                <div class="mes-boutiques__stat-card">
-                  <span class="mes-boutiques__stat-label">{{ 'mesBoutiques.statsValidatedSales' | translate }}</span>
-                  <span class="mes-boutiques__stat-value">{{ panneau.stats.validatedSalesCount ?? 0 }}</span>
-                </div>
-                <div class="mes-boutiques__stat-card">
-                  <span class="mes-boutiques__stat-label">{{ 'mesBoutiques.statsPendingSales' | translate }}</span>
-                  <span class="mes-boutiques__stat-value">{{ panneau.stats.pendingSalesCount ?? 0 }}</span>
-                </div>
-                <div class="mes-boutiques__stat-card">
-                  <span class="mes-boutiques__stat-label">{{ 'mesBoutiques.statsStockAlerts' | translate }}</span>
-                  <span class="mes-boutiques__stat-value">{{ panneau.stats.stockAlertCount ?? 0 }}</span>
-                </div>
-                <div class="mes-boutiques__stat-card">
-                  <span class="mes-boutiques__stat-label">{{ 'mesBoutiques.statsRoyaltyDue' | translate }}</span>
-                  <span class="mes-boutiques__stat-value">{{ formatMontant(panneau.stats.royaltyOutstandingAmount) }}</span>
-                </div>
-              </div>
-            }
+              } @else {
+                <div class="adm-empty-inline" jhiTranslate="mesBoutiques.statsOpenHint">Ouvrez la carte pour charger les statistiques.</div>
+              }
+            </aside>
           </div>
-        }
-      </div>
-    </div>
-  }
-</div>
+        </div>
+      </article>
+    }
+  </section>
+</section>

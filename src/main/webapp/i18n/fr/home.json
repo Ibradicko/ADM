@@ -49,10 +49,11 @@
         "title": "Tableau de bord vendeur",
         "description": "Un apercu simple de votre activite du jour pour demarrer rapidement vos encaissements.",
         "todayPill": "Ventes du jour",
+        "scopePill": "Mes ventes",
         "ctaTitle": "Pret a encaisser ?",
         "ctaText": "Ouvrez le poste de caisse pour demarrer une nouvelle vente.",
         "recentSalesTitle": "Mes dernieres ventes",
-        "recentSalesSubtitle": "Tickets enregistres aujourd'hui.",
+        "recentSalesSubtitle": "Tickets enregistres sur la periode filtree.",
         "noSalesText": "Ouvrez la caisse pour enregistrer votre premiere vente du jour."
       },
       "royaltyByGroup": {

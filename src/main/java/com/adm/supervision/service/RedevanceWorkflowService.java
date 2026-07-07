@@ -90,13 +90,19 @@ public class RedevanceWorkflowService {
 
         Instant start = request.getPeriodeDebut().atStartOfDay().toInstant(ZoneOffset.UTC);
         Instant end = request.getPeriodeFin().plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC).minusNanos(1);
-        List<Vente> ventes = venteRepository.findAllByDateHeureBetweenAndBoutique_IdAndLocataire_IdAndStatut(
-            start,
-            end,
-            request.getBoutiqueId(),
-            request.getLocataireId(),
-            StatutVente.VALIDEE
-        );
+        // Chaque vente validee declenche deja generateForValidatedSale() a la caisse : exclure ici les ventes
+        // qui ont deja leur propre LigneCalculRedevance pour eviter de compter deux fois la meme redevance.
+        List<Vente> ventes = venteRepository
+            .findAllByDateHeureBetweenAndBoutique_IdAndLocataire_IdAndStatut(
+                start,
+                end,
+                request.getBoutiqueId(),
+                request.getLocataireId(),
+                StatutVente.VALIDEE
+            )
+            .stream()
+            .filter(vente -> !ligneCalculRedevanceRepository.existsByVente_Id(vente.getId()))
+            .toList();
         List<RegleRedevance> rules = regleRedevanceRepository.findAllWithEagerRelationships();
         List<ExploitationBoutique> exploitations = exploitationBoutiqueRepository.findAllWithEagerRelationships();
 

@@ -1,50 +1,61 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (groupeArticle(); as groupeArticleRef) {
+@if (groupeArticle(); as groupeArticleRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="groupeArticleDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.groupeArticle.detail.title">Groupe Article</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ groupeArticleRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.code">Code</span></dt>
-          <dd>
-            <span>{{ groupeArticleRef.code }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.libelle">Libelle</span></dt>
-          <dd>
-            <span>{{ groupeArticleRef.libelle }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.statut">Statut</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.StatutGeneral.' + (groupeArticleRef.statut ?? 'null')">{{
-              { null: '', ACTIF: 'ACTIF', INACTIF: 'INACTIF', SUSPENDU: 'SUSPENDU' }[groupeArticleRef.statut ?? 'null']
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.groupeArticle.tauxRedevance">Taux de redevance</span></dt>
-          <dd>
-            <span>{{ groupeArticleRef.tauxRedevance ?? 0 }}%</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/groupe-article', groupeArticleRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.groupeArticle.detail.title">Groupe Article</p>
+        <h1 data-cy="groupeArticleDetailsHeading">{{ groupeArticleRef.libelle }}</h1>
+        <p>{{ groupeArticleRef.code || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/groupe-article', groupeArticleRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.groupeArticle.detail.title">Groupe Article</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="groupeArticleRef.statut === 'ACTIF'"
+          [class.adm-pill--warning]="groupeArticleRef.statut === 'INACTIF'"
+          [class.adm-pill--danger]="groupeArticleRef.statut === 'SUSPENDU'"
+        >
+          {{ 'admSupervisionVentesApp.StatutGeneral.' + (groupeArticleRef.statut ?? 'null') | translate }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="global.field.id">ID</span>
+          <strong>{{ groupeArticleRef.id }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.groupeArticle.code">Code</span>
+          <strong>{{ groupeArticleRef.code }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.groupeArticle.libelle">Libelle</span>
+          <strong>{{ groupeArticleRef.libelle }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.groupeArticle.statut">Statut</span>
+          <strong>{{ 'admSupervisionVentesApp.StatutGeneral.' + (groupeArticleRef.statut ?? 'null') | translate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.groupeArticle.tauxRedevance">Taux de redevance</span>
+          <strong>{{ groupeArticleRef.tauxRedevance ?? 0 }}%</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

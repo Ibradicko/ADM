@@ -1,60 +1,65 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (stockProduit(); as stockProduitRef) {
+@if (stockProduit(); as stockProduitRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="stockProduitDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.stockProduit.detail.title">Stock Produit</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ stockProduitRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.stockProduit.quantiteTheorique">Quantite Theorique</span></dt>
-          <dd>
-            <span>{{ stockProduitRef.quantiteTheorique }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.stockProduit.stockAlerte">Stock Alerte</span></dt>
-          <dd>
-            <span>{{ stockProduitRef.stockAlerte }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.stockProduit.dateDernierMouvement">Date Dernier Mouvement</span></dt>
-          <dd>
-            <span>{{ stockProduitRef.dateDernierMouvement | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.stockProduit.produit">Produit</span></dt>
-          <dd>
-            @if (stockProduit()!.produit) {
-              <div>
-                <a [routerLink]="['/produit', stockProduit()!.produit?.id, 'view']">{{ stockProduitRef.produit?.designation }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.stockProduit.depot">Depot</span></dt>
-          <dd>
-            @if (stockProduit()!.depot) {
-              <div>
-                <a [routerLink]="['/depot-stock', stockProduit()!.depot?.id, 'view']">{{ stockProduitRef.depot?.code }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/stock-produit', stockProduitRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.stockProduit.detail.title">Stock Produit</p>
+        <h1 data-cy="stockProduitDetailsHeading">{{ stockProduitRef.produit?.designation || '#' + stockProduitRef.id }}</h1>
+        <p>{{ stockProduitRef.depot?.code || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/stock-produit', stockProduitRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.stockProduit.detail.title">Stock Produit</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.stockProduit.quantiteTheorique"
+            >Quantite Theorique</span
+          >
+          <strong>{{ stockProduitRef.quantiteTheorique }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.stockProduit.stockAlerte">Stock Alerte</span>
+          <strong>{{ stockProduitRef.stockAlerte ?? '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.stockProduit.dateDernierMouvement"
+            >Date Dernier Mouvement</span
+          >
+          <strong>{{ stockProduitRef.dateDernierMouvement | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.stockProduit.produit">Produit</span>
+          @if (stockProduitRef.produit) {
+            <a [routerLink]="['/produit', stockProduitRef.produit.id, 'view']">{{ stockProduitRef.produit.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.stockProduit.depot">Depot</span>
+          @if (stockProduitRef.depot) {
+            <a [routerLink]="['/depot-stock', stockProduitRef.depot.id, 'view']">{{ stockProduitRef.depot.code }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

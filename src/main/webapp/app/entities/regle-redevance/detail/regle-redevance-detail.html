@@ -1,98 +1,94 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (regleRedevance(); as regleRedevanceRef) {
+@if (regleRedevance(); as regleRedevanceRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="regleRedevanceDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.regleRedevance.detail.title">Regle Redevance</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ regleRedevanceRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.code">Code</span></dt>
-          <dd>
-            <span>{{ regleRedevanceRef.code }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.typeRegle">Type Regle</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.TypeRegleRedevance.' + (regleRedevanceRef.typeRegle ?? 'null')">{{
-              { null: '', BOUTIQUE: 'BOUTIQUE', LOCATAIRE: 'LOCATAIRE', GROUPE_ARTICLE: 'GROUPE_ARTICLE', PRODUIT: 'PRODUIT' }[
-                regleRedevanceRef.typeRegle ?? 'null'
-              ]
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.taux">Taux</span></dt>
-          <dd>
-            <span>{{ regleRedevanceRef.taux }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.dateDebut">Date Debut</span></dt>
-          <dd>
-            <span>{{ regleRedevanceRef.dateDebut | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.dateFin">Date Fin</span></dt>
-          <dd>
-            <span>{{ regleRedevanceRef.dateFin | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.priorite">Priorite</span></dt>
-          <dd>
-            <span>{{ regleRedevanceRef.priorite }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.actif">Actif</span></dt>
-          <dd>
-            <span>{{ regleRedevanceRef.actif }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.boutique">Boutique</span></dt>
-          <dd>
-            @if (regleRedevance()!.boutique) {
-              <div>
-                <a [routerLink]="['/boutique', regleRedevance()!.boutique?.id, 'view']">{{ regleRedevanceRef.boutique?.nom }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.locataire">Locataire</span></dt>
-          <dd>
-            @if (regleRedevance()!.locataire) {
-              <div>
-                <a [routerLink]="['/locataire', regleRedevance()!.locataire?.id, 'view']">{{ regleRedevanceRef.locataire?.nom }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.groupeArticle">Groupe Article</span></dt>
-          <dd>
-            @if (regleRedevance()!.groupeArticle) {
-              <div>
-                <a [routerLink]="['/groupe-article', regleRedevance()!.groupeArticle?.id, 'view']">{{
-                  regleRedevanceRef.groupeArticle?.libelle
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.regleRedevance.produit">Produit</span></dt>
-          <dd>
-            @if (regleRedevance()!.produit) {
-              <div>
-                <a [routerLink]="['/produit', regleRedevance()!.produit?.id, 'view']">{{ regleRedevanceRef.produit?.designation }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/regle-redevance', regleRedevanceRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.regleRedevance.detail.title">Regle Redevance</p>
+        <h1 data-cy="regleRedevanceDetailsHeading">{{ regleRedevanceRef.code }}</h1>
+        <p>{{ 'admSupervisionVentesApp.TypeRegleRedevance.' + (regleRedevanceRef.typeRegle ?? 'null') | translate }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/regle-redevance', regleRedevanceRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.regleRedevance.detail.title">Regle Redevance</h2>
+        </div>
+        <span class="adm-pill" [class.adm-pill--success]="regleRedevanceRef.actif" [class.adm-pill--warning]="!regleRedevanceRef.actif">
+          {{ regleRedevanceRef.actif ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.code">Code</span>
+          <strong>{{ regleRedevanceRef.code }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.typeRegle">Type Regle</span>
+          <strong>{{ 'admSupervisionVentesApp.TypeRegleRedevance.' + (regleRedevanceRef.typeRegle ?? 'null') | translate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.taux">Taux</span>
+          <strong>{{ regleRedevanceRef.taux }} %</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.priorite">Priorite</span>
+          <strong>{{ regleRedevanceRef.priorite }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.dateDebut">Date Debut</span>
+          <strong>{{ regleRedevanceRef.dateDebut | formatMediumDate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.dateFin">Date Fin</span>
+          <strong>{{ regleRedevanceRef.dateFin | formatMediumDate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.boutique">Boutique</span>
+          @if (regleRedevanceRef.boutique) {
+            <a [routerLink]="['/boutique', regleRedevanceRef.boutique.id, 'view']">{{ regleRedevanceRef.boutique.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.locataire">Locataire</span>
+          @if (regleRedevanceRef.locataire) {
+            <a [routerLink]="['/locataire', regleRedevanceRef.locataire.id, 'view']">{{ regleRedevanceRef.locataire.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.groupeArticle">Groupe Article</span>
+          @if (regleRedevanceRef.groupeArticle) {
+            <a [routerLink]="['/groupe-article', regleRedevanceRef.groupeArticle.id, 'view']">{{
+              regleRedevanceRef.groupeArticle.libelle
+            }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.regleRedevance.produit">Produit</span>
+          @if (regleRedevanceRef.produit) {
+            <a [routerLink]="['/produit', regleRedevanceRef.produit.id, 'view']">{{ regleRedevanceRef.produit.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

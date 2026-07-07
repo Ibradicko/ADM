@@ -1,48 +1,48 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (parametreGlobal(); as parametreGlobalRef) {
+@if (parametreGlobal(); as parametreGlobalRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="parametreGlobalDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.parametreGlobal.detail.title">Parametre Global</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ parametreGlobalRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreGlobal.code">Code</span></dt>
-          <dd>
-            <span>{{ parametreGlobalRef.code }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreGlobal.valeur">Valeur</span></dt>
-          <dd>
-            <span>{{ parametreGlobalRef.valeur }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreGlobal.description">Description</span></dt>
-          <dd>
-            <span>{{ parametreGlobalRef.description }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreGlobal.actif">Actif</span></dt>
-          <dd>
-            <span>{{ parametreGlobalRef.actif }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/parametre-global', parametreGlobalRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.parametreGlobal.detail.title">Parametre Global</p>
+        <h1 data-cy="parametreGlobalDetailsHeading">{{ parametreGlobalRef.code }}</h1>
+        <p>{{ parametreGlobalRef.valeur }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/parametre-global', parametreGlobalRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.parametreGlobal.detail.title">Parametre Global</h2>
+        </div>
+        <span class="adm-pill" [class.adm-pill--success]="parametreGlobalRef.actif" [class.adm-pill--warning]="!parametreGlobalRef.actif">
+          {{ parametreGlobalRef.actif ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.parametreGlobal.code">Code</span>
+          <strong>{{ parametreGlobalRef.code }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.parametreGlobal.valeur">Valeur</span>
+          <strong>{{ parametreGlobalRef.valeur }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.parametreGlobal.description">Description</span>
+          <strong>{{ parametreGlobalRef.description || '--' }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

@@ -1,56 +1,55 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (ticketCaisse(); as ticketCaisseRef) {
+@if (ticketCaisse(); as ticketCaisseRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="ticketCaisseDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.ticketCaisse.detail.title">Ticket Caisse</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ ticketCaisseRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.numero">Numero</span></dt>
-          <dd>
-            <span>{{ ticketCaisseRef.numero }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.dateEmission">Date Emission</span></dt>
-          <dd>
-            <span>{{ ticketCaisseRef.dateEmission | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.nombreImpressions">Nombre Impressions</span></dt>
-          <dd>
-            <span>{{ ticketCaisseRef.nombreImpressions }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.contenu">Contenu</span></dt>
-          <dd>
-            <span>{{ ticketCaisseRef.contenu }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ticketCaisse.vente">Vente</span></dt>
-          <dd>
-            @if (ticketCaisse()!.vente) {
-              <div>
-                <a [routerLink]="['/vente', ticketCaisse()!.vente?.id, 'view']">{{ ticketCaisseRef.vente?.numeroTicket }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/ticket-caisse', ticketCaisseRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.ticketCaisse.detail.title">Ticket Caisse</p>
+        <h1 data-cy="ticketCaisseDetailsHeading">{{ ticketCaisseRef.numero }}</h1>
+        <p>{{ ticketCaisseRef.vente?.numeroTicket || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/ticket-caisse', ticketCaisseRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.ticketCaisse.detail.title">Ticket Caisse</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ticketCaisse.dateEmission">Date Emission</span>
+          <strong>{{ ticketCaisseRef.dateEmission | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ticketCaisse.nombreImpressions"
+            >Nombre Impressions</span
+          >
+          <strong>{{ ticketCaisseRef.nombreImpressions }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ticketCaisse.contenu">Contenu</span>
+          <strong>{{ ticketCaisseRef.contenu || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ticketCaisse.vente">Vente</span>
+          @if (ticketCaisseRef.vente) {
+            <a [routerLink]="['/vente', ticketCaisseRef.vente.id, 'view']">{{ ticketCaisseRef.vente.numeroTicket }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

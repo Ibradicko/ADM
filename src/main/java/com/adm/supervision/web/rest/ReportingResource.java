@@ -26,19 +26,19 @@ public class ReportingResource {
     }
 
     @PostMapping("/exports/generate")
-    @PreAuthorize("@businessAuthorizationService.canExportReporting()")
+    @PreAuthorize("@businessAuthorizationService.canAccessReportingExports()")
     public ResponseEntity<RapportExportPreviewDTO> generateExport(@Valid @RequestBody GenerateRapportExportRequest request) {
         return ResponseEntity.ok(dashboardReportingService.generateExport(request));
     }
 
     @GetMapping("/exports/{rapportExportId}/preview")
-    @PreAuthorize("@businessAuthorizationService.canReadReporting()")
+    @PreAuthorize("@businessAuthorizationService.canAccessReportingExports()")
     public ResponseEntity<RapportExportPreviewDTO> previewExport(@PathVariable Long rapportExportId) {
         return ResponseEntity.ok(dashboardReportingService.previewExport(rapportExportId));
     }
 
     @GetMapping("/exports/{rapportExportId}/download")
-    @PreAuthorize("@businessAuthorizationService.canReadReporting()")
+    @PreAuthorize("@businessAuthorizationService.canAccessReportingExports()")
     public ResponseEntity<byte[]> downloadExport(@PathVariable Long rapportExportId) {
         ExportDownload exportDownload = dashboardReportingService.downloadExport(rapportExportId);
         return ResponseEntity.ok()

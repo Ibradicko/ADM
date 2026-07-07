@@ -1,351 +1,249 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-vente-heading" data-cy="VenteCreateUpdateHeading" jhiTranslate="admSupervisionVentesApp.vente.home.createOrEditLabel">
-        Create or edit a Vente
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let numeroTicketRef = editForm.get('numeroTicket')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_numeroTicket" jhiTranslate="admSupervisionVentesApp.vente.numeroTicket">Numero Ticket</label>
-          <input
-            type="text"
-            class="form-control"
-            name="numeroTicket"
-            id="field_numeroTicket"
-            data-cy="numeroTicket"
-            formControlName="numeroTicket"
-          />
-          @if (numeroTicketRef.invalid && (numeroTicketRef.dirty || numeroTicketRef.touched)) {
-            <div>
-              @if (editForm.get('numeroTicket')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('numeroTicket')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
-                  >This field cannot be longer than 80 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let dateHeureRef = editForm.get('dateHeure')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateHeure" jhiTranslate="admSupervisionVentesApp.vente.dateHeure">Date Heure</label>
-          <div class="d-flex">
-            <input
-              id="field_dateHeure"
-              data-cy="dateHeure"
-              type="datetime-local"
-              class="form-control"
-              name="dateHeure"
-              formControlName="dateHeure"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          @if (dateHeureRef.invalid && (dateHeureRef.dirty || dateHeureRef.touched)) {
-            <div>
-              @if (editForm.get('dateHeure')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('dateHeure')?.errors?.datetimelocal"
-                jhiTranslate="entity.validation.datetimelocal"
-                >This field should be a date and time.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let statutRef = editForm.get('statut')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_statut" jhiTranslate="admSupervisionVentesApp.vente.statut">Statut</label>
-          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
-            <option [ngValue]="null">{{ 'admSupervisionVentesApp.StatutVente.null' | translate }}</option>
-            @for (statutVente of statutVenteValues; track $index) {
-              <option [value]="statutVente">{{ 'admSupervisionVentesApp.StatutVente.' + statutVente | translate }}</option>
-            }
-          </select>
-          @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
-            <div>
-              @if (editForm.get('statut')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let referencePassagerRef = editForm.get('referencePassager')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_referencePassager" jhiTranslate="admSupervisionVentesApp.vente.referencePassager"
-            >Reference Passager</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            name="referencePassager"
-            id="field_referencePassager"
-            data-cy="referencePassager"
-            formControlName="referencePassager"
-          />
-          @if (referencePassagerRef.invalid && (referencePassagerRef.dirty || referencePassagerRef.touched)) {
-            <div>
-              @if (editForm.get('referencePassager')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
-                  >This field cannot be longer than 80 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let referenceCarteEmbarquementRef = editForm.get('referenceCarteEmbarquement')!;
-        <div class="mb-3">
-          <label
-            class="form-label"
-            for="field_referenceCarteEmbarquement"
-            jhiTranslate="admSupervisionVentesApp.vente.referenceCarteEmbarquement"
-            >Reference Carte Embarquement</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            name="referenceCarteEmbarquement"
-            id="field_referenceCarteEmbarquement"
-            data-cy="referenceCarteEmbarquement"
-            formControlName="referenceCarteEmbarquement"
-          />
-          @if (referenceCarteEmbarquementRef.invalid && (referenceCarteEmbarquementRef.dirty || referenceCarteEmbarquementRef.touched)) {
-            <div>
-              @if (editForm.get('referenceCarteEmbarquement')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
-                  >This field cannot be longer than 80 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let montantBrutRef = editForm.get('montantBrut')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_montantBrut" jhiTranslate="admSupervisionVentesApp.vente.montantBrut">Montant Brut</label>
-          <input
-            type="number"
-            class="form-control"
-            name="montantBrut"
-            id="field_montantBrut"
-            data-cy="montantBrut"
-            formControlName="montantBrut"
-          />
-          @if (montantBrutRef.invalid && (montantBrutRef.dirty || montantBrutRef.touched)) {
-            <div>
-              @if (editForm.get('montantBrut')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('montantBrut')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('montantBrut')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let montantRemiseRef = editForm.get('montantRemise')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_montantRemise" jhiTranslate="admSupervisionVentesApp.vente.montantRemise"
-            >Montant Remise</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="montantRemise"
-            id="field_montantRemise"
-            data-cy="montantRemise"
-            formControlName="montantRemise"
-          />
-          @if (montantRemiseRef.invalid && (montantRemiseRef.dirty || montantRemiseRef.touched)) {
-            <div>
-              @if (editForm.get('montantRemise')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('montantRemise')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let montantNetRef = editForm.get('montantNet')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_montantNet" jhiTranslate="admSupervisionVentesApp.vente.montantNet">Montant Net</label>
-          <input
-            type="number"
-            class="form-control"
-            name="montantNet"
-            id="field_montantNet"
-            data-cy="montantNet"
-            formControlName="montantNet"
-          />
-          @if (montantNetRef.invalid && (montantNetRef.dirty || montantNetRef.touched)) {
-            <div>
-              @if (editForm.get('montantNet')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('montantNet')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('montantNet')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let commentaireRef = editForm.get('commentaire')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_commentaire" jhiTranslate="admSupervisionVentesApp.vente.commentaire">Commentaire</label>
-          <input
-            type="text"
-            class="form-control"
-            name="commentaire"
-            id="field_commentaire"
-            data-cy="commentaire"
-            formControlName="commentaire"
-          />
-          @if (commentaireRef.invalid && (commentaireRef.dirty || commentaireRef.touched)) {
-            <div>
-              @if (editForm.get('commentaire')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
-                  >This field cannot be longer than 255 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_boutique" jhiTranslate="admSupervisionVentesApp.vente.boutique">Boutique</label>
-          <select
-            class="form-control"
-            id="field_boutique"
-            data-cy="boutique"
-            name="boutique"
-            formControlName="boutique"
-            [compareWith]="compareBoutique"
-          >
-            @if (!editForm.get('boutique')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
-              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['boutique'])!.invalid && (editForm.get(['boutique'])!.dirty || editForm.get(['boutique'])!.touched)) {
-          <div>
-            @if (editForm.get(['boutique'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_locataire" jhiTranslate="admSupervisionVentesApp.vente.locataire">Locataire</label>
-          <select
-            class="form-control"
-            id="field_locataire"
-            data-cy="locataire"
-            name="locataire"
-            formControlName="locataire"
-            [compareWith]="compareLocataire"
-          >
-            @if (!editForm.get('locataire')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (locataireOption of locatairesSharedCollection(); track $index) {
-              <option [ngValue]="locataireOption">{{ locataireOption.nom }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['locataire'])!.invalid && (editForm.get(['locataire'])!.dirty || editForm.get(['locataire'])!.touched)) {
-          <div>
-            @if (editForm.get(['locataire'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_vendeur" jhiTranslate="admSupervisionVentesApp.vente.vendeur">Vendeur</label>
-          <select
-            class="form-control"
-            id="field_vendeur"
-            data-cy="vendeur"
-            name="vendeur"
-            formControlName="vendeur"
-            [compareWith]="compareUser"
-          >
-            @if (!editForm.get('vendeur')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (userOption of usersSharedCollection(); track $index) {
-              <option [ngValue]="userOption">{{ userOption.login }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['vendeur'])!.invalid && (editForm.get(['vendeur'])!.dirty || editForm.get(['vendeur'])!.touched)) {
-          <div>
-            @if (editForm.get(['vendeur'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
+        <h2 id="jhi-vente-heading" data-cy="VenteCreateUpdateHeading" jhiTranslate="admSupervisionVentesApp.vente.home.createOrEditLabel">
+          Create or edit a Vente
+        </h2>
       </div>
+    </div>
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
+    <jhi-alert-error />
 
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let numeroTicketRef = editForm.get('numeroTicket')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.numeroTicket">Numero Ticket</span>
+        <input type="text" name="numeroTicket" id="field_numeroTicket" data-cy="numeroTicket" formControlName="numeroTicket" />
+        @if (numeroTicketRef.invalid && (numeroTicketRef.dirty || numeroTicketRef.touched)) {
+          @if (numeroTicketRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (numeroTicketRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+              >This field cannot be longer than 80 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let dateHeureRef = editForm.get('dateHeure')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.dateHeure">Date Heure</span>
+        <input
+          id="field_dateHeure"
+          data-cy="dateHeure"
+          type="datetime-local"
+          name="dateHeure"
+          formControlName="dateHeure"
+          placeholder="YYYY-MM-DD HH:mm"
+        />
+        @if (dateHeureRef.invalid && (dateHeureRef.dirty || dateHeureRef.touched)) {
+          @if (dateHeureRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          <small class="text-danger" [hidden]="!dateHeureRef.errors?.datetimelocal" jhiTranslate="entity.validation.datetimelocal"
+            >This field should be a date and time.</small
+          >
+        }
+      </label>
+
+      @let statutRef = editForm.get('statut')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.statut">Statut</span>
+        <select name="statut" formControlName="statut" id="field_statut" data-cy="statut">
+          <option [ngValue]="null">{{ 'admSupervisionVentesApp.StatutVente.null' | translate }}</option>
+          @for (statutVente of statutVenteValues; track $index) {
+            <option [value]="statutVente">{{ 'admSupervisionVentesApp.StatutVente.' + statutVente | translate }}</option>
+          }
+        </select>
+        @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
+          @if (statutRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+        }
+      </label>
+
+      @let referencePassagerRef = editForm.get('referencePassager')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.referencePassager">Reference Passager</span>
+        <input
+          type="text"
+          name="referencePassager"
+          id="field_referencePassager"
+          data-cy="referencePassager"
+          formControlName="referencePassager"
+        />
+        @if (referencePassagerRef.invalid && (referencePassagerRef.dirty || referencePassagerRef.touched)) {
+          @if (referencePassagerRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+              >This field cannot be longer than 80 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let referenceCarteEmbarquementRef = editForm.get('referenceCarteEmbarquement')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.referenceCarteEmbarquement">Reference Carte Embarquement</span>
+        <input
+          type="text"
+          name="referenceCarteEmbarquement"
+          id="field_referenceCarteEmbarquement"
+          data-cy="referenceCarteEmbarquement"
+          formControlName="referenceCarteEmbarquement"
+        />
+        @if (referenceCarteEmbarquementRef.invalid && (referenceCarteEmbarquementRef.dirty || referenceCarteEmbarquementRef.touched)) {
+          @if (referenceCarteEmbarquementRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+              >This field cannot be longer than 80 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let montantBrutRef = editForm.get('montantBrut')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.montantBrut">Montant Brut</span>
+        <input type="number" name="montantBrut" id="field_montantBrut" data-cy="montantBrut" formControlName="montantBrut" />
+        @if (montantBrutRef.invalid && (montantBrutRef.dirty || montantBrutRef.touched)) {
+          @if (montantBrutRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (montantBrutRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          <small class="text-danger" [hidden]="!montantBrutRef.errors?.number" jhiTranslate="entity.validation.number"
+            >This field should be a number.</small
+          >
+        }
+      </label>
+
+      @let montantRemiseRef = editForm.get('montantRemise')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.montantRemise">Montant Remise</span>
+        <input type="number" name="montantRemise" id="field_montantRemise" data-cy="montantRemise" formControlName="montantRemise" />
+        @if (montantRemiseRef.invalid && (montantRemiseRef.dirty || montantRemiseRef.touched)) {
+          @if (montantRemiseRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          <small class="text-danger" [hidden]="!montantRemiseRef.errors?.number" jhiTranslate="entity.validation.number"
+            >This field should be a number.</small
+          >
+        }
+      </label>
+
+      @let montantNetRef = editForm.get('montantNet')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.montantNet">Montant Net</span>
+        <input type="number" name="montantNet" id="field_montantNet" data-cy="montantNet" formControlName="montantNet" />
+        @if (montantNetRef.invalid && (montantNetRef.dirty || montantNetRef.touched)) {
+          @if (montantNetRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (montantNetRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          <small class="text-danger" [hidden]="!montantNetRef.errors?.number" jhiTranslate="entity.validation.number"
+            >This field should be a number.</small
+          >
+        }
+      </label>
+
+      @let commentaireRef = editForm.get('commentaire')!;
+      <label class="adm-field adm-field--full">
+        <span jhiTranslate="admSupervisionVentesApp.vente.commentaire">Commentaire</span>
+        <input type="text" name="commentaire" id="field_commentaire" data-cy="commentaire" formControlName="commentaire" />
+        @if (commentaireRef.invalid && (commentaireRef.dirty || commentaireRef.touched)) {
+          @if (commentaireRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+              >This field cannot be longer than 255 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let boutiqueRef = editForm.get('boutique')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.boutique">Boutique</span>
+        <select id="field_boutique" data-cy="boutique" name="boutique" formControlName="boutique" [compareWith]="compareBoutique">
+          @if (!editForm.get('boutique')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
+            <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
+          }
+        </select>
+        @if (boutiqueRef.invalid && (boutiqueRef.dirty || boutiqueRef.touched) && boutiqueRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let locataireRef = editForm.get('locataire')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.locataire">Locataire</span>
+        <select id="field_locataire" data-cy="locataire" name="locataire" formControlName="locataire" [compareWith]="compareLocataire">
+          @if (!editForm.get('locataire')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (locataireOption of locatairesSharedCollection(); track $index) {
+            <option [ngValue]="locataireOption">{{ locataireOption.nom }}</option>
+          }
+        </select>
+        @if (locataireRef.invalid && (locataireRef.dirty || locataireRef.touched) && locataireRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let vendeurRef = editForm.get('vendeur')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.vente.vendeur">Vendeur</span>
+        <select id="field_vendeur" data-cy="vendeur" name="vendeur" formControlName="vendeur" [compareWith]="compareUser">
+          @if (!editForm.get('vendeur')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (userOption of usersSharedCollection(); track $index) {
+            <option [ngValue]="userOption">{{ userOption.login }}</option>
+          }
+        </select>
+        @if (vendeurRef.invalid && (vendeurRef.dirty || vendeurRef.touched) && vendeurRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

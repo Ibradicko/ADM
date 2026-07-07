@@ -1,52 +1,62 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (parametreCodeBarres(); as parametreCodeBarresRef) {
+@if (parametreCodeBarres(); as parametreCodeBarresRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="parametreCodeBarresDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.detail.title">Parametre Code Barres</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ parametreCodeBarresRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.formatParDefaut">Format Par Defaut</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.TypeCodeBarres.' + (parametreCodeBarresRef.formatParDefaut ?? 'null')">{{
-              { null: '', EAN13: 'EAN13', EAN8: 'EAN8', CODE128: 'CODE128', QR_CODE: 'QR_CODE', INTERNE: 'INTERNE' }[
-                parametreCodeBarresRef.formatParDefaut ?? 'null'
-              ]
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.prefixe">Prefixe</span></dt>
-          <dd>
-            <span>{{ parametreCodeBarresRef.prefixe }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.longueur">Longueur</span></dt>
-          <dd>
-            <span>{{ parametreCodeBarresRef.longueur }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.actif">Actif</span></dt>
-          <dd>
-            <span>{{ parametreCodeBarresRef.actif }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/parametre-code-barres', parametreCodeBarresRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.detail.title">Parametre Code Barres</p>
+        <h1 data-cy="parametreCodeBarresDetailsHeading">{{ parametreCodeBarresRef.prefixe || '--' }}</h1>
+        <p>{{ 'admSupervisionVentesApp.TypeCodeBarres.' + (parametreCodeBarresRef.formatParDefaut ?? 'null') | translate }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/parametre-code-barres', parametreCodeBarresRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.detail.title">Parametre Code Barres</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="parametreCodeBarresRef.actif"
+          [class.adm-pill--warning]="!parametreCodeBarresRef.actif"
+        >
+          {{ parametreCodeBarresRef.actif ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="global.field.id">ID</span>
+          <strong>{{ parametreCodeBarresRef.id }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.formatParDefaut"
+            >Format Par Defaut</span
+          >
+          <strong>{{ 'admSupervisionVentesApp.TypeCodeBarres.' + (parametreCodeBarresRef.formatParDefaut ?? 'null') | translate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.prefixe">Prefixe</span>
+          <strong>{{ parametreCodeBarresRef.prefixe || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.longueur">Longueur</span>
+          <strong>{{ parametreCodeBarresRef.longueur }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.parametreCodeBarres.actif">Actif</span>
+          <strong>{{ parametreCodeBarresRef.actif }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

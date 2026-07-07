@@ -1,60 +1,74 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (etiquetteProduit(); as etiquetteProduitRef) {
+@if (etiquetteProduit(); as etiquetteProduitRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="etiquetteProduitDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.detail.title">Etiquette Produit</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ etiquetteProduitRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.quantite">Quantite</span></dt>
-          <dd>
-            <span>{{ etiquetteProduitRef.quantite }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.imprimee">Imprimee</span></dt>
-          <dd>
-            <span>{{ etiquetteProduitRef.imprimee }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.dateImpression">Date Impression</span></dt>
-          <dd>
-            <span>{{ etiquetteProduitRef.dateImpression | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.produit">Produit</span></dt>
-          <dd>
-            @if (etiquetteProduit()!.produit) {
-              <div>
-                <a [routerLink]="['/produit', etiquetteProduit()!.produit?.id, 'view']">{{ etiquetteProduitRef.produit?.designation }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.etiquetteProduit.lot">Lot</span></dt>
-          <dd>
-            @if (etiquetteProduit()!.lot) {
-              <div>
-                <a [routerLink]="['/lot-etiquettes', etiquetteProduit()!.lot?.id, 'view']">{{ etiquetteProduitRef.lot?.reference }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/etiquette-produit', etiquetteProduitRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.detail.title">Etiquette Produit</p>
+        <h1 data-cy="etiquetteProduitDetailsHeading">{{ etiquetteProduitRef.produit?.designation || '--' }}</h1>
+        <p>{{ etiquetteProduitRef.lot?.reference || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/etiquette-produit', etiquetteProduitRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.etiquetteProduit.detail.title">Etiquette Produit</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="etiquetteProduitRef.imprimee"
+          [class.adm-pill--warning]="!etiquetteProduitRef.imprimee"
+        >
+          {{ etiquetteProduitRef.imprimee ? 'Imprimee' : 'Non imprimee' }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="global.field.id">ID</span>
+          <strong>{{ etiquetteProduitRef.id }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.quantite">Quantite</span>
+          <strong>{{ etiquetteProduitRef.quantite }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.imprimee">Imprimee</span>
+          <strong>{{ etiquetteProduitRef.imprimee }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.dateImpression"
+            >Date Impression</span
+          >
+          <strong>{{ etiquetteProduitRef.dateImpression | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.produit">Produit</span>
+          @if (etiquetteProduitRef.produit) {
+            <a [routerLink]="['/produit', etiquetteProduitRef.produit.id, 'view']">{{ etiquetteProduitRef.produit.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.etiquetteProduit.lot">Lot</span>
+          @if (etiquetteProduitRef.lot) {
+            <a [routerLink]="['/lot-etiquettes', etiquetteProduitRef.lot.id, 'view']">{{ etiquetteProduitRef.lot.reference }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

@@ -1,74 +1,75 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (transfertStock(); as transfertStockRef) {
+@if (transfertStock(); as transfertStockRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="transfertStockDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.transfertStock.detail.title">Transfert Stock</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ transfertStockRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.transfertStock.reference">Reference</span></dt>
-          <dd>
-            <span>{{ transfertStockRef.reference }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.transfertStock.dateTransfert">Date Transfert</span></dt>
-          <dd>
-            <span>{{ transfertStockRef.dateTransfert | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.transfertStock.statut">Statut</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.StatutMouvementStock.' + (transfertStockRef.statut ?? 'null')">{{
-              { null: '', BROUILLON: 'BROUILLON', VALIDE: 'VALIDE', ANNULE: 'ANNULE' }[transfertStockRef.statut ?? 'null']
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.transfertStock.motif">Motif</span></dt>
-          <dd>
-            <span>{{ transfertStockRef.motif }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.transfertStock.boutiqueOrigine">Boutique Origine</span></dt>
-          <dd>
-            @if (transfertStock()!.boutiqueOrigine) {
-              <div>
-                <a [routerLink]="['/boutique', transfertStock()!.boutiqueOrigine?.id, 'view']">{{
-                  transfertStockRef.boutiqueOrigine?.nom
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.transfertStock.boutiqueDestination">Boutique Destination</span></dt>
-          <dd>
-            @if (transfertStock()!.boutiqueDestination) {
-              <div>
-                <a [routerLink]="['/boutique', transfertStock()!.boutiqueDestination?.id, 'view']">{{
-                  transfertStockRef.boutiqueDestination?.nom
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.transfertStock.utilisateur">Utilisateur</span></dt>
-          <dd>
-            <span>{{ transfertStockRef.utilisateur?.login }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/transfert-stock', transfertStockRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.transfertStock.detail.title">Transfert Stock</p>
+        <h1 data-cy="transfertStockDetailsHeading">{{ transfertStockRef.reference }}</h1>
+        <p>{{ transfertStockRef.boutiqueOrigine?.nom || '--' }} &rarr; {{ transfertStockRef.boutiqueDestination?.nom || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/transfert-stock', transfertStockRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.transfertStock.detail.title">Transfert Stock</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="transfertStockRef.statut === 'VALIDE'"
+          [class.adm-pill--warning]="transfertStockRef.statut === 'BROUILLON'"
+          [class.adm-pill--danger]="transfertStockRef.statut === 'ANNULE'"
+        >
+          {{ 'admSupervisionVentesApp.StatutMouvementStock.' + (transfertStockRef.statut ?? 'null') | translate }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.transfertStock.dateTransfert">Date Transfert</span>
+          <strong>{{ transfertStockRef.dateTransfert | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.transfertStock.motif">Motif</span>
+          <strong>{{ transfertStockRef.motif || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.transfertStock.boutiqueOrigine"
+            >Boutique Origine</span
+          >
+          @if (transfertStockRef.boutiqueOrigine) {
+            <a [routerLink]="['/boutique', transfertStockRef.boutiqueOrigine.id, 'view']">{{ transfertStockRef.boutiqueOrigine.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.transfertStock.boutiqueDestination"
+            >Boutique Destination</span
+          >
+          @if (transfertStockRef.boutiqueDestination) {
+            <a [routerLink]="['/boutique', transfertStockRef.boutiqueDestination.id, 'view']">{{
+              transfertStockRef.boutiqueDestination.nom
+            }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.transfertStock.utilisateur">Utilisateur</span>
+          <strong>{{ transfertStockRef.utilisateur?.login || '--' }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

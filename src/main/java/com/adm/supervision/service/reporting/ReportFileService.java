@@ -8,21 +8,19 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.Normalizer;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ReportFileService {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_INSTANT;
-    private static final int PDF_LINES_PER_PAGE = 42;
     private static final String PDF_CONTENT_TYPE = "application/pdf";
     private static final String EXCEL_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
@@ -104,102 +102,11 @@ public class ReportFileService {
     }
 
     private byte[] buildPdf(ReportDocument document) throws IOException {
-        List<String> printableLines = new ArrayList<>();
-        printableLines.add(document.title());
-        printableLines.add("");
-        printableLines.addAll(document.summaryLines());
-        printableLines.add("");
-        printableLines.add(String.join(" | ", document.headers()));
-        for (List<String> row : document.rows()) {
-            printableLines.add(String.join(" | ", row));
+        try (PDDocument pdf = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            new PdfReportRenderer(pdf, document).render();
+            pdf.save(output);
+            return output.toByteArray();
         }
-
-        List<List<String>> pages = new ArrayList<>();
-        for (int index = 0; index < printableLines.size(); index += PDF_LINES_PER_PAGE) {
-            pages.add(printableLines.subList(index, Math.min(printableLines.size(), index + PDF_LINES_PER_PAGE)));
-        }
-        if (pages.isEmpty()) {
-            pages.add(List.of(document.title()));
-        }
-
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        List<Integer> offsets = new ArrayList<>();
-        writeAscii(output, "%PDF-1.4\n%\u00E2\u00E3\u00CF\u00D3\n");
-
-        int fontObjectNumber = 3 + pages.size() * 2;
-        writeObject(output, offsets, 1, "<< /Type /Catalog /Pages 2 0 R >>");
-
-        StringBuilder kids = new StringBuilder();
-        for (int pageIndex = 0; pageIndex < pages.size(); pageIndex++) {
-            kids.append(3 + pageIndex * 2).append(" 0 R ");
-        }
-        writeObject(output, offsets, 2, "<< /Type /Pages /Kids [ " + kids + "] /Count " + pages.size() + " >>");
-
-        for (int pageIndex = 0; pageIndex < pages.size(); pageIndex++) {
-            int pageObjectNumber = 3 + pageIndex * 2;
-            int contentObjectNumber = pageObjectNumber + 1;
-            writeObject(
-                output,
-                offsets,
-                pageObjectNumber,
-                "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 " +
-                    fontObjectNumber +
-                    " 0 R >> >> /Contents " +
-                    contentObjectNumber +
-                    " 0 R >>"
-            );
-            byte[] contentBytes = buildPdfContent(pages.get(pageIndex)).getBytes(StandardCharsets.US_ASCII);
-            writeStreamObject(output, offsets, contentObjectNumber, contentBytes);
-        }
-
-        writeObject(output, offsets, fontObjectNumber, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
-
-        int xrefStart = output.size();
-        writeAscii(output, "xref\n0 " + (offsets.size() + 1) + "\n");
-        writeAscii(output, "0000000000 65535 f \n");
-        for (Integer offset : offsets) {
-            writeAscii(output, String.format(Locale.ROOT, "%010d 00000 n %n", offset));
-        }
-        writeAscii(output, "trailer\n<< /Size " + (offsets.size() + 1) + " /Root 1 0 R >>\nstartxref\n" + xrefStart + "\n%%EOF");
-        return output.toByteArray();
-    }
-
-    private String buildPdfContent(List<String> lines) {
-        StringBuilder content = new StringBuilder();
-        content.append("BT\n/F1 11 Tf\n14 TL\n50 770 Td\n");
-        for (int i = 0; i < lines.size(); i++) {
-            if (i > 0) {
-                content.append("T*\n");
-            }
-            content.append("(").append(escapePdf(asciiText(lines.get(i)))).append(") Tj\n");
-        }
-        content.append("ET\n");
-        return content.toString();
-    }
-
-    private String asciiText(String input) {
-        String normalized = Normalizer.normalize(input == null ? "" : input, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
-        return normalized.replaceAll("[^\\x20-\\x7E]", "?");
-    }
-
-    private String escapePdf(String input) {
-        return input.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)");
-    }
-
-    private void writeObject(ByteArrayOutputStream output, List<Integer> offsets, int objectNumber, String body) throws IOException {
-        offsets.add(output.size());
-        writeAscii(output, objectNumber + " 0 obj\n" + body + "\nendobj\n");
-    }
-
-    private void writeStreamObject(ByteArrayOutputStream output, List<Integer> offsets, int objectNumber, byte[] data) throws IOException {
-        offsets.add(output.size());
-        writeAscii(output, objectNumber + " 0 obj\n<< /Length " + data.length + " >>\nstream\n");
-        output.write(data);
-        writeAscii(output, "\nendstream\nendobj\n");
-    }
-
-    private void writeAscii(ByteArrayOutputStream output, String content) throws IOException {
-        output.write(content.getBytes(StandardCharsets.US_ASCII));
     }
 
     private byte[] buildWorkbook(ReportDocument document) throws IOException {

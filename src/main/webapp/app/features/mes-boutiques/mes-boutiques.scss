@@ -1,0 +1,139 @@
+:host {
+  display: block;
+}
+
+.mes-boutiques-page {
+  gap: 1.25rem;
+}
+
+.mes-boutiques-hero {
+  align-items: stretch;
+  min-height: 10rem;
+  padding: 1.35rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.1), rgba(37, 99, 235, 0.08)), #ffffff;
+}
+
+.mes-boutiques-hero__content {
+  max-width: 48rem;
+}
+
+.mes-boutiques-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.mes-boutiques-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.mes-boutique-card {
+  overflow: hidden;
+}
+
+.mes-boutique-card--active {
+  border-color: rgba(15, 118, 110, 0.28);
+}
+
+.mes-boutique-card__summary {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) auto auto auto auto;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 1.1rem;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  background: #ffffff;
+  color: var(--adm-text);
+  text-align: left;
+}
+
+.mes-boutique-card__summary:hover {
+  background: #f8fafc;
+}
+
+.mes-boutique-card__date {
+  color: var(--adm-text-soft);
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mes-boutique-card__body {
+  padding: 1rem;
+}
+
+.mes-boutique-card__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.mes-boutique-card__section {
+  min-width: 0;
+}
+
+.mes-boutique-card__section .adm-card__header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1rem;
+}
+
+.mes-boutique-card__form {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-style: dashed;
+}
+
+.mes-boutique-card__form .adm-card__header {
+  padding: 0;
+  border: 0;
+}
+
+.mes-boutique-card__stats {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.mes-boutique-card__stats div {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+.mes-boutique-card__stats span {
+  color: var(--adm-text-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.mes-boutique-card__stats strong {
+  color: var(--adm-text);
+  font-size: 1.15rem;
+}
+
+.mes-boutiques-page__empty-icon {
+  display: block;
+  margin: 0 auto 0.75rem;
+  color: var(--adm-text-soft);
+  font-size: 2rem;
+}
+
+@media (max-width: 980px) {
+  .mes-boutique-card__summary,
+  .mes-boutique-card__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mes-boutique-card__summary {
+    gap: 0.65rem;
+  }
+}

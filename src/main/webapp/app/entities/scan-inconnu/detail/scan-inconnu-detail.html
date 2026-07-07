@@ -1,70 +1,76 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (scanInconnu(); as scanInconnuRef) {
+@if (scanInconnu(); as scanInconnuRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="scanInconnuDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.scanInconnu.detail.title">Scan Inconnu</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ scanInconnuRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.codeScanne">Code Scanne</span></dt>
-          <dd>
-            <span>{{ scanInconnuRef.codeScanne }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.ecranOrigine">Ecran Origine</span></dt>
-          <dd>
-            <span>{{ scanInconnuRef.ecranOrigine }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.dateScan">Date Scan</span></dt>
-          <dd>
-            <span>{{ scanInconnuRef.dateScan | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.commentaire">Commentaire</span></dt>
-          <dd>
-            <span>{{ scanInconnuRef.commentaire }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.resolu">Resolu</span></dt>
-          <dd>
-            <span>{{ scanInconnuRef.resolu }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.boutique">Boutique</span></dt>
-          <dd>
-            @if (scanInconnu()!.boutique) {
-              <div>
-                <a [routerLink]="['/boutique', scanInconnu()!.boutique?.id, 'view']">{{ scanInconnuRef.boutique?.nom }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.scanInconnu.produitAffecte">Produit Affecte</span></dt>
-          <dd>
-            @if (scanInconnu()!.produitAffecte) {
-              <div>
-                <a [routerLink]="['/produit', scanInconnu()!.produitAffecte?.id, 'view']">{{
-                  scanInconnuRef.produitAffecte?.designation
-                }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/scan-inconnu', scanInconnuRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.scanInconnu.detail.title">Scan Inconnu</p>
+        <h1 data-cy="scanInconnuDetailsHeading">{{ scanInconnuRef.codeScanne }}</h1>
+        <p>{{ scanInconnuRef.boutique?.nom || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/scan-inconnu', scanInconnuRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.scanInconnu.detail.title">Scan Inconnu</h2>
+        </div>
+        <span class="adm-pill" [class.adm-pill--success]="scanInconnuRef.resolu" [class.adm-pill--warning]="!scanInconnuRef.resolu">
+          {{ scanInconnuRef.resolu ? 'Resolu' : 'Non resolu' }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="global.field.id">ID</span>
+          <strong>{{ scanInconnuRef.id }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.scanInconnu.codeScanne">Code Scanne</span>
+          <strong>{{ scanInconnuRef.codeScanne }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.scanInconnu.ecranOrigine">Ecran Origine</span>
+          <strong>{{ scanInconnuRef.ecranOrigine || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.scanInconnu.dateScan">Date Scan</span>
+          <strong>{{ scanInconnuRef.dateScan | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block adm-detail-block--full">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.scanInconnu.commentaire">Commentaire</span>
+          <strong>{{ scanInconnuRef.commentaire || '--' }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.scanInconnu.resolu">Resolu</span>
+          <strong>{{ scanInconnuRef.resolu }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.scanInconnu.boutique">Boutique</span>
+          @if (scanInconnuRef.boutique) {
+            <a [routerLink]="['/boutique', scanInconnuRef.boutique.id, 'view']">{{ scanInconnuRef.boutique.nom }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.scanInconnu.produitAffecte">Produit Affecte</span>
+          @if (scanInconnuRef.produitAffecte) {
+            <a [routerLink]="['/produit', scanInconnuRef.produitAffecte.id, 'view']">{{ scanInconnuRef.produitAffecte.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

@@ -33,6 +33,30 @@ public class ModuleSecurityService {
         return businessAuthorizationService.getAccessibleBoutiqueIds();
     }
 
+    public boolean canAccessReportingExports() {
+        return businessAuthorizationService.canAccessReportingExports();
+    }
+
+    public boolean canReadAudit() {
+        return businessAuthorizationService.canReadAudit();
+    }
+
+    public boolean canReadRoyalties() {
+        return businessAuthorizationService.canReadRoyalties();
+    }
+
+    public boolean canReadStock() {
+        return businessAuthorizationService.canReadStock();
+    }
+
+    public boolean isCurrentUserLocataire() {
+        return businessAuthorizationService.isCurrentUserLocataire();
+    }
+
+    public Long getCurrentLocataireIdOrNull() {
+        return businessAuthorizationService.getCurrentLocataireId().orElse(null);
+    }
+
     public void assertBoutiqueAccess(Long boutiqueId, String message) {
         if (!businessAuthorizationService.canAccessBoutique(boutiqueId)) {
             throw new AccessDeniedException(message);

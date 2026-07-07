@@ -1,129 +1,125 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-groupe-article-heading"
-        data-cy="GroupeArticleCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.groupeArticle.home.createOrEditLabel"
-      >
-        Create or edit a Groupe Article
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let codeRef = editForm.get('code')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_code" jhiTranslate="admSupervisionVentesApp.groupeArticle.code">Code</label>
-          <input type="text" class="form-control" name="code" id="field_code" data-cy="code" formControlName="code" />
-          @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
-            <div>
-              @if (editForm.get('code')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('code')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '30' }"
-                  >This field cannot be longer than 30 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let libelleRef = editForm.get('libelle')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_libelle" jhiTranslate="admSupervisionVentesApp.groupeArticle.libelle">Libelle</label>
-          <input type="text" class="form-control" name="libelle" id="field_libelle" data-cy="libelle" formControlName="libelle" />
-          @if (libelleRef.invalid && (libelleRef.dirty || libelleRef.touched)) {
-            <div>
-              @if (editForm.get('libelle')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('libelle')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '150' }"
-                  >This field cannot be longer than 150 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let statutRef = editForm.get('statut')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_statut" jhiTranslate="admSupervisionVentesApp.groupeArticle.statut">Statut</label>
-          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
-            <option [ngValue]="null">{{ 'admSupervisionVentesApp.StatutGeneral.null' | translate }}</option>
-            @for (statutGeneral of statutGeneralValues; track $index) {
-              <option [value]="statutGeneral">{{ 'admSupervisionVentesApp.StatutGeneral.' + statutGeneral | translate }}</option>
-            }
-          </select>
-          @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
-            <div>
-              @if (editForm.get('statut')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let tauxRedevanceRef = editForm.get('tauxRedevance')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_tauxRedevance" jhiTranslate="admSupervisionVentesApp.groupeArticle.tauxRedevance"
-            >Taux de redevance</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="tauxRedevance"
-            id="field_tauxRedevance"
-            data-cy="tauxRedevance"
-            formControlName="tauxRedevance"
-            min="0"
-            max="100"
-            step="0.01"
-          />
-          @if (tauxRedevanceRef.invalid && (tauxRedevanceRef.dirty || tauxRedevanceRef.touched)) {
-            <div>
-              @if (editForm.get('tauxRedevance')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('tauxRedevance')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              @if (editForm.get('tauxRedevance')?.errors?.max) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.max" [translateValues]="{ max: '100' }"
-                  >This field cannot be more than 100.</small
-                >
-              }
-            </div>
-          }
-        </div>
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-groupe-article-heading"
+          data-cy="GroupeArticleCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.groupeArticle.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Groupe Article
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let codeRef = editForm.get('code')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.groupeArticle.code">Code</span>
+        <input type="text" name="code" id="field_code" data-cy="code" formControlName="code" />
+        @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
+          @if (editForm.get('code')?.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (editForm.get('code')?.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '30' }"
+              >This field cannot be longer than 30 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let libelleRef = editForm.get('libelle')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.groupeArticle.libelle">Libelle</span>
+        <input type="text" name="libelle" id="field_libelle" data-cy="libelle" formControlName="libelle" />
+        @if (libelleRef.invalid && (libelleRef.dirty || libelleRef.touched)) {
+          @if (editForm.get('libelle')?.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (editForm.get('libelle')?.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '150' }"
+              >This field cannot be longer than 150 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let statutRef = editForm.get('statut')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.groupeArticle.statut">Statut</span>
+        <select name="statut" formControlName="statut" id="field_statut" data-cy="statut">
+          <option [ngValue]="null">{{ 'admSupervisionVentesApp.StatutGeneral.null' | translate }}</option>
+          @for (statutGeneral of statutGeneralValues; track $index) {
+            <option [value]="statutGeneral">{{ 'admSupervisionVentesApp.StatutGeneral.' + statutGeneral | translate }}</option>
+          }
+        </select>
+        @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
+          @if (editForm.get('statut')?.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+        }
+      </label>
+
+      @let tauxRedevanceRef = editForm.get('tauxRedevance')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.groupeArticle.tauxRedevance">Taux de redevance</span>
+        <input
+          type="number"
+          name="tauxRedevance"
+          id="field_tauxRedevance"
+          data-cy="tauxRedevance"
+          formControlName="tauxRedevance"
+          min="0"
+          max="100"
+          step="0.01"
+        />
+        @if (tauxRedevanceRef.invalid && (tauxRedevanceRef.dirty || tauxRedevanceRef.touched)) {
+          @if (editForm.get('tauxRedevance')?.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (editForm.get('tauxRedevance')?.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          @if (editForm.get('tauxRedevance')?.errors?.max) {
+            <small class="text-danger" jhiTranslate="entity.validation.max" [translateValues]="{ max: '100' }"
+              >This field cannot be more than 100.</small
+            >
+          }
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

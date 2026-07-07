@@ -1,16 +1,12 @@
 <section class="adm-page">
   <header class="adm-page__header">
-    <div>
-      <p class="adm-page__eyebrow" jhiTranslate="royalties.eyebrow">Financial management</p>
-      <h1 jhiTranslate="royalties.title">Royalties</h1>
-      <p jhiTranslate="royalties.subtitle">Track calculations, payments and adjustments by shop and tenant.</p>
-    </div>
     <div class="adm-page__actions">
       @if (permissionsUi.peutExporterReporting()) {
         <a routerLink="/reporting" class="adm-button adm-button--ghost" jhiTranslate="royalties.actions.exportReport">Export a report</a>
       }
       <button type="button" class="adm-button" (click)="recharger()" [disabled]="chargement()">
-        {{ (chargement() ? 'royalties.actions.refreshing' : 'royalties.actions.refresh') | translate }}
+        <fa-icon icon="sync" [animation]="chargement() ? 'spin' : undefined" />
+        <span>{{ (chargement() ? 'royalties.actions.refreshing' : 'royalties.actions.refresh') | translate }}</span>
       </button>
     </div>
   </header>
@@ -23,6 +19,19 @@
       </div>
     </article>
   } @else {
+    <div class="royalty-scope-banner" [class.royalty-scope-banner--readonly]="!permissionsUi.peutGererRedevances()">
+      <fa-icon [icon]="permissionsUi.peutGererRedevances() ? 'coins' : 'eye'" />
+      @if (estVueLocataire()) {
+        <span jhiTranslate="royalties.scope.tenant">Vous consultez les redevances de vos boutiques, en lecture seule.</span>
+      } @else if (estVueVendeur()) {
+        <span jhiTranslate="royalties.scope.seller">Vous consultez les redevances de votre boutique, en lecture seule.</span>
+      } @else if (estVuePerimetreBoutique()) {
+        <span jhiTranslate="royalties.scope.shopManager">Vous consultez les redevances de votre boutique, en lecture seule.</span>
+      } @else {
+        <span jhiTranslate="royalties.scope.admin">Vue globale : les redevances sont calculees automatiquement apres chaque vente.</span>
+      }
+    </div>
+
     @if (message(); as feedback) {
       <div
         class="alert"
@@ -34,56 +43,17 @@
       </div>
     }
 
-    <section class="adm-kpi-grid">
-      <article class="adm-kpi-card">
-        <span class="adm-kpi-card__label" jhiTranslate="royalties.kpis.filteredCalculations">Filtered calculations</span>
-        <strong>{{ resume().nombreCalculs }}</strong>
-      </article>
-      <article class="adm-kpi-card">
-        <span class="adm-kpi-card__label" jhiTranslate="royalties.kpis.turnover">Turnover</span>
-        <strong>{{ formatMontant(resume().chiffreAffaires) }}</strong>
-      </article>
-      <article class="adm-kpi-card">
-        <span class="adm-kpi-card__label" jhiTranslate="royalties.kpis.royaltiesDue">Royalties due</span>
-        <strong>{{ formatMontant(resume().montantDu) }}</strong>
-      </article>
-      <article class="adm-kpi-card">
-        <span class="adm-kpi-card__label" jhiTranslate="royalties.kpis.paymentsReceived">Payments received</span>
-        <strong>{{ formatMontant(resume().montantPaye) }}</strong>
-      </article>
-      <article class="adm-kpi-card">
-        <span class="adm-kpi-card__label" jhiTranslate="royalties.kpis.adjustments">Adjustments</span>
-        <strong>{{ formatMontant(resume().montantRegularise) }}</strong>
-      </article>
-      <article class="adm-kpi-card">
-        <span class="adm-kpi-card__label" jhiTranslate="royalties.kpis.outstandingBalance">Outstanding balance</span>
-        <strong>{{ formatMontant(resume().solde) }}</strong>
-      </article>
-    </section>
-
     <article class="adm-card adm-card--spaced">
       <div class="adm-toolbar">
         <label class="adm-field">
           <span jhiTranslate="royalties.fields.shop">Shop</span>
           <select [ngModel]="boutiqueId()" (ngModelChange)="boutiqueId.set($event ? +$event : null)">
             <option [ngValue]="null" jhiTranslate="royalties.filters.allShops">All shops</option>
-            @for (boutique of boutiques(); track boutique.id) {
-              <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
+            @for (option of boutiqueOptions(); track option.id) {
+              <option [ngValue]="option.id">{{ option.label }}</option>
             }
           </select>
         </label>
-
-        @if (!estVueLocataire()) {
-          <label class="adm-field">
-            <span jhiTranslate="royalties.fields.tenant">Tenant</span>
-            <select [ngModel]="locataireId()" (ngModelChange)="locataireId.set($event ? +$event : null)">
-              <option [ngValue]="null" jhiTranslate="royalties.filters.allTenants">All tenants</option>
-              @for (locataire of locataires(); track locataire.id) {
-                <option [ngValue]="locataire.id">{{ locataire.nom }}</option>
-              }
-            </select>
-          </label>
-        }
 
         <label class="adm-field">
           <span jhiTranslate="royalties.fields.status">Status</span>
@@ -117,42 +87,137 @@
       </div>
     </article>
 
-    <section class="adm-two-columns">
-      <article class="adm-card adm-card--spaced">
-        <div class="adm-section-heading">
-          <div>
-            <h2 jhiTranslate="royalties.sections.calculations">Royalty calculations</h2>
-            <p>{{ 'royalties.count.calculations' | translate: { count: calculsFiltres().length } }}</p>
-          </div>
-        </div>
+    <section class="adm-kpi-grid royalties-kpi-grid">
+      <article class="adm-kpi-card royalties-kpi-card">
+        <span class="adm-kpi-card__label"><fa-icon icon="chart-line" /> {{ 'royalties.kpis.turnover' | translate }}</span>
+        <strong>{{ formatMontant(resume().chiffreAffaires) }}</strong>
+      </article>
+      <article class="adm-kpi-card royalties-kpi-card">
+        <span class="adm-kpi-card__label"><fa-icon icon="coins" /> {{ 'royalties.kpis.royaltiesDue' | translate }}</span>
+        <strong>{{ formatMontant(resume().montantDu) }}</strong>
+      </article>
+      <article class="adm-kpi-card royalties-kpi-card royalties-kpi-card--paid">
+        <span class="adm-kpi-card__label"><fa-icon icon="check-circle" /> {{ 'royalties.kpis.paymentsReceived' | translate }}</span>
+        <strong>{{ formatMontant(resume().montantPaye) }}</strong>
+      </article>
+      <article class="adm-kpi-card royalties-kpi-card">
+        <span class="adm-kpi-card__label"><fa-icon icon="file-alt" /> {{ 'royalties.kpis.adjustments' | translate }}</span>
+        <strong>{{ formatMontant(resume().montantRegularise) }}</strong>
+      </article>
+      <article class="adm-kpi-card royalties-kpi-card royalties-kpi-card--balance">
+        <span class="adm-kpi-card__label"
+          ><fa-icon icon="exclamation-triangle" /> {{ 'royalties.kpis.outstandingBalance' | translate }}</span
+        >
+        <strong>{{ formatMontant(resume().solde) }}</strong>
+      </article>
+    </section>
 
-        <div class="adm-data-table">
-          <table>
+    <div class="royalty-tabs" role="tablist">
+      <button type="button" class="adm-chip" [class.adm-pill--primary]="ongletActif() === 'calculs'" (click)="definirOnglet('calculs')">
+        <fa-icon icon="list" />
+        <span>{{ 'royalties.tabs.calculations' | translate: { count: calculsFiltres().length } }}</span>
+      </button>
+      <button
+        type="button"
+        class="adm-chip"
+        [class.adm-pill--primary]="ongletActif() === 'historique'"
+        (click)="definirOnglet('historique')"
+      >
+        <fa-icon icon="history" />
+        <span>{{ 'royalties.tabs.paymentHistory' | translate: { count: historiquePaiements().length } }}</span>
+      </button>
+      @if (estVueGlobale()) {
+        <button type="button" class="adm-chip" [class.adm-pill--primary]="ongletActif() === 'regles'" (click)="definirOnglet('regles')">
+          <fa-icon icon="file-alt" />
+          <span>{{ 'royalties.tabs.rules' | translate: { count: reglesActives().length } }}</span>
+        </button>
+      }
+    </div>
+
+    @if (ongletActif() === 'calculs') {
+      <article class="adm-card adm-card--table adm-card--spaced">
+        <div class="adm-table-wrapper royalty-clickable-table">
+          <table class="adm-table">
             <thead>
               <tr>
                 <th jhiTranslate="royalties.fields.reference">Reference</th>
-                <th jhiTranslate="royalties.fields.shop">Shop</th>
-                <th jhiTranslate="royalties.fields.tenant">Tenant</th>
+                @if (afficherColonneBoutique()) {
+                  <th jhiTranslate="royalties.fields.shop">Shop</th>
+                }
+                @if (afficherColonneLocataire()) {
+                  <th jhiTranslate="royalties.fields.tenant">Tenant</th>
+                }
                 <th jhiTranslate="royalties.fields.period">Period</th>
                 <th jhiTranslate="royalties.fields.turnover">Turnover</th>
                 <th jhiTranslate="royalties.fields.amount">Amount</th>
                 <th jhiTranslate="royalties.fields.status">Status</th>
+                <th jhiTranslate="royalties.fields.actions">Actions</th>
               </tr>
             </thead>
             <tbody>
-              @for (calcul of calculsFiltres(); track calcul.id) {
-                <tr (click)="selectionnerCalcul(calcul.id)" [class.adm-data-table__row--selected]="calculSelectionne().id === calcul.id">
-                  <td>{{ calcul.reference }}</td>
-                  <td>{{ calcul.boutique?.nom ?? '--' }}</td>
-                  <td>{{ calcul.locataire?.nom ?? '--' }}</td>
+              @for (calcul of calculsFiltres(); track calcul.id; let even = $even) {
+                <tr (click)="ouvrirDetailCalcul(calcul.id)" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                  <td>
+                    <span class="adm-code">{{ calcul.reference }}</span>
+                  </td>
+                  @if (afficherColonneBoutique()) {
+                    <td>
+                      <div class="adm-table-title">
+                        <strong>{{ calcul.boutique?.nom ?? '--' }}</strong>
+                        <small>{{ calcul.boutique?.code ?? '--' }}</small>
+                      </div>
+                    </td>
+                  }
+                  @if (afficherColonneLocataire()) {
+                    <td>
+                      <div class="adm-table-title">
+                        <strong>{{ calcul.locataire?.nom ?? '--' }}</strong>
+                        <small>{{ calcul.locataire?.code ?? '--' }}</small>
+                      </div>
+                    </td>
+                  }
                   <td>{{ formatDate(calcul.periodeDebut) }} - {{ formatDate(calcul.periodeFin) }}</td>
                   <td>{{ formatMontant(calcul.chiffreAffaires) }}</td>
                   <td>{{ formatMontant(calcul.montantRedevance) }}</td>
-                  <td>{{ statutKey(calcul.statut) | translate }}</td>
+                  <td>
+                    <span [class]="statutClasse(calcul.statut)">{{ statutKey(calcul.statut) | translate }}</span>
+                  </td>
+                  <td class="royalty-clickable-table__actions" (click)="$event.stopPropagation()">
+                    @if (permissionsUi.peutGererRedevances() && resteCalcul(calcul) > 0) {
+                      <button
+                        type="button"
+                        class="adm-button adm-button--primary adm-button--small"
+                        (click)="ouvrirDetailCalcul(calcul.id)"
+                      >
+                        <fa-icon icon="coins" />
+                        <span jhiTranslate="royalties.actions.pay">Pay</span>
+                      </button>
+                    }
+                    @if (montantPayeCalcul(calcul.id) > 0) {
+                      <button
+                        type="button"
+                        class="adm-button adm-button--ghost adm-button--small"
+                        (click)="imprimerDernierRecuCalcul(calcul.id)"
+                        [attr.aria-label]="'royalties.actions.printReceipt' | translate"
+                        [title]="'royalties.actions.printReceipt' | translate"
+                      >
+                        <fa-icon icon="print" />
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="adm-button adm-button--ghost adm-button--small"
+                      (click)="ouvrirDetailCalcul(calcul.id)"
+                      [attr.aria-label]="'royalties.actions.viewDetail' | translate"
+                      [title]="'royalties.actions.viewDetail' | translate"
+                    >
+                      <fa-icon icon="eye" />
+                    </button>
+                  </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="7">
+                  <td colspan="8">
                     <div class="adm-empty-inline" jhiTranslate="royalties.empty.noCalculation">No calculation matches the filters.</div>
                   </td>
                 </tr>
@@ -161,150 +226,372 @@
           </table>
         </div>
       </article>
+    }
 
+    @if (ongletActif() === 'historique') {
+      <article class="adm-card adm-card--table adm-card--spaced">
+        <div class="adm-table-wrapper royalty-history-table">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th jhiTranslate="royalties.fields.date">Date</th>
+                <th jhiTranslate="royalties.fields.reference">Reference</th>
+                @if (afficherColonneBoutique()) {
+                  <th jhiTranslate="royalties.fields.shop">Shop</th>
+                }
+                @if (afficherColonneLocataire()) {
+                  <th jhiTranslate="royalties.fields.tenant">Tenant</th>
+                }
+                <th jhiTranslate="royalties.receipt.calculationReference">Calculation reference</th>
+                <th jhiTranslate="royalties.fields.paymentMethod">Method</th>
+                <th jhiTranslate="royalties.fields.amount">Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entree of historiquePaiements(); track entree.paiement.id; let even = $even) {
+                <tr [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                  <td>{{ formatDate(entree.paiement.datePaiement) }}</td>
+                  <td>
+                    <span class="adm-code">{{ entree.paiement.reference }}</span>
+                  </td>
+                  @if (afficherColonneBoutique()) {
+                    <td>{{ entree.calcul?.boutique?.nom ?? '--' }}</td>
+                  }
+                  @if (afficherColonneLocataire()) {
+                    <td>{{ entree.calcul?.locataire?.nom ?? '--' }}</td>
+                  }
+                  <td>{{ entree.calcul?.reference ?? '--' }}</td>
+                  <td>{{ entree.paiement.modePaiement ?? '--' }}</td>
+                  <td>{{ formatMontant(entree.paiement.montant) }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="adm-button adm-button--ghost adm-button--small"
+                      (click)="imprimerRecuPaiement(entree.paiement, entree.calcul)"
+                      [attr.aria-label]="'royalties.actions.printReceipt' | translate"
+                      [title]="'royalties.actions.printReceipt' | translate"
+                    >
+                      <fa-icon icon="print" />
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8">
+                    <div class="adm-empty-inline" jhiTranslate="royalties.empty.noPaymentHistory">No payment recorded yet.</div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    }
+
+    @if (ongletActif() === 'regles' && estVueGlobale()) {
       <article class="adm-card adm-card--spaced">
-        <div class="adm-section-heading">
-          <div>
-            <h2 jhiTranslate="royalties.sections.calculationDetail">Calculation details</h2>
-            <p jhiTranslate="royalties.hints.selectCalculation">Select a calculation to manage its lifecycle.</p>
+        <div class="adm-mini-table">
+          <table>
+            <thead>
+              <tr>
+                <th jhiTranslate="royalties.fields.code">Code</th>
+                <th jhiTranslate="royalties.fields.type">Type</th>
+                <th jhiTranslate="royalties.fields.rate">Rate</th>
+                <th jhiTranslate="royalties.fields.priority">Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (regle of reglesActives(); track regle.id) {
+                <tr>
+                  <td>{{ regle.code }}</td>
+                  <td>{{ regle.typeRegle }}</td>
+                  <td>{{ regle.taux !== null && regle.taux !== undefined ? (regle.taux | number: '1.2-2') + ' %' : '--' }}</td>
+                  <td>{{ regle.priorite }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" jhiTranslate="royalties.empty.noActiveRule">No active rule.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    }
+
+    @if (modalDetailOuvert() && calculSelectionne(); as calcul) {
+      <div class="adm-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="royalty-detail-title" (click)="fermerModalDetail()">
+        <div class="adm-modal-shell adm-modal-shell--wide" (click)="$event.stopPropagation()">
+          <div class="adm-modal">
+            <div class="adm-modal__header">
+              <div>
+                <h2 id="royalty-detail-title">{{ calcul.reference }}</h2>
+                <p>
+                  {{ calcul.boutique?.nom ?? '--' }} - {{ calcul.locataire?.nom ?? '--' }} - {{ formatDate(calcul.periodeDebut) }} -
+                  {{ formatDate(calcul.periodeFin) }}
+                </p>
+              </div>
+              <button
+                type="button"
+                class="adm-icon-button"
+                (click)="fermerModalDetail()"
+                [attr.aria-label]="'entity.action.close' | translate"
+              >
+                <fa-icon icon="times" />
+              </button>
+            </div>
+
+            <div class="adm-modal__body">
+              <section class="royalty-payment-hero">
+                <div class="royalty-payment-hero__main">
+                  <span class="royalty-payment-hero__label" jhiTranslate="royalties.payment.remaining">Reste a payer</span>
+                  <strong>{{ formatMontant(resteSelectionne()) }}</strong>
+                  <small>
+                    {{
+                      'royalties.payment.paidOnTotal'
+                        | translate: { paid: formatMontant(montantPayeSelectionne()), total: formatMontant(calcul.montantRedevance) }
+                    }}
+                  </small>
+                </div>
+                <div class="royalty-payment-hero__side">
+                  <span [class]="statutClasse(calcul.statut)">{{ statutKey(calcul.statut) | translate }}</span>
+                  <div class="royalty-progress" [attr.aria-label]="'royalties.payment.progress' | translate">
+                    <span [style.width]="progressionStyle()"></span>
+                  </div>
+                  <strong>{{ progressionPaiementSelectionne() }}%</strong>
+                </div>
+              </section>
+
+              <div class="adm-detail-grid royalty-modal-summary">
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label" jhiTranslate="royalties.fields.turnover">Turnover</span>
+                  <strong>{{ formatMontant(calcul.chiffreAffaires) }}</strong>
+                </div>
+                <div class="adm-detail-block">
+                  <span class="adm-detail-block__label" jhiTranslate="royalties.fields.royaltyAmount">Royalty amount</span>
+                  <strong>{{ formatMontant(calcul.montantRedevance) }}</strong>
+                </div>
+              </div>
+
+              <section class="royalty-payment-columns">
+                <div class="royalty-payment-columns__history">
+                  <div class="adm-section-heading">
+                    <div>
+                      <h3 jhiTranslate="royalties.sections.relatedPayments">Related payments</h3>
+                      <p>{{ 'royalties.count.payments' | translate: { count: paiementsSelectionnes().length } }}</p>
+                    </div>
+                  </div>
+
+                  <div class="adm-mini-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th jhiTranslate="royalties.fields.reference">Reference</th>
+                          <th jhiTranslate="royalties.fields.date">Date</th>
+                          <th jhiTranslate="royalties.fields.paymentMethod">Method</th>
+                          <th jhiTranslate="royalties.fields.amount">Amount</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (paiement of paiementsSelectionnes(); track paiement.id) {
+                          <tr>
+                            <td>{{ paiement.reference }}</td>
+                            <td>{{ formatDate(paiement.datePaiement) }}</td>
+                            <td>{{ paiement.modePaiement ?? '--' }}</td>
+                            <td>{{ formatMontant(paiement.montant) }}</td>
+                            <td>
+                              <button
+                                type="button"
+                                class="adm-button adm-button--ghost adm-button--small"
+                                (click)="imprimerRecuPaiement(paiement)"
+                                [attr.aria-label]="'royalties.actions.printReceipt' | translate"
+                                [title]="'royalties.actions.printReceipt' | translate"
+                              >
+                                <fa-icon icon="print" />
+                              </button>
+                            </td>
+                          </tr>
+                        } @empty {
+                          <tr>
+                            <td colspan="5" jhiTranslate="royalties.empty.noPayment">No payment is linked to this calculation.</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="royalty-payment-columns__form">
+                  @if (permissionsUi.peutGererRedevances()) {
+                    <div class="royalty-payment-panel">
+                      <div class="royalty-payment-panel__header">
+                        <h3 jhiTranslate="royalties.payment.title">Enregistrer un paiement</h3>
+                        <button
+                          type="button"
+                          class="adm-button adm-button--ghost adm-button--small"
+                          (click)="solderRedevance()"
+                          [disabled]="!paiementPossible()"
+                        >
+                          <span jhiTranslate="royalties.payment.payBalance">Payer le solde</span>
+                        </button>
+                      </div>
+                      <p class="royalty-payment-panel__description" jhiTranslate="royalties.payment.description">
+                        Le paiement partiel est accepte; seul le montant saisi est deduit.
+                      </p>
+
+                      <div class="royalty-payment-form">
+                        <label class="adm-field">
+                          <span jhiTranslate="royalties.fields.amount">Amount</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            [max]="resteSelectionne()"
+                            [class.is-invalid]="montantPaiementInvalide()"
+                            [ngModel]="paiementMontant()"
+                            (ngModelChange)="paiementMontant.set($event ? +$event : null)"
+                          />
+                          <small>{{ 'royalties.payment.maxAmount' | translate: { amount: formatMontant(resteSelectionne()) } }}</small>
+                        </label>
+                        <label class="adm-field">
+                          <span jhiTranslate="royalties.fields.date">Date</span>
+                          <input type="date" [ngModel]="paiementDate()" (ngModelChange)="paiementDate.set($event)" />
+                        </label>
+                        <label class="adm-field">
+                          <span jhiTranslate="royalties.fields.paymentMethod">Method</span>
+                          <select [ngModel]="paiementMode()" (ngModelChange)="paiementMode.set($event)">
+                            @for (mode of modesPaiement; track mode) {
+                              <option [value]="mode">{{ mode }}</option>
+                            }
+                          </select>
+                        </label>
+                        <label class="adm-field adm-field--full">
+                          <span jhiTranslate="royalties.fields.comment">Comment</span>
+                          <input type="text" [ngModel]="paiementCommentaire()" (ngModelChange)="paiementCommentaire.set($event)" />
+                        </label>
+                        <button
+                          type="button"
+                          class="adm-button adm-button--primary adm-button--block royalty-payment-form__submit"
+                          (click)="enregistrerPaiement()"
+                          [disabled]="enregistrement() || !paiementPossible() || montantPaiementInvalide()"
+                        >
+                          <fa-icon icon="coins" />
+                          <span>{{ (enregistrement() ? 'royalties.actions.saving' : 'royalties.actions.addPayment') | translate }}</span>
+                        </button>
+                      </div>
+
+                      @if (!paiementPossible()) {
+                        <p class="royalty-payment-panel__note" jhiTranslate="royalties.payment.noPaymentPossible">
+                          Aucun paiement n'est possible pour ce calcul.
+                        </p>
+                      }
+                    </div>
+                  } @else {
+                    <p class="royalty-payment-panel__note royalty-payment-panel__note--locked">
+                      <fa-icon icon="eye" />
+                      <span jhiTranslate="royalties.payment.readOnlyNote"
+                        >Seuls l'administrateur et le manager ADM peuvent encaisser un paiement.</span
+                      >
+                    </p>
+                  }
+                </div>
+              </section>
+
+              @if (regularisationsSelectionnees().length > 0 || permissionsUi.peutGererRedevances()) {
+                <section class="adm-subsection">
+                  <div class="adm-section-heading royalty-adjustments-heading">
+                    <div>
+                      <h3 jhiTranslate="royalties.sections.adjustments">Adjustments</h3>
+                      <p>{{ 'royalties.count.adjustments' | translate: { count: regularisationsSelectionnees().length } }}</p>
+                    </div>
+                  </div>
+
+                  <div class="adm-mini-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th jhiTranslate="royalties.fields.reference">Reference</th>
+                          <th jhiTranslate="royalties.fields.date">Date</th>
+                          <th jhiTranslate="royalties.fields.reason">Reason</th>
+                          <th jhiTranslate="royalties.fields.amount">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (regularisation of regularisationsSelectionnees(); track regularisation.id) {
+                          <tr>
+                            <td>{{ regularisation.reference }}</td>
+                            <td>{{ formatDate(regularisation.dateRegularisation) }}</td>
+                            <td>{{ regularisation.motif }}</td>
+                            <td>{{ formatMontant(regularisation.montant) }}</td>
+                          </tr>
+                        } @empty {
+                          <tr>
+                            <td colspan="4" jhiTranslate="royalties.empty.noAdjustment">No adjustment for this calculation.</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+
+                  @if (permissionsUi.peutGererRedevances()) {
+                    <div class="royalty-payment-form royalty-adjustment-form">
+                      <label class="adm-field">
+                        <span jhiTranslate="royalties.fields.amount">Amount</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          [ngModel]="regularisationMontant()"
+                          (ngModelChange)="regularisationMontant.set($event ? +$event : null)"
+                        />
+                      </label>
+                      <label class="adm-field">
+                        <span jhiTranslate="royalties.fields.date">Date</span>
+                        <input type="date" [ngModel]="regularisationDate()" (ngModelChange)="regularisationDate.set($event)" />
+                      </label>
+                      <label class="adm-field adm-field--full">
+                        <span jhiTranslate="royalties.fields.reason">Reason</span>
+                        <input type="text" [ngModel]="regularisationMotif()" (ngModelChange)="regularisationMotif.set($event)" />
+                      </label>
+                      <button
+                        type="button"
+                        class="adm-button adm-button--ghost royalty-payment-form__submit"
+                        (click)="enregistrerRegularisation()"
+                        [disabled]="enregistrement()"
+                      >
+                        <span>{{ (enregistrement() ? 'royalties.actions.saving' : 'royalties.actions.addAdjustment') | translate }}</span>
+                      </button>
+                    </div>
+                  }
+                </section>
+              }
+
+              @if (permissionsUi.peutGererRedevances()) {
+                <div class="royalty-status-form">
+                  <label class="adm-field">
+                    <span jhiTranslate="royalties.fields.changeStatus">Change status</span>
+                    <select [ngModel]="statutCible()" (ngModelChange)="statutCible.set($event)">
+                      @for (etat of statutsDisponibles; track etat) {
+                        <option [value]="etat">{{ statutKey(etat) | translate }}</option>
+                      }
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    class="adm-button adm-button--ghost"
+                    (click)="mettreAJourStatutCalcul()"
+                    [disabled]="enregistrement()"
+                  >
+                    {{ (enregistrement() ? 'royalties.actions.saving' : 'royalties.actions.update') | translate }}
+                  </button>
+                </div>
+              }
+            </div>
           </div>
         </div>
-
-        @if (calculSelectionne(); as calcul) {
-          <div class="adm-detail-grid">
-            <div>
-              <span class="adm-detail-grid__label" jhiTranslate="royalties.fields.reference">Reference</span>
-              <strong>{{ calcul.reference }}</strong>
-            </div>
-            <div>
-              <span class="adm-detail-grid__label" jhiTranslate="royalties.fields.status">Status</span>
-              <strong>{{ statutKey(calcul.statut) | translate }}</strong>
-            </div>
-            <div>
-              <span class="adm-detail-grid__label" jhiTranslate="royalties.fields.shop">Shop</span>
-              <strong>{{ calcul.boutique?.nom ?? '--' }}</strong>
-            </div>
-            <div>
-              <span class="adm-detail-grid__label" jhiTranslate="royalties.fields.tenant">Tenant</span>
-              <strong>{{ calcul.locataire?.nom ?? '--' }}</strong>
-            </div>
-            <div>
-              <span class="adm-detail-grid__label" jhiTranslate="royalties.fields.turnover">Turnover</span>
-              <strong>{{ formatMontant(calcul.chiffreAffaires) }}</strong>
-            </div>
-            <div>
-              <span class="adm-detail-grid__label" jhiTranslate="royalties.fields.royaltyAmount">Royalty amount</span>
-              <strong>{{ formatMontant(calcul.montantRedevance) }}</strong>
-            </div>
-            <div>
-              <span class="adm-detail-grid__label">Deja paye</span>
-              <strong>{{ formatMontant(montantPayeSelectionne()) }}</strong>
-            </div>
-            <div>
-              <span class="adm-detail-grid__label">Reste a payer</span>
-              <strong>{{ formatMontant(resteSelectionne()) }}</strong>
-            </div>
-          </div>
-
-          <section class="adm-subsection">
-            <div class="adm-section-heading">
-              <div>
-                <h3 jhiTranslate="royalties.sections.relatedPayments">Related payments</h3>
-                <p>{{ 'royalties.count.payments' | translate: { count: paiementsSelectionnes().length } }}</p>
-              </div>
-            </div>
-
-            <div class="adm-mini-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th jhiTranslate="royalties.fields.reference">Reference</th>
-                    <th jhiTranslate="royalties.fields.date">Date</th>
-                    <th jhiTranslate="royalties.fields.paymentMethod">Method</th>
-                    <th jhiTranslate="royalties.fields.amount">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (paiement of paiementsSelectionnes(); track paiement.id) {
-                    <tr>
-                      <td>{{ paiement.reference }}</td>
-                      <td>{{ formatDate(paiement.datePaiement) }}</td>
-                      <td>{{ paiement.modePaiement ?? '--' }}</td>
-                      <td>{{ formatMontant(paiement.montant) }}</td>
-                    </tr>
-                  } @empty {
-                    <tr>
-                      <td colspan="4" jhiTranslate="royalties.empty.noPayment">No payment is linked to this calculation.</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-
-            @if (permissionsUi.peutGererRedevances()) {
-              <div class="adm-inline-form adm-inline-form--stack">
-                <label class="adm-field">
-                  <span jhiTranslate="royalties.fields.amount">Amount</span>
-                  <input
-                    type="number"
-                    min="0"
-                    [max]="resteSelectionne()"
-                    [ngModel]="paiementMontant()"
-                    (ngModelChange)="paiementMontant.set($event ? +$event : null)"
-                  />
-                  <button type="button" class="adm-link-button mt-1" (click)="solderRedevance()">Payer le solde</button>
-                </label>
-                <label class="adm-field">
-                  <span jhiTranslate="royalties.fields.date">Date</span>
-                  <input type="date" [ngModel]="paiementDate()" (ngModelChange)="paiementDate.set($event)" />
-                </label>
-                <label class="adm-field">
-                  <span jhiTranslate="royalties.fields.paymentMethod">Method</span>
-                  <select [ngModel]="paiementMode()" (ngModelChange)="paiementMode.set($event)">
-                    @for (mode of modesPaiement; track mode) {
-                      <option [value]="mode">{{ mode }}</option>
-                    }
-                  </select>
-                </label>
-                <label class="adm-field adm-field--grow">
-                  <span jhiTranslate="royalties.fields.comment">Comment</span>
-                  <input type="text" [ngModel]="paiementCommentaire()" (ngModelChange)="paiementCommentaire.set($event)" />
-                </label>
-                <button
-                  type="button"
-                  class="adm-button"
-                  (click)="enregistrerPaiement()"
-                  [disabled]="enregistrement() || resteSelectionne() <= 0"
-                >
-                  <span jhiTranslate="royalties.actions.addPayment">Add payment</span>
-                </button>
-              </div>
-            }
-          </section>
-        } @else {
-          <div class="adm-empty-state">
-            <h3 jhiTranslate="royalties.empty.noSelectedCalculation">No calculation selected</h3>
-            <p jhiTranslate="royalties.hints.chooseCalculation">Choose a calculation from the list to display its details.</p>
-          </div>
-        }
-      </article>
-    </section>
-
-    @if (permissionsUi.peutGererRedevances()) {
-      <section class="adm-two-columns">
-        <article class="adm-card adm-card--spaced">
-          <div class="adm-section-heading">
-            <div>
-              <h2 jhiTranslate="royalties.sections.quickCreation">Automatic calculation</h2>
-              <p jhiTranslate="royalties.hints.quickCreation">Calculate royalties from validated sales in the selected period.</p>
-            </div>
-          </div>
-
-          <button type="button" class="adm-button" (click)="creerCalcul()" [disabled]="enregistrement()">
-            {{ (enregistrement() ? 'royalties.actions.creating' : 'royalties.actions.createCalculation') | translate }}
-          </button>
-        </article>
-      </section>
+      </div>
     }
   }
 </section>

@@ -34,6 +34,8 @@ public class BusinessAuthorizationService {
     private static final Set<String> SALES_MANAGE_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE", "VENDEUR");
     private static final Set<String> STOCK_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE", "VENDEUR");
     private static final Set<String> SUPERVISION_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE");
+    private static final Set<String> ROYALTY_READ_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE", "VENDEUR");
+    private static final Set<String> DASHBOARD_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE", "VENDEUR");
 
     private final AffectationUtilisateurRepository affectationUtilisateurRepository;
     private final UserRepository userRepository;
@@ -154,18 +156,31 @@ public class BusinessAuthorizationService {
         if (isCurrentUserLocataire()) {
             return !getAccessibleBoutiqueIds().isEmpty();
         }
-        return hasProfileAndPermission(SUPERVISION_PROFILE_CODES, BusinessPermissions.REPORTING_EXPORT, BusinessPermissions.REPORTING_READ);
+        return (
+            hasProfileAndPermission(SUPERVISION_PROFILE_CODES, BusinessPermissions.REPORTING_EXPORT, BusinessPermissions.REPORTING_READ) ||
+            hasProfileAndPermission(DASHBOARD_PROFILE_CODES, BusinessPermissions.SALES_MANAGE, BusinessPermissions.SALES_READ)
+        );
     }
 
     public boolean canExportReporting() {
         return hasProfileAndPermission(MANAGEMENT_PROFILE_CODES, BusinessPermissions.REPORTING_EXPORT);
     }
 
+    public boolean canAccessReportingExports() {
+        if (isCurrentUserLocataire()) {
+            return !getAccessibleBoutiqueIds().isEmpty();
+        }
+        return (
+            canExportReporting() ||
+            hasProfileAndPermission(SUPERVISION_PROFILE_CODES, BusinessPermissions.REPORTING_EXPORT, BusinessPermissions.REPORTING_READ)
+        );
+    }
+
     public boolean canReadRoyalties() {
         if (isCurrentUserLocataire()) {
             return !getAccessibleBoutiqueIds().isEmpty();
         }
-        return hasProfileAndPermission(SUPERVISION_PROFILE_CODES, BusinessPermissions.ROYALTY_MANAGE, BusinessPermissions.ROYALTY_READ);
+        return hasProfileAndPermission(ROYALTY_READ_PROFILE_CODES, BusinessPermissions.ROYALTY_MANAGE, BusinessPermissions.ROYALTY_READ);
     }
 
     public boolean canManageRoyalties() {

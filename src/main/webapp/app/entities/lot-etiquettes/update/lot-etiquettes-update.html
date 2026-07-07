@@ -1,146 +1,131 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-lot-etiquettes-heading"
-        data-cy="LotEtiquettesCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.lotEtiquettes.home.createOrEditLabel"
-      >
-        Create or edit a Lot Etiquettes
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let referenceRef = editForm.get('reference')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_reference" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.reference">Reference</label>
-          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
-          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
-            <div>
-              @if (editForm.get('reference')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('reference')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                  >This field cannot be longer than 50 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let dateGenerationRef = editForm.get('dateGeneration')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateGeneration" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.dateGeneration"
-            >Date Generation</label
-          >
-          <div class="d-flex">
-            <input
-              id="field_dateGeneration"
-              data-cy="dateGeneration"
-              type="datetime-local"
-              class="form-control"
-              name="dateGeneration"
-              formControlName="dateGeneration"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          @if (dateGenerationRef.invalid && (dateGenerationRef.dirty || dateGenerationRef.touched)) {
-            <div>
-              @if (editForm.get('dateGeneration')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('dateGeneration')?.errors?.datetimelocal"
-                jhiTranslate="entity.validation.datetimelocal"
-                >This field should be a date and time.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let formatImpressionRef = editForm.get('formatImpression')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_formatImpression" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.formatImpression"
-            >Format Impression</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            name="formatImpression"
-            id="field_formatImpression"
-            data-cy="formatImpression"
-            formControlName="formatImpression"
-          />
-          @if (formatImpressionRef.invalid && (formatImpressionRef.dirty || formatImpressionRef.touched)) {
-            <div>
-              @if (editForm.get('formatImpression')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
-                  >This field cannot be longer than 80 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let nombreEtiquettesRef = editForm.get('nombreEtiquettes')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_nombreEtiquettes" jhiTranslate="admSupervisionVentesApp.lotEtiquettes.nombreEtiquettes"
-            >Nombre Etiquettes</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="nombreEtiquettes"
-            id="field_nombreEtiquettes"
-            data-cy="nombreEtiquettes"
-            formControlName="nombreEtiquettes"
-          />
-          @if (nombreEtiquettesRef.invalid && (nombreEtiquettesRef.dirty || nombreEtiquettesRef.touched)) {
-            <div>
-              @if (editForm.get('nombreEtiquettes')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('nombreEtiquettes')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '1' }"
-                  >This field should be at least 1.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('nombreEtiquettes')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-lot-etiquettes-heading"
+          data-cy="LotEtiquettesCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.lotEtiquettes.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Lot Etiquettes
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let referenceRef = editForm.get('reference')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.reference">Reference</span>
+        <input type="text" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+        @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+          @if (editForm.get('reference')?.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (editForm.get('reference')?.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+              >This field cannot be longer than 50 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let dateGenerationRef = editForm.get('dateGeneration')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.dateGeneration">Date Generation</span>
+        <input
+          id="field_dateGeneration"
+          data-cy="dateGeneration"
+          type="datetime-local"
+          name="dateGeneration"
+          formControlName="dateGeneration"
+          placeholder="YYYY-MM-DD HH:mm"
+        />
+        @if (dateGenerationRef.invalid && (dateGenerationRef.dirty || dateGenerationRef.touched)) {
+          @if (editForm.get('dateGeneration')?.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          <small
+            class="text-danger"
+            [hidden]="!editForm.get('dateGeneration')?.errors?.datetimelocal"
+            jhiTranslate="entity.validation.datetimelocal"
+            >This field should be a date and time.</small
+          >
+        }
+      </label>
+
+      @let formatImpressionRef = editForm.get('formatImpression')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.formatImpression">Format Impression</span>
+        <input
+          type="text"
+          name="formatImpression"
+          id="field_formatImpression"
+          data-cy="formatImpression"
+          formControlName="formatImpression"
+        />
+        @if (formatImpressionRef.invalid && (formatImpressionRef.dirty || formatImpressionRef.touched)) {
+          @if (editForm.get('formatImpression')?.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+              >This field cannot be longer than 80 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let nombreEtiquettesRef = editForm.get('nombreEtiquettes')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.lotEtiquettes.nombreEtiquettes">Nombre Etiquettes</span>
+        <input
+          type="number"
+          name="nombreEtiquettes"
+          id="field_nombreEtiquettes"
+          data-cy="nombreEtiquettes"
+          formControlName="nombreEtiquettes"
+        />
+        @if (nombreEtiquettesRef.invalid && (nombreEtiquettesRef.dirty || nombreEtiquettesRef.touched)) {
+          @if (editForm.get('nombreEtiquettes')?.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (editForm.get('nombreEtiquettes')?.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '1' }"
+              >This field should be at least 1.</small
+            >
+          }
+          <small class="text-danger" [hidden]="!editForm.get('nombreEtiquettes')?.errors?.number" jhiTranslate="entity.validation.number"
+            >This field should be a number.</small
+          >
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

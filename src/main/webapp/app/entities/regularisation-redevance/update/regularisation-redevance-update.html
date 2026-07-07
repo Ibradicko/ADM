@@ -1,159 +1,124 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-regularisation-redevance-heading"
-        data-cy="RegularisationRedevanceCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.regularisationRedevance.home.createOrEditLabel"
-      >
-        Create or edit a Regularisation Redevance
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let referenceRef = editForm.get('reference')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_reference" jhiTranslate="admSupervisionVentesApp.regularisationRedevance.reference"
-            >Reference</label
-          >
-          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
-          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
-            <div>
-              @if (editForm.get('reference')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('reference')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
-                  >This field cannot be longer than 80 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let montantRef = editForm.get('montant')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_montant" jhiTranslate="admSupervisionVentesApp.regularisationRedevance.montant"
-            >Montant</label
-          >
-          <input type="number" class="form-control" name="montant" id="field_montant" data-cy="montant" formControlName="montant" />
-          @if (montantRef.invalid && (montantRef.dirty || montantRef.touched)) {
-            <div>
-              @if (editForm.get('montant')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('montant')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let motifRef = editForm.get('motif')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_motif" jhiTranslate="admSupervisionVentesApp.regularisationRedevance.motif">Motif</label>
-          <input type="text" class="form-control" name="motif" id="field_motif" data-cy="motif" formControlName="motif" />
-          @if (motifRef.invalid && (motifRef.dirty || motifRef.touched)) {
-            <div>
-              @if (editForm.get('motif')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('motif')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
-                  >This field cannot be longer than 255 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let dateRegularisationRef = editForm.get('dateRegularisation')!;
-        <div class="mb-3">
-          <label
-            class="form-label"
-            for="field_dateRegularisation"
-            jhiTranslate="admSupervisionVentesApp.regularisationRedevance.dateRegularisation"
-            >Date Regularisation</label
-          >
-          <div class="d-flex">
-            <input
-              id="field_dateRegularisation"
-              data-cy="dateRegularisation"
-              type="datetime-local"
-              class="form-control"
-              name="dateRegularisation"
-              formControlName="dateRegularisation"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          @if (dateRegularisationRef.invalid && (dateRegularisationRef.dirty || dateRegularisationRef.touched)) {
-            <div>
-              @if (editForm.get('dateRegularisation')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('dateRegularisation')?.errors?.datetimelocal"
-                jhiTranslate="entity.validation.datetimelocal"
-                >This field should be a date and time.</small
-              >
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_calcul" jhiTranslate="admSupervisionVentesApp.regularisationRedevance.calcul">Calcul</label>
-          <select
-            class="form-control"
-            id="field_calcul"
-            data-cy="calcul"
-            name="calcul"
-            formControlName="calcul"
-            [compareWith]="compareCalculRedevance"
-          >
-            @if (!editForm.get('calcul')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (calculRedevanceOption of calculRedevancesSharedCollection(); track $index) {
-              <option [ngValue]="calculRedevanceOption">{{ calculRedevanceOption.reference }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['calcul'])!.invalid && (editForm.get(['calcul'])!.dirty || editForm.get(['calcul'])!.touched)) {
-          <div>
-            @if (editForm.get(['calcul'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-regularisation-redevance-heading"
+          data-cy="RegularisationRedevanceCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.regularisationRedevance.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Regularisation Redevance
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let calculRef = editForm.get('calcul')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.calcul">Calcul</span>
+        <select id="field_calcul" data-cy="calcul" name="calcul" formControlName="calcul" [compareWith]="compareCalculRedevance">
+          @if (!editForm.get('calcul')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (calculRedevanceOption of calculRedevancesSharedCollection(); track $index) {
+            <option [ngValue]="calculRedevanceOption">{{ calculRedevanceOption.reference }}</option>
+          }
+        </select>
+        @if (calculRef.invalid && (calculRef.dirty || calculRef.touched) && calculRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let referenceRef = editForm.get('reference')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.reference">Reference</span>
+        <input type="text" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+        @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+          @if (referenceRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (referenceRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+              >This field cannot be longer than 80 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let montantRef = editForm.get('montant')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.montant">Montant</span>
+        <input type="number" name="montant" id="field_montant" data-cy="montant" formControlName="montant" />
+        @if (montantRef.invalid && (montantRef.dirty || montantRef.touched) && montantRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let motifRef = editForm.get('motif')!;
+      <label class="adm-field adm-field--full">
+        <span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.motif">Motif</span>
+        <input type="text" name="motif" id="field_motif" data-cy="motif" formControlName="motif" />
+        @if (motifRef.invalid && (motifRef.dirty || motifRef.touched)) {
+          @if (motifRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (motifRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+              >This field cannot be longer than 255 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let dateRegularisationRef = editForm.get('dateRegularisation')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regularisationRedevance.dateRegularisation">Date Regularisation</span>
+        <input
+          type="datetime-local"
+          name="dateRegularisation"
+          id="field_dateRegularisation"
+          data-cy="dateRegularisation"
+          formControlName="dateRegularisation"
+          placeholder="YYYY-MM-DD HH:mm"
+        />
+        @if (
+          dateRegularisationRef.invalid &&
+          (dateRegularisationRef.dirty || dateRegularisationRef.touched) &&
+          dateRegularisationRef.errors?.required
+        ) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

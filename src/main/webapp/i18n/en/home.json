@@ -49,10 +49,11 @@
         "title": "Cashier dashboard",
         "description": "A simple overview of today's activity to start checking out quickly.",
         "todayPill": "Today's sales",
+        "scopePill": "My sales",
         "ctaTitle": "Ready to check out?",
         "ctaText": "Open the cash register to start a new sale.",
         "recentSalesTitle": "My latest sales",
-        "recentSalesSubtitle": "Tickets recorded today.",
+        "recentSalesSubtitle": "Tickets recorded over the filtered period.",
         "noSalesText": "Open the cash register to record your first sale of the day."
       },
       "royaltyByGroup": {

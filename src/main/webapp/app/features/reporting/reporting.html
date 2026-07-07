@@ -1,17 +1,21 @@
-<section class="adm-page">
-  <div class="adm-page-header">
+<section class="adm-page reporting-page">
+  <div class="adm-page-header reporting-hero">
     <div>
+      <p class="adm-page__eyebrow" jhiTranslate="reporting.eyebrow">Analyse et exports</p>
       <h1 jhiTranslate="reporting.title">Centre de reporting</h1>
       <p jhiTranslate="reporting.subtitle">Generation d exports, apercus rapides et pilotage des rapports reels du backend.</p>
     </div>
 
     <div class="adm-page-header__actions">
-      @if (permissionsUi.peutExporterReporting()) {
+      @if (permissionsUi.peutVoirArchivesTechniques()) {
         <a class="adm-button adm-button--ghost" [routerLink]="['/rapport-export']" jhiTranslate="reporting.actions.technicalArchives"
           >Archives techniques</a
         >
+      }
+      @if (peutGenererRapport()) {
         <button type="button" class="adm-button adm-button--primary" (click)="genererApercu()" [disabled]="generationEnCours()">
-          {{ (generationEnCours() ? 'reporting.actions.generating' : 'reporting.actions.generate') | translate }}
+          <fa-icon icon="file-export" />
+          <span>{{ (generationEnCours() ? 'reporting.actions.generating' : 'reporting.actions.generate') | translate }}</span>
         </button>
       }
     </div>
@@ -34,27 +38,50 @@
       </div>
     }
 
-    <div class="adm-form-layout">
-      <div class="adm-form-layout__main">
-        <article class="adm-card">
+    <div class="reporting-scope-strip">
+      <div>
+        <span jhiTranslate="reporting.scopeMode.label">Vue active</span>
+        <strong>{{ modeAccesKey() | translate }}</strong>
+      </div>
+      <p>{{ roleHintKey() | translate }}</p>
+    </div>
+
+    <section class="reporting-type-grid" [attr.aria-label]="'reporting.filters.reportTypeChoice' | translate">
+      @for (type of typesRapportDisponibles(); track type.valeur) {
+        <button
+          type="button"
+          class="reporting-type-card"
+          [class.reporting-type-card--active]="typeRapport() === type.valeur"
+          [class.reporting-type-card--sales]="type.tone === 'sales'"
+          [class.reporting-type-card--stock]="type.tone === 'stock'"
+          [class.reporting-type-card--royalty]="type.tone === 'royalty'"
+          [class.reporting-type-card--audit]="type.tone === 'audit'"
+          (click)="choisirTypeRapport(type.valeur)"
+        >
+          <span class="reporting-type-card__icon"><fa-icon [icon]="type.icon" /></span>
+          <span class="reporting-type-card__body">
+            <strong>{{ type.labelKey | translate }}</strong>
+            <small>{{ type.descriptionKey | translate }}</small>
+          </span>
+          @if (typeRapport() === type.valeur) {
+            <span class="reporting-type-card__check"><fa-icon icon="check" /></span>
+          }
+        </button>
+      }
+    </section>
+
+    <div class="reporting-layout">
+      <div class="reporting-layout__main">
+        <article class="adm-card reporting-filter-card">
           <div class="adm-card__header">
             <div>
               <h2 jhiTranslate="reporting.filters.title">Filtres de generation</h2>
               <p jhiTranslate="reporting.filters.subtitle">Choisissez le type de rapport et le perimetre de l export.</p>
             </div>
-            <span class="adm-pill adm-pill--dark">{{ typeActif().labelKey | translate }}</span>
+            <span class="adm-pill adm-pill--dark">{{ resumeFiltres() }}</span>
           </div>
 
           <div class="adm-form-grid">
-            <label class="adm-field">
-              <span jhiTranslate="reporting.fields.reportType">Type de rapport</span>
-              <select class="adm-select" [ngModel]="typeRapport()" (ngModelChange)="typeRapport.set($event)">
-                @for (type of typesRapport; track type.valeur) {
-                  <option [value]="type.valeur">{{ type.labelKey | translate }}</option>
-                }
-              </select>
-            </label>
-
             <label class="adm-field">
               <span jhiTranslate="reporting.fields.format">Format</span>
               <select class="adm-select" [ngModel]="format()" (ngModelChange)="format.set($event)">
@@ -83,35 +110,39 @@
               </select>
             </label>
 
-            <label class="adm-field">
-              <span jhiTranslate="reporting.fields.tenant">Locataire</span>
-              <select class="adm-select" [ngModel]="locataireId()" (ngModelChange)="locataireId.set($event ? +$event : null)">
-                <option [ngValue]="null" jhiTranslate="reporting.fields.allTenants">Tous les locataires</option>
-                @for (locataire of locataires(); track locataire.id) {
-                  <option [value]="locataire.id">{{ locataire.nom }}</option>
-                }
-              </select>
-            </label>
+            @if (peutFiltrerLocataire()) {
+              <label class="adm-field">
+                <span jhiTranslate="reporting.fields.tenant">Locataire</span>
+                <select class="adm-select" [ngModel]="locataireId()" (ngModelChange)="locataireId.set($event ? +$event : null)">
+                  <option [ngValue]="null" jhiTranslate="reporting.fields.allTenants">Tous les locataires</option>
+                  @for (locataire of locataires(); track locataire.id) {
+                    <option [value]="locataire.id">{{ locataire.nom }}</option>
+                  }
+                </select>
+              </label>
+            }
 
-            <label class="adm-field">
-              <span jhiTranslate="reporting.fields.depot">Depot</span>
-              <select class="adm-select" [ngModel]="depotId()" (ngModelChange)="depotId.set($event ? +$event : null)">
-                <option [ngValue]="null" jhiTranslate="reporting.fields.allDepots">Tous les depots</option>
-                @for (depot of depotsFiltres(); track depot.id) {
-                  <option [value]="depot.id">{{ depot.code }} - {{ depot.libelle }}</option>
-                }
-              </select>
-            </label>
+            @if (peutFiltrerStock()) {
+              <label class="adm-field">
+                <span jhiTranslate="reporting.fields.depot">Depot</span>
+                <select class="adm-select" [ngModel]="depotId()" (ngModelChange)="depotId.set($event ? +$event : null)">
+                  <option [ngValue]="null" jhiTranslate="reporting.fields.allDepots">Tous les depots</option>
+                  @for (depot of depotsFiltres(); track depot.id) {
+                    <option [value]="depot.id">{{ depot.code }} - {{ depot.libelle }}</option>
+                  }
+                </select>
+              </label>
 
-            <label class="adm-field">
-              <span jhiTranslate="reporting.fields.product">Produit</span>
-              <select class="adm-select" [ngModel]="produitId()" (ngModelChange)="produitId.set($event ? +$event : null)">
-                <option [ngValue]="null" jhiTranslate="reporting.fields.allProducts">Tous les produits</option>
-                @for (produit of produitsFiltres().slice(0, 500); track produit.id) {
-                  <option [value]="produit.id">{{ produit.designation }}</option>
-                }
-              </select>
-            </label>
+              <label class="adm-field">
+                <span jhiTranslate="reporting.fields.product">Produit</span>
+                <select class="adm-select" [ngModel]="produitId()" (ngModelChange)="produitId.set($event ? +$event : null)">
+                  <option [ngValue]="null" jhiTranslate="reporting.fields.allProducts">Tous les produits</option>
+                  @for (produit of produitsFiltres().slice(0, 500); track produit.id) {
+                    <option [value]="produit.id">{{ produit.designation }}</option>
+                  }
+                </select>
+              </label>
+            }
 
             @if (typeRapport() === 'ventes-par-jour') {
               <label class="adm-field">
@@ -140,11 +171,12 @@
           </div>
 
           <div class="adm-inline-alert adm-inline-alert--info">
+            <fa-icon [icon]="typeActif().icon" />
             {{ typeActif().descriptionKey | translate }}
           </div>
         </article>
 
-        <article class="adm-card adm-card--table">
+        <article class="adm-card adm-card--table reporting-history-card">
           <div class="adm-card__header">
             <div>
               <h2 jhiTranslate="reporting.recentExports.title">Exports recents</h2>
@@ -159,7 +191,7 @@
             </div>
           } @else {
             <div class="adm-table-wrapper">
-              <table class="adm-data-table">
+              <table class="adm-table">
                 <thead>
                   <tr>
                     <th jhiTranslate="reporting.recentExports.columns.reference">Reference</th>
@@ -171,8 +203,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (rapport of exportsRecents(); track rapport.id) {
-                    <tr>
+                  @for (rapport of exportsRecents(); track rapport.id; let even = $even) {
+                    <tr [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
                       <td class="adm-code">{{ rapport.reference ?? '--' }}</td>
                       <td>{{ rapport.typeRapport ?? '--' }}</td>
                       <td>{{ rapport.boutique?.nom ?? rapport.locataire?.nom ?? ('reporting.scope.global' | translate) }}</td>
@@ -180,25 +212,22 @@
                       <td>{{ rapport.dateGeneration ? rapport.dateGeneration.format('DD/MM/YYYY HH:mm') : '--' }}</td>
                       <td>
                         <div class="adm-inline-actions">
-                          <button
-                            type="button"
-                            class="adm-link-button"
-                            (click)="ouvrirApercu(rapport.id)"
-                            jhiTranslate="reporting.actions.preview"
-                          >
-                            Apercu
+                          <button type="button" class="adm-button adm-button--ghost adm-button--small" (click)="ouvrirApercu(rapport.id)">
+                            <fa-icon icon="eye" />
+                            <span jhiTranslate="reporting.actions.preview">Apercu</span>
                           </button>
-                          @if (permissionsUi.peutExporterReporting()) {
+                          @if (peutTelechargerRapport()) {
                             <button
                               type="button"
-                              class="adm-link-button"
+                              class="adm-button adm-button--primary adm-button--small"
                               (click)="telechargerExport(rapport.id)"
                               [disabled]="telechargementEnCours() === rapport.id"
                             >
-                              {{
+                              <fa-icon icon="download" />
+                              <span>{{
                                 (telechargementEnCours() === rapport.id ? 'reporting.actions.downloading' : 'reporting.actions.download')
                                   | translate
-                              }}
+                              }}</span>
                             </button>
                           }
                         </div>
@@ -212,8 +241,8 @@
         </article>
       </div>
 
-      <div class="adm-form-layout__aside">
-        <article class="adm-card">
+      <div class="reporting-layout__aside">
+        <article class="adm-card reporting-preview-card">
           <div class="adm-card__header">
             <div>
               <h2 jhiTranslate="reporting.currentPreview.title">Apercu courant</h2>
@@ -222,18 +251,58 @@
           </div>
 
           @if (previewDisponible()) {
-            <div class="adm-caisse-ticket">
+            <div class="adm-caisse-ticket reporting-preview-ticket">
               <div class="adm-caisse-ticket__meta">
                 <strong>{{ apercu()?.export?.reference ?? 'Export' }}</strong>
                 <small>{{ formatDate(apercu()?.export?.dateGeneration ?? null) }}</small>
               </div>
-              <pre>{{ apercuTexte() }}</pre>
+
+              @if (apercuStructure().entetes.length > 0) {
+                <ul class="reporting-preview-summary">
+                  @for (item of apercuStructure().resume; track item.label + item.valeur) {
+                    <li>
+                      @if (item.label) {
+                        <span>{{ item.label }}</span>
+                      }
+                      <strong>{{ item.valeur }}</strong>
+                    </li>
+                  }
+                </ul>
+
+                <div class="adm-table-wrapper reporting-preview-table-wrapper">
+                  <table class="adm-table">
+                    <thead>
+                      <tr>
+                        @for (colonne of apercuStructure().entetes; track colonne) {
+                          <th>{{ colonne }}</th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (ligne of apercuStructure().lignes; track $index; let even = $even) {
+                        <tr [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                          @for (cellule of ligne; track $index) {
+                            <td>{{ cellule }}</td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                @if (apercuStructure().noteComplementaire) {
+                  <p class="reporting-preview-more">{{ apercuStructure().noteComplementaire }}</p>
+                }
+              } @else {
+                <pre>{{ apercuTexte() }}</pre>
+              }
             </div>
 
-            @if (permissionsUi.peutExporterReporting()) {
+            @if (peutTelechargerRapport()) {
               <div class="adm-action-stack">
                 <button type="button" class="adm-button adm-button--ghost adm-button--block" (click)="ouvrirApercuGrandFormat()">
-                  {{ 'reporting.actions.openLarge' | translate }}
+                  <fa-icon icon="expand" />
+                  <span>{{ 'reporting.actions.openLarge' | translate }}</span>
                 </button>
                 <button
                   type="button"
@@ -241,12 +310,13 @@
                   (click)="telechargerExport(apercu()?.export?.id!)"
                   [disabled]="telechargementEnCours() === apercu()?.export?.id"
                 >
-                  {{
+                  <fa-icon icon="download" />
+                  <span>{{
                     (telechargementEnCours() === apercu()?.export?.id
                       ? 'reporting.actions.downloading'
                       : 'reporting.actions.downloadThisReport'
                     ) | translate
-                  }}
+                  }}</span>
                 </button>
               </div>
             }
@@ -260,43 +330,45 @@
           }
         </article>
 
-        <article class="adm-card">
-          <div class="adm-card__header">
-            <div>
-              <h2 jhiTranslate="reporting.stockAlerts.title">Alertes stock live</h2>
-              <p jhiTranslate="reporting.stockAlerts.subtitle">Extrait temps reel du backend pour les produits sous seuil.</p>
+        @if (permissionsUi.peutLireStock()) {
+          <article class="adm-card reporting-alert-card">
+            <div class="adm-card__header">
+              <div>
+                <h2 jhiTranslate="reporting.stockAlerts.title">Alertes stock live</h2>
+                <p jhiTranslate="reporting.stockAlerts.subtitle">Extrait temps reel du backend pour les produits sous seuil.</p>
+              </div>
+              <span
+                class="adm-pill adm-pill--warning"
+                jhiTranslate="reporting.stockAlerts.count"
+                [translateValues]="{ count: alertesStock().length }"
+                >{{ alertesStock().length }} alertes</span
+              >
             </div>
-            <span
-              class="adm-pill adm-pill--warning"
-              jhiTranslate="reporting.stockAlerts.count"
-              [translateValues]="{ count: alertesStock().length }"
-              >{{ alertesStock().length }} alertes</span
-            >
-          </div>
 
-          @if (alertesStock().length === 0) {
-            <div class="adm-empty-inline" jhiTranslate="reporting.stockAlerts.empty">
-              Aucune alerte stock visible avec les filtres courants.
-            </div>
-          } @else {
-            <div class="adm-list-panel">
-              @for (alerte of alertesStock().slice(0, 8); track alerte.stockProduitId) {
-                <div class="adm-list-panel__row">
-                  <div>
-                    <strong>{{ alerte.produitDesignation ?? '--' }}</strong>
-                    <small
-                      >{{ alerte.boutiqueNom ?? '--' }} - {{ 'reporting.fields.depot' | translate }} {{ alerte.depotCode ?? '--' }}</small
-                    >
+            @if (alertesStock().length === 0) {
+              <div class="adm-empty-inline" jhiTranslate="reporting.stockAlerts.empty">
+                Aucune alerte stock visible avec les filtres courants.
+              </div>
+            } @else {
+              <div class="adm-list-panel">
+                @for (alerte of alertesStock().slice(0, 8); track alerte.stockProduitId) {
+                  <div class="adm-list-panel__row">
+                    <div>
+                      <strong>{{ alerte.produitDesignation ?? '--' }}</strong>
+                      <small
+                        >{{ alerte.boutiqueNom ?? '--' }} - {{ 'reporting.fields.depot' | translate }} {{ alerte.depotCode ?? '--' }}</small
+                      >
+                    </div>
+                    <div class="text-end">
+                      <strong>{{ alerte.quantiteTheorique ?? 0 }}</strong>
+                      <small>{{ 'reporting.stockAlerts.threshold' | translate }} {{ alerte.stockAlerte ?? 0 }}</small>
+                    </div>
                   </div>
-                  <div class="text-end">
-                    <strong>{{ formatMontant(alerte.quantiteTheorique) }}</strong>
-                    <small>{{ 'reporting.stockAlerts.threshold' | translate }} {{ formatMontant(alerte.stockAlerte) }}</small>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </article>
+                }
+              </div>
+            }
+          </article>
+        }
       </div>
     </div>
   }
@@ -319,7 +391,7 @@
               (click)="fermerApercuGrandFormat()"
               [attr.aria-label]="'entity.action.close' | translate"
             >
-              x
+              <fa-icon icon="times" />
             </button>
           </div>
 
@@ -339,8 +411,46 @@
               </div>
             </div>
 
-            <div class="adm-caisse-ticket adm-caisse-ticket--large">
-              <pre>{{ apercuTexte() }}</pre>
+            <div class="adm-caisse-ticket adm-caisse-ticket--large reporting-preview-ticket">
+              @if (apercuStructure().entetes.length > 0) {
+                <ul class="reporting-preview-summary reporting-preview-summary--large">
+                  @for (item of apercuStructure().resume; track item.label + item.valeur) {
+                    <li>
+                      @if (item.label) {
+                        <span>{{ item.label }}</span>
+                      }
+                      <strong>{{ item.valeur }}</strong>
+                    </li>
+                  }
+                </ul>
+
+                <div class="adm-table-wrapper reporting-preview-table-wrapper">
+                  <table class="adm-table">
+                    <thead>
+                      <tr>
+                        @for (colonne of apercuStructure().entetes; track colonne) {
+                          <th>{{ colonne }}</th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (ligne of apercuStructure().lignes; track $index; let even = $even) {
+                        <tr [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
+                          @for (cellule of ligne; track $index) {
+                            <td>{{ cellule }}</td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                @if (apercuStructure().noteComplementaire) {
+                  <p class="reporting-preview-more">{{ apercuStructure().noteComplementaire }}</p>
+                }
+              } @else {
+                <pre>{{ apercuTexte() }}</pre>
+              }
             </div>
           </div>
 
@@ -353,7 +463,7 @@
             >
               Fermer
             </button>
-            @if (permissionsUi.peutExporterReporting() && apercu()?.export?.id) {
+            @if (peutTelechargerRapport() && apercu()?.export?.id) {
               <button
                 type="button"
                 class="adm-button adm-button--primary"

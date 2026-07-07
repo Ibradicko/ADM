@@ -1,64 +1,67 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (ligneCalculRedevance(); as ligneCalculRedevanceRef) {
+@if (ligneCalculRedevance(); as ligneCalculRedevanceRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="ligneCalculRedevanceDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.detail.title">Ligne Calcul Redevance</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ ligneCalculRedevanceRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.baseCalcul">Base Calcul</span></dt>
-          <dd>
-            <span>{{ ligneCalculRedevanceRef.baseCalcul }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.tauxApplique">Taux Applique</span></dt>
-          <dd>
-            <span>{{ ligneCalculRedevanceRef.tauxApplique }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.montantRedevance">Montant Redevance</span></dt>
-          <dd>
-            <span>{{ ligneCalculRedevanceRef.montantRedevance }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.calcul">Calcul</span></dt>
-          <dd>
-            @if (ligneCalculRedevance()!.calcul) {
-              <div>
-                <a [routerLink]="['/calcul-redevance', ligneCalculRedevance()!.calcul?.id, 'view']">{{
-                  ligneCalculRedevanceRef.calcul?.reference
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.vente">Vente</span></dt>
-          <dd>
-            @if (ligneCalculRedevance()!.vente) {
-              <div>
-                <a [routerLink]="['/vente', ligneCalculRedevance()!.vente?.id, 'view']">{{
-                  ligneCalculRedevanceRef.vente?.numeroTicket
-                }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/ligne-calcul-redevance', ligneCalculRedevanceRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.detail.title">Ligne Calcul Redevance</p>
+        <h1 data-cy="ligneCalculRedevanceDetailsHeading">#{{ ligneCalculRedevanceRef.id }}</h1>
+        <p>{{ ligneCalculRedevanceRef.calcul?.reference || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/ligne-calcul-redevance', ligneCalculRedevanceRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.detail.title">Ligne Calcul Redevance</h2>
+        </div>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.calcul">Calcul</span>
+          @if (ligneCalculRedevanceRef.calcul) {
+            <a [routerLink]="['/calcul-redevance', ligneCalculRedevanceRef.calcul.id, 'view']">{{
+              ligneCalculRedevanceRef.calcul.reference
+            }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.vente">Vente</span>
+          @if (ligneCalculRedevanceRef.vente) {
+            <a [routerLink]="['/vente', ligneCalculRedevanceRef.vente.id, 'view']">{{ ligneCalculRedevanceRef.vente.numeroTicket }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.baseCalcul">Base Calcul</span>
+          <strong>{{ ligneCalculRedevanceRef.baseCalcul }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.tauxApplique"
+            >Taux Applique</span
+          >
+          <strong>{{ ligneCalculRedevanceRef.tauxApplique }} %</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.ligneCalculRedevance.montantRedevance"
+            >Montant Redevance</span
+          >
+          <strong>{{ ligneCalculRedevanceRef.montantRedevance }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+}

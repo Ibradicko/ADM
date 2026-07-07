@@ -73,7 +73,8 @@ export class UiPermissionService {
       this.estAdmin() ||
       (this.estLocataire() && this.boutiqueIds().length > 0) ||
       this.estProfilBoutique() ||
-      ((this.estProfilAdm() || this.estProfilBoutique()) &&
+      this.estProfilVente() ||
+      ((this.estProfilAdm() || this.estProfilBoutique() || this.estProfilVente()) &&
         this.hasAnyBusinessPermission(PERMISSIONS.royaltyManage, PERMISSIONS.royaltyRead)),
   );
   readonly peutGererRedevances = computed(
@@ -101,6 +102,15 @@ export class UiPermissionService {
   private readonly exploitationBoutiqueService = inject(ExploitationBoutiqueService);
 
   private versionChargement = 0;
+  // Coalesces concurrent callers (the reactive effect below and any route guard awaiting
+  // chargerPermissions()) onto a single in-flight fetch for the same account. Without this,
+  // two overlapping calls each bump versionChargement and the loser aborts via the version
+  // check in rechargerPermissions() before writing the signals - if the guard's own awaited
+  // call happens to be the loser, it resolves as a no-op while permissions are still empty,
+  // and a route guard reading peutVoirEcran() right after sees a false negative (reproduced by
+  // reloading /royalties or /reporting as manager_boutique/vendeur: the guard redirects to
+  // /dashboard even though the same account passes on a normal client-side nav click).
+  private chargementEnCours: { compteId: number; promise: Promise<void> } | null = null;
 
   constructor() {
     effect(() => {
@@ -259,9 +269,9 @@ export class UiPermissionService {
   }
 
   private async rechargerPermissions(compte: Account | null): Promise<void> {
-    const version = ++this.versionChargement;
-
     if (!compte?.id) {
+      this.versionChargement++;
+      this.chargementEnCours = null;
       this.permissionsMetier.set(new Set());
       this.codesProfil.set(new Set());
       this.boutiqueIds.set([]);
@@ -269,12 +279,31 @@ export class UiPermissionService {
     }
 
     if (this.accountService.hasAnyAuthority('ROLE_ADMIN')) {
+      this.versionChargement++;
+      this.chargementEnCours = null;
       this.permissionsMetier.set(new Set(Object.values(PERMISSIONS)));
       this.codesProfil.set(new Set(['ADMINISTRATEUR']));
       this.boutiqueIds.set([]);
       return;
     }
 
+    if (this.chargementEnCours?.compteId === compte.id) {
+      return this.chargementEnCours.promise;
+    }
+
+    const version = ++this.versionChargement;
+    const promise = this.chargerPermissionsMetier(compte, version);
+    this.chargementEnCours = { compteId: compte.id, promise };
+    try {
+      await promise;
+    } finally {
+      if (this.chargementEnCours?.promise === promise) {
+        this.chargementEnCours = null;
+      }
+    }
+  }
+
+  private async chargerPermissionsMetier(compte: Account, version: number): Promise<void> {
     this.chargement.set(true);
 
     try {

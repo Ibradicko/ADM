@@ -1,250 +1,202 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-regle-redevance-heading"
-        data-cy="RegleRedevanceCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.regleRedevance.home.createOrEditLabel"
-      >
-        Create or edit a Regle Redevance
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let codeRef = editForm.get('code')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_code" jhiTranslate="admSupervisionVentesApp.regleRedevance.code">Code</label>
-          <input type="text" class="form-control" name="code" id="field_code" data-cy="code" formControlName="code" />
-          @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
-            <div>
-              @if (editForm.get('code')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('code')?.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                  >This field cannot be longer than 50 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let typeRegleRef = editForm.get('typeRegle')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_typeRegle" jhiTranslate="admSupervisionVentesApp.regleRedevance.typeRegle">Type Regle</label>
-          <select class="form-control" name="typeRegle" formControlName="typeRegle" id="field_typeRegle" data-cy="typeRegle">
-            <option [ngValue]="null">{{ 'admSupervisionVentesApp.TypeRegleRedevance.null' | translate }}</option>
-            @for (typeRegleRedevance of typeRegleRedevanceValues; track $index) {
-              <option [value]="typeRegleRedevance">
-                {{ 'admSupervisionVentesApp.TypeRegleRedevance.' + typeRegleRedevance | translate }}
-              </option>
-            }
-          </select>
-          @if (typeRegleRef.invalid && (typeRegleRef.dirty || typeRegleRef.touched)) {
-            <div>
-              @if (editForm.get('typeRegle')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let tauxRef = editForm.get('taux')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_taux" jhiTranslate="admSupervisionVentesApp.regleRedevance.taux">Taux</label>
-          <input type="number" class="form-control" name="taux" id="field_taux" data-cy="taux" formControlName="taux" />
-          @if (tauxRef.invalid && (tauxRef.dirty || tauxRef.touched)) {
-            <div>
-              @if (editForm.get('taux')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('taux')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              @if (editForm.get('taux')?.errors?.max) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.max" [translateValues]="{ max: '100' }"
-                  >This field cannot be more than 100.</small
-                >
-              }
-              <small class="form-text text-danger" [hidden]="!editForm.get('taux')?.errors?.number" jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let dateDebutRef = editForm.get('dateDebut')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateDebut" jhiTranslate="admSupervisionVentesApp.regleRedevance.dateDebut">Date Debut</label>
-          <div class="input-group">
-            <input
-              id="field_dateDebut"
-              data-cy="dateDebut"
-              type="text"
-              class="form-control"
-              name="dateDebut"
-              ngbDatepicker
-              #dateDebutDp="ngbDatepicker"
-              formControlName="dateDebut"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateDebutDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-          @if (dateDebutRef.invalid && (dateDebutRef.dirty || dateDebutRef.touched)) {
-            <div>
-              @if (editForm.get('dateDebut')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateFin" jhiTranslate="admSupervisionVentesApp.regleRedevance.dateFin">Date Fin</label>
-          <div class="input-group">
-            <input
-              id="field_dateFin"
-              data-cy="dateFin"
-              type="text"
-              class="form-control"
-              name="dateFin"
-              ngbDatepicker
-              #dateFinDp="ngbDatepicker"
-              formControlName="dateFin"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateFinDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-        </div>
-
-        @let prioriteRef = editForm.get('priorite')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_priorite" jhiTranslate="admSupervisionVentesApp.regleRedevance.priorite">Priorite</label>
-          <input type="number" class="form-control" name="priorite" id="field_priorite" data-cy="priorite" formControlName="priorite" />
-          @if (prioriteRef.invalid && (prioriteRef.dirty || prioriteRef.touched)) {
-            <div>
-              @if (editForm.get('priorite')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '1' }"
-                  >This field should be at least 1.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('priorite')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let actifRef = editForm.get('actif')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_actif" jhiTranslate="admSupervisionVentesApp.regleRedevance.actif">Actif</label>
-          <input type="checkbox" class="form-check" name="actif" id="field_actif" data-cy="actif" formControlName="actif" />
-          @if (actifRef.invalid && (actifRef.dirty || actifRef.touched)) {
-            <div>
-              @if (editForm.get('actif')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_boutique" jhiTranslate="admSupervisionVentesApp.regleRedevance.boutique">Boutique</label>
-          <select
-            class="form-control"
-            id="field_boutique"
-            data-cy="boutique"
-            name="boutique"
-            formControlName="boutique"
-            [compareWith]="compareBoutique"
-          >
-            <option [ngValue]="null"></option>
-            @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
-              <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_locataire" jhiTranslate="admSupervisionVentesApp.regleRedevance.locataire">Locataire</label>
-          <select
-            class="form-control"
-            id="field_locataire"
-            data-cy="locataire"
-            name="locataire"
-            formControlName="locataire"
-            [compareWith]="compareLocataire"
-          >
-            <option [ngValue]="null"></option>
-            @for (locataireOption of locatairesSharedCollection(); track $index) {
-              <option [ngValue]="locataireOption">{{ locataireOption.nom }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_groupeArticle" jhiTranslate="admSupervisionVentesApp.regleRedevance.groupeArticle"
-            >Groupe Article</label
-          >
-          <select
-            class="form-control"
-            id="field_groupeArticle"
-            data-cy="groupeArticle"
-            name="groupeArticle"
-            formControlName="groupeArticle"
-            [compareWith]="compareGroupeArticle"
-          >
-            <option [ngValue]="null"></option>
-            @for (groupeArticleOption of groupeArticlesSharedCollection(); track $index) {
-              <option [ngValue]="groupeArticleOption">{{ groupeArticleOption.libelle }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_produit" jhiTranslate="admSupervisionVentesApp.regleRedevance.produit">Article</label>
-          <select
-            class="form-control"
-            id="field_produit"
-            data-cy="produit"
-            name="produit"
-            formControlName="produit"
-            [compareWith]="compareProduit"
-          >
-            <option [ngValue]="null"></option>
-            @for (produitOption of produitsSharedCollection(); track $index) {
-              <option [ngValue]="produitOption">{{ produitOption.designation }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-regle-redevance-heading"
+          data-cy="RegleRedevanceCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.regleRedevance.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Regle Redevance
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let codeRef = editForm.get('code')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.code">Code</span>
+        <input type="text" name="code" id="field_code" data-cy="code" formControlName="code" />
+        @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
+          @if (codeRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (codeRef.errors?.maxlength) {
+            <small class="text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+              >This field cannot be longer than 50 characters.</small
+            >
+          }
+        }
+      </label>
+
+      @let typeRegleRef = editForm.get('typeRegle')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.typeRegle">Type Regle</span>
+        <select name="typeRegle" formControlName="typeRegle" id="field_typeRegle" data-cy="typeRegle">
+          <option [ngValue]="null">{{ 'admSupervisionVentesApp.TypeRegleRedevance.null' | translate }}</option>
+          @for (typeRegleRedevance of typeRegleRedevanceValues; track $index) {
+            <option [value]="typeRegleRedevance">
+              {{ 'admSupervisionVentesApp.TypeRegleRedevance.' + typeRegleRedevance | translate }}
+            </option>
+          }
+        </select>
+        @if (typeRegleRef.invalid && (typeRegleRef.dirty || typeRegleRef.touched) && typeRegleRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let tauxRef = editForm.get('taux')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.taux">Taux</span>
+        <input type="number" name="taux" id="field_taux" data-cy="taux" formControlName="taux" />
+        @if (tauxRef.invalid && (tauxRef.dirty || tauxRef.touched)) {
+          @if (tauxRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (tauxRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          @if (tauxRef.errors?.max) {
+            <small class="text-danger" jhiTranslate="entity.validation.max" [translateValues]="{ max: '100' }"
+              >This field cannot be more than 100.</small
+            >
+          }
+        }
+      </label>
+
+      @let prioriteRef = editForm.get('priorite')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.priorite">Priorite</span>
+        <input type="number" name="priorite" id="field_priorite" data-cy="priorite" formControlName="priorite" />
+        @if (prioriteRef.invalid && (prioriteRef.dirty || prioriteRef.touched) && prioriteRef.errors?.min) {
+          <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '1' }"
+            >This field should be at least 1.</small
+          >
+        }
+      </label>
+
+      @let dateDebutRef = editForm.get('dateDebut')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.dateDebut">Date Debut</span>
+        <div class="input-group">
+          <input
+            id="field_dateDebut"
+            data-cy="dateDebut"
+            type="text"
+            name="dateDebut"
+            ngbDatepicker
+            #dateDebutDp="ngbDatepicker"
+            formControlName="dateDebut"
+          />
+          <button type="button" class="adm-button adm-button--ghost" (click)="dateDebutDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+        </div>
+        @if (dateDebutRef.invalid && (dateDebutRef.dirty || dateDebutRef.touched) && dateDebutRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.dateFin">Date Fin</span>
+        <div class="input-group">
+          <input
+            id="field_dateFin"
+            data-cy="dateFin"
+            type="text"
+            name="dateFin"
+            ngbDatepicker
+            #dateFinDp="ngbDatepicker"
+            formControlName="dateFin"
+          />
+          <button type="button" class="adm-button adm-button--ghost" (click)="dateFinDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+        </div>
+      </label>
+
+      @let actifRef = editForm.get('actif')!;
+      <label class="adm-field adm-field--checkbox">
+        <input type="checkbox" name="actif" id="field_actif" data-cy="actif" formControlName="actif" />
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.actif">Actif</span>
+      </label>
+      @if (actifRef.invalid && (actifRef.dirty || actifRef.touched) && actifRef.errors?.required) {
+        <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+      }
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.boutique">Boutique</span>
+        <select id="field_boutique" data-cy="boutique" name="boutique" formControlName="boutique" [compareWith]="compareBoutique">
+          <option [ngValue]="null"></option>
+          @for (boutiqueOption of boutiquesSharedCollection(); track $index) {
+            <option [ngValue]="boutiqueOption">{{ boutiqueOption.nom }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.locataire">Locataire</span>
+        <select id="field_locataire" data-cy="locataire" name="locataire" formControlName="locataire" [compareWith]="compareLocataire">
+          <option [ngValue]="null"></option>
+          @for (locataireOption of locatairesSharedCollection(); track $index) {
+            <option [ngValue]="locataireOption">{{ locataireOption.nom }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.groupeArticle">Groupe Article</span>
+        <select
+          id="field_groupeArticle"
+          data-cy="groupeArticle"
+          name="groupeArticle"
+          formControlName="groupeArticle"
+          [compareWith]="compareGroupeArticle"
+        >
+          <option [ngValue]="null"></option>
+          @for (groupeArticleOption of groupeArticlesSharedCollection(); track $index) {
+            <option [ngValue]="groupeArticleOption">{{ groupeArticleOption.libelle }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.regleRedevance.produit">Article</span>
+        <select id="field_produit" data-cy="produit" name="produit" formControlName="produit" [compareWith]="compareProduit">
+          <option [ngValue]="null"></option>
+          @for (produitOption of produitsSharedCollection(); track $index) {
+            <option [ngValue]="produitOption">{{ produitOption.designation }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

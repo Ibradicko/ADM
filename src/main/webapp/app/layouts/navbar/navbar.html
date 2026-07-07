@@ -1,5 +1,5 @@
-<div class="adm-shell-layer">
-  <aside class="adm-sidebar" [class.adm-sidebar--open]="!isNavbarCollapsed()">
+<div class="adm-shell-layer" [class.adm-shell-layer--compact]="isSidebarCompact()">
+  <aside class="adm-sidebar" [class.adm-sidebar--open]="!isNavbarCollapsed()" [class.adm-sidebar--compact]="isSidebarCompact()">
     <div class="adm-sidebar__brand">
       <a class="adm-brand" routerLink="/dashboard" (click)="collapseNavbar()">
         <span class="adm-brand__mark">
@@ -10,6 +10,15 @@
           <small>{{ version }}</small>
         </span>
       </a>
+      <button
+        type="button"
+        class="adm-sidebar-compact-toggle"
+        (click)="toggleSidebarCompact()"
+        [attr.aria-label]="(isSidebarCompact() ? 'global.navbar.expandMenu' : 'global.navbar.reduceMenu') | translate"
+        [title]="(isSidebarCompact() ? 'global.navbar.expandMenu' : 'global.navbar.reduceMenu') | translate"
+      >
+        <fa-icon [icon]="isSidebarCompact() ? 'arrow-right' : 'arrow-left'" />
+      </button>
       <button type="button" class="adm-mobile-close" (click)="collapseNavbar()" [attr.aria-label]="'global.navbar.closeMenu' | translate">
         <fa-icon icon="times" />
       </button>
@@ -24,6 +33,8 @@
           routerLinkActive="adm-nav__link--active"
           [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
           (click)="onNavLinkClick(item, $event)"
+          [title]="item.labelKey | translate"
+          [attr.aria-label]="item.labelKey | translate"
         >
           <fa-icon [icon]="item.icon" />
           <span [jhiTranslate]="item.labelKey"></span>

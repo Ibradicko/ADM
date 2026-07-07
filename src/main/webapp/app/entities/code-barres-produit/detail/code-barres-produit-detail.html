@@ -1,68 +1,80 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (codeBarresProduit(); as codeBarresProduitRef) {
+@if (codeBarresProduit(); as codeBarresProduitRef) {
+  <section class="adm-page">
+    <header class="adm-page__header">
       <div>
-        <h2 data-cy="codeBarresProduitDetailsHeading">
-          <span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.detail.title">Code Barres Produit</span>
-        </h2>
-
-        <hr />
-
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ codeBarresProduitRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.code">Code</span></dt>
-          <dd>
-            <span>{{ codeBarresProduitRef.code }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.type">Type</span></dt>
-          <dd>
-            <span [jhiTranslate]="'admSupervisionVentesApp.TypeCodeBarres.' + (codeBarresProduitRef.type ?? 'null')">{{
-              { null: '', EAN13: 'EAN13', EAN8: 'EAN8', CODE128: 'CODE128', QR_CODE: 'QR_CODE', INTERNE: 'INTERNE' }[
-                codeBarresProduitRef.type ?? 'null'
-              ]
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.principal">Principal</span></dt>
-          <dd>
-            <span>{{ codeBarresProduitRef.principal }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.genereParSysteme">Genere Par Systeme</span></dt>
-          <dd>
-            <span>{{ codeBarresProduitRef.genereParSysteme }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.actif">Actif</span></dt>
-          <dd>
-            <span>{{ codeBarresProduitRef.actif }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.dateAffectation">Date Affectation</span></dt>
-          <dd>
-            <span>{{ codeBarresProduitRef.dateAffectation | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="admSupervisionVentesApp.codeBarresProduit.produit">Produit</span></dt>
-          <dd>
-            @if (codeBarresProduit()!.produit) {
-              <div>
-                <a [routerLink]="['/produit', codeBarresProduit()!.produit?.id, 'view']">{{ codeBarresProduitRef.produit?.designation }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/code-barres-produit', codeBarresProduitRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        <p class="adm-page__eyebrow" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.detail.title">Code Barres Produit</p>
+        <h1 data-cy="codeBarresProduitDetailsHeading">{{ codeBarresProduitRef.code }}</h1>
+        <p>{{ codeBarresProduitRef.produit?.designation || '--' }}</p>
       </div>
-    }
-  </div>
-</div>
+      <div class="adm-page__actions">
+        <button type="button" (click)="previousState()" class="adm-button adm-button--ghost" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" /> <span jhiTranslate="entity.action.back">Back</span>
+        </button>
+        <a [routerLink]="['/code-barres-produit', codeBarresProduitRef.id, 'edit']" class="adm-button">
+          <fa-icon icon="pencil-alt" /> <span jhiTranslate="entity.action.edit">Edit</span>
+        </a>
+      </div>
+    </header>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <article class="adm-card adm-card--spaced">
+      <div class="adm-section-heading">
+        <div>
+          <h2 jhiTranslate="admSupervisionVentesApp.codeBarresProduit.detail.title">Code Barres Produit</h2>
+        </div>
+        <span
+          class="adm-pill"
+          [class.adm-pill--success]="codeBarresProduitRef.actif"
+          [class.adm-pill--warning]="!codeBarresProduitRef.actif"
+        >
+          {{ codeBarresProduitRef.actif ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+
+      <div class="adm-detail-grid">
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="global.field.id">ID</span>
+          <strong>{{ codeBarresProduitRef.id }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.code">Code</span>
+          <strong>{{ codeBarresProduitRef.code }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.type">Type</span>
+          <strong>{{ 'admSupervisionVentesApp.TypeCodeBarres.' + (codeBarresProduitRef.type ?? 'null') | translate }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.principal">Principal</span>
+          <strong>{{ codeBarresProduitRef.principal }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.genereParSysteme"
+            >Genere Par Systeme</span
+          >
+          <strong>{{ codeBarresProduitRef.genereParSysteme }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.actif">Actif</span>
+          <strong>{{ codeBarresProduitRef.actif }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.dateAffectation"
+            >Date Affectation</span
+          >
+          <strong>{{ codeBarresProduitRef.dateAffectation | formatMediumDatetime }}</strong>
+        </div>
+        <div class="adm-detail-block">
+          <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.codeBarresProduit.produit">Produit</span>
+          @if (codeBarresProduitRef.produit) {
+            <a [routerLink]="['/produit', codeBarresProduitRef.produit.id, 'view']">{{ codeBarresProduitRef.produit.designation }}</a>
+          } @else {
+            <strong>--</strong>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

@@ -204,7 +204,7 @@ describe('Navbar Component', () => {
     expect(routes).not.toContain('/admin/user-management');
   });
 
-  it('should show every menu entry for ROLE_ADMIN', () => {
+  it('should show ADM menus for ROLE_ADMIN without sales and stock operations', () => {
     accountService.authenticate({ ...account, login: 'admin', authorities: ['ROLE_ADMIN'] });
 
     const routes = comp.menuItemsAffiches().map(item => item.route);
@@ -214,8 +214,8 @@ describe('Navbar Component', () => {
     expect(routes).toContain('/exploitation-boutique');
     expect(routes).toContain('/locataire');
     expect(routes).toContain('/produit');
-    expect(routes).toContain('/caisse');
-    expect(routes).toContain('/stock-operations');
+    expect(routes).not.toContain('/caisse');
+    expect(routes).not.toContain('/stock-operations');
     expect(routes).toContain('/royalties');
     expect(routes).toContain('/reporting');
     expect(routes).toContain('/audit-supervision');

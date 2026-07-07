@@ -1,175 +1,132 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-stock-produit-heading"
-        data-cy="StockProduitCreateUpdateHeading"
-        jhiTranslate="admSupervisionVentesApp.stockProduit.home.createOrEditLabel"
-      >
-        Create or edit a Stock Produit
-      </h2>
-
+<section class="adm-page">
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
+    <div class="adm-section-heading">
       <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let quantiteTheoriqueRef = editForm.get('quantiteTheorique')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_quantiteTheorique" jhiTranslate="admSupervisionVentesApp.stockProduit.quantiteTheorique"
-            >Quantite Theorique</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="quantiteTheorique"
-            id="field_quantiteTheorique"
-            data-cy="quantiteTheorique"
-            formControlName="quantiteTheorique"
-          />
-          @if (quantiteTheoriqueRef.invalid && (quantiteTheoriqueRef.dirty || quantiteTheoriqueRef.touched)) {
-            <div>
-              @if (editForm.get('quantiteTheorique')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (editForm.get('quantiteTheorique')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('quantiteTheorique')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        @let stockAlerteRef = editForm.get('stockAlerte')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_stockAlerte" jhiTranslate="admSupervisionVentesApp.stockProduit.stockAlerte"
-            >Stock Alerte</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            name="stockAlerte"
-            id="field_stockAlerte"
-            data-cy="stockAlerte"
-            formControlName="stockAlerte"
-          />
-          @if (stockAlerteRef.invalid && (stockAlerteRef.dirty || stockAlerteRef.touched)) {
-            <div>
-              @if (editForm.get('stockAlerte')?.errors?.min) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
-                  >This field should be at least 0.</small
-                >
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!editForm.get('stockAlerte')?.errors?.number"
-                jhiTranslate="entity.validation.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label
-            class="form-label"
-            for="field_dateDernierMouvement"
-            jhiTranslate="admSupervisionVentesApp.stockProduit.dateDernierMouvement"
-            >Date Dernier Mouvement</label
-          >
-          <div class="d-flex">
-            <input
-              id="field_dateDernierMouvement"
-              data-cy="dateDernierMouvement"
-              type="datetime-local"
-              class="form-control"
-              name="dateDernierMouvement"
-              formControlName="dateDernierMouvement"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_produit" jhiTranslate="admSupervisionVentesApp.stockProduit.produit">Produit</label>
-          <select
-            class="form-control"
-            id="field_produit"
-            data-cy="produit"
-            name="produit"
-            formControlName="produit"
-            [compareWith]="compareProduit"
-          >
-            @if (!editForm.get('produit')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (produitOption of produitsSharedCollection(); track $index) {
-              <option [ngValue]="produitOption">{{ produitOption.designation }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['produit'])!.invalid && (editForm.get(['produit'])!.dirty || editForm.get(['produit'])!.touched)) {
-          <div>
-            @if (editForm.get(['produit'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_depot" jhiTranslate="admSupervisionVentesApp.stockProduit.depot">Depot</label>
-          <select
-            class="form-control"
-            id="field_depot"
-            data-cy="depot"
-            name="depot"
-            formControlName="depot"
-            [compareWith]="compareDepotStock"
-          >
-            @if (!editForm.get('depot')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (depotStockOption of depotStocksSharedCollection(); track $index) {
-              <option [ngValue]="depotStockOption">{{ depotStockOption.code }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['depot'])!.invalid && (editForm.get(['depot'])!.dirty || editForm.get(['depot'])!.touched)) {
-          <div>
-            @if (editForm.get(['depot'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+        <h2
+          id="jhi-stock-produit-heading"
+          data-cy="StockProduitCreateUpdateHeading"
+          jhiTranslate="admSupervisionVentesApp.stockProduit.home.createOrEditLabel"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          Create or edit a Stock Produit
+        </h2>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <jhi-alert-error />
+
+    <div class="adm-form-grid">
+      @if (editForm.controls.id.value !== null) {
+        <label class="adm-field">
+          <span jhiTranslate="global.field.id">ID</span>
+          <input type="number" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </label>
+      }
+
+      @let quantiteTheoriqueRef = editForm.get('quantiteTheorique')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.stockProduit.quantiteTheorique">Quantite Theorique</span>
+        <input
+          type="number"
+          name="quantiteTheorique"
+          id="field_quantiteTheorique"
+          data-cy="quantiteTheorique"
+          formControlName="quantiteTheorique"
+        />
+        @if (quantiteTheoriqueRef.invalid && (quantiteTheoriqueRef.dirty || quantiteTheoriqueRef.touched)) {
+          @if (quantiteTheoriqueRef.errors?.required) {
+            <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+          }
+          @if (quantiteTheoriqueRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          <small class="text-danger" [hidden]="!quantiteTheoriqueRef.errors?.number" jhiTranslate="entity.validation.number"
+            >This field should be a number.</small
+          >
+        }
+      </label>
+
+      @let stockAlerteRef = editForm.get('stockAlerte')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.stockProduit.stockAlerte">Stock Alerte</span>
+        <input type="number" name="stockAlerte" id="field_stockAlerte" data-cy="stockAlerte" formControlName="stockAlerte" />
+        @if (stockAlerteRef.invalid && (stockAlerteRef.dirty || stockAlerteRef.touched)) {
+          @if (stockAlerteRef.errors?.min) {
+            <small class="text-danger" jhiTranslate="entity.validation.min" [translateValues]="{ min: '0' }"
+              >This field should be at least 0.</small
+            >
+          }
+          <small class="text-danger" [hidden]="!stockAlerteRef.errors?.number" jhiTranslate="entity.validation.number"
+            >This field should be a number.</small
+          >
+        }
+      </label>
+
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.stockProduit.dateDernierMouvement">Date Dernier Mouvement</span>
+        <input
+          id="field_dateDernierMouvement"
+          data-cy="dateDernierMouvement"
+          type="datetime-local"
+          name="dateDernierMouvement"
+          formControlName="dateDernierMouvement"
+          placeholder="YYYY-MM-DD HH:mm"
+        />
+      </label>
+
+      @let produitRef = editForm.get('produit')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.stockProduit.produit">Produit</span>
+        <select id="field_produit" data-cy="produit" name="produit" formControlName="produit" [compareWith]="compareProduit">
+          @if (!editForm.get('produit')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (produitOption of produitsSharedCollection(); track $index) {
+            <option [ngValue]="produitOption">{{ produitOption.designation }}</option>
+          }
+        </select>
+        @if (produitRef.invalid && (produitRef.dirty || produitRef.touched) && produitRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+
+      @let depotRef = editForm.get('depot')!;
+      <label class="adm-field">
+        <span jhiTranslate="admSupervisionVentesApp.stockProduit.depot">Depot</span>
+        <select id="field_depot" data-cy="depot" name="depot" formControlName="depot" [compareWith]="compareDepotStock">
+          @if (!editForm.get('depot')!.value) {
+            <option [ngValue]="null" selected></option>
+          }
+          @for (depotStockOption of depotStocksSharedCollection(); track $index) {
+            <option [ngValue]="depotStockOption">{{ depotStockOption.code }}</option>
+          }
+        </select>
+        @if (depotRef.invalid && (depotRef.dirty || depotRef.touched) && depotRef.errors?.required) {
+          <small class="text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+        }
+      </label>
+    </div>
+
+    <div class="adm-page__actions">
+      <button
+        type="button"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+        class="adm-button adm-button--ghost"
+        (click)="previousState()"
+      >
+        <fa-icon icon="ban" /> <span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="adm-button adm-button--primary"
+      >
+        <fa-icon icon="save" /> <span jhiTranslate="entity.action.save">Save</span>
+      </button>
+    </div>
+  </form>
+</section>

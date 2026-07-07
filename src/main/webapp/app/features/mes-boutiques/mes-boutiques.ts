@@ -38,9 +38,16 @@ interface BoutiquePanel {
   statsErreur: string | null;
 }
 
+interface MesBoutiquesMetric {
+  labelKey: string;
+  value: string;
+  tone: 'primary' | 'success' | 'warning' | 'neutral';
+}
+
 @Component({
   selector: 'jhi-mes-boutiques',
   templateUrl: './mes-boutiques.html',
+  styleUrl: './mes-boutiques.scss',
   imports: [FontAwesomeModule, FormsModule, NgbCollapseModule, TranslateModule, TranslateDirective],
 })
 export default class MesBoutiquesComponent implements OnInit {
@@ -54,6 +61,39 @@ export default class MesBoutiquesComponent implements OnInit {
     const c = this.compte();
     return [c?.firstName, c?.lastName].filter(Boolean).join(' ') || c?.login || '';
   });
+  readonly boutiquesActives = computed(() => this.panneaux().filter(panneau => panneau.exploitation.statut === 'ACTIF'));
+  readonly totalMembres = computed(() => this.panneaux().reduce((total, panneau) => total + panneau.affectations.length, 0));
+  readonly caNetCharge = computed(() => this.panneaux().reduce((total, panneau) => total + (panneau.stats?.netSales ?? 0), 0));
+  readonly redevanceRestanteChargee = computed(() =>
+    this.panneaux().reduce((total, panneau) => total + (panneau.stats?.royaltyOutstandingAmount ?? 0), 0),
+  );
+  readonly metrics = computed<MesBoutiquesMetric[]>(() => [
+    {
+      labelKey: 'mesBoutiques.metrics.activeShops',
+      value: String(this.boutiquesActives().length),
+      tone: 'success',
+    },
+    {
+      labelKey: 'mesBoutiques.metrics.totalShops',
+      value: String(this.panneaux().length),
+      tone: 'primary',
+    },
+    {
+      labelKey: 'mesBoutiques.metrics.teamMembers',
+      value: String(this.totalMembres()),
+      tone: 'neutral',
+    },
+    {
+      labelKey: 'mesBoutiques.metrics.loadedNetSales',
+      value: this.formatMontant(this.caNetCharge()),
+      tone: 'success',
+    },
+    {
+      labelKey: 'mesBoutiques.metrics.loadedRoyalties',
+      value: this.formatMontant(this.redevanceRestanteChargee()),
+      tone: 'warning',
+    },
+  ]);
 
   private readonly translateService = inject(TranslateService);
   private readonly exploitationService = inject(ExploitationBoutiqueService);
@@ -187,6 +227,16 @@ export default class MesBoutiquesComponent implements OnInit {
 
   formatMontant(valeur: number | null | undefined): string {
     return typeof valeur === 'number' ? `${valeur.toLocaleString('fr-FR')} F CFA` : '0 F CFA';
+  }
+
+  statutClasse(statut: string | null | undefined): string {
+    if (statut === 'ACTIF') {
+      return 'adm-pill adm-pill--success';
+    }
+    if (statut === 'SUSPENDU') {
+      return 'adm-pill adm-pill--danger';
+    }
+    return 'adm-pill adm-pill--warning';
   }
 
   private async creerNouvelUtilisateur(panneau: BoutiquePanel): Promise<void> {
