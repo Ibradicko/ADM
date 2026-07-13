@@ -1,0 +1,37 @@
+.adm-user-form .adm-form-surface {
+  border: 1px solid #dbe4ea;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(37, 99, 235, 0.05)), #ffffff;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
+}
+
+.adm-user-form .adm-section-heading {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1rem;
+}
+
+.adm-user-form .adm-section-heading h2 {
+  color: #0f172a;
+}
+
+.adm-user-form .adm-section-heading p,
+.adm-user-form .adm-field small {
+  color: #475569;
+}
+
+.adm-user-form .adm-field input,
+.adm-user-form .adm-field select {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.adm-user-form .adm-field input:focus,
+.adm-user-form .adm-field select:focus {
+  border-color: #0f766e;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+  outline: none;
+}

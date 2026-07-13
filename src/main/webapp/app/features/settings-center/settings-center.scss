@@ -1,0 +1,326 @@
+.adm-settings-center {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  color: #0f172a;
+}
+
+.adm-settings-center__hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  padding: 1.35rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.96)), #fff;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+}
+
+.adm-settings-center__hero::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.25rem;
+  content: '';
+  background: linear-gradient(90deg, #0d6efd, #198754, #f59f00);
+}
+
+.adm-settings-center__title h1 {
+  margin: 0;
+  color: #111827;
+  font-size: clamp(1.45rem, 2vw, 2.05rem);
+  font-weight: 800;
+}
+
+.adm-settings-center__title p:last-child {
+  max-width: 58rem;
+  color: #64748b;
+}
+
+.adm-settings-center__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.adm-settings-center__alert {
+  margin: 0;
+  border-radius: 0.75rem;
+}
+
+.adm-settings-center__stats {
+  margin-top: 0;
+}
+
+.adm-settings-kpi {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  height: 100%;
+  padding: 1rem 1.05rem;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.adm-settings-kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 42px rgba(15, 23, 42, 0.09);
+}
+
+.adm-settings-kpi__icon {
+  display: grid;
+  flex: 0 0 2.7rem;
+  width: 2.7rem;
+  height: 2.7rem;
+  place-items: center;
+  border-radius: 0.85rem;
+  color: #fff;
+  font-weight: 900;
+}
+
+.adm-settings-kpi span,
+.adm-settings-kpi small {
+  display: block;
+  color: #64748b;
+}
+
+.adm-settings-kpi span {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.adm-settings-kpi strong {
+  display: block;
+  margin: 0.35rem 0;
+  color: #0f172a;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.adm-settings-kpi--primary {
+  border-top: 4px solid #0d6efd;
+}
+
+.adm-settings-kpi--primary .adm-settings-kpi__icon {
+  background: #0d6efd;
+}
+
+.adm-settings-kpi--success {
+  border-top: 4px solid #198754;
+}
+
+.adm-settings-kpi--success .adm-settings-kpi__icon {
+  background: #198754;
+}
+
+.adm-settings-kpi--warning {
+  border-top: 4px solid #f59f00;
+}
+
+.adm-settings-kpi--warning .adm-settings-kpi__icon {
+  background: #f59f00;
+}
+
+.adm-settings-panel {
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 1rem;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.07);
+}
+
+.adm-settings-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(180deg, #f8fafc, #fff);
+}
+
+.adm-settings-panel__header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.adm-settings-panel__header p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.adm-settings-panel__header--table {
+  align-items: center;
+}
+
+.adm-setting-editor {
+  position: relative;
+  height: 100%;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 0.9rem;
+  background: #fff;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.adm-setting-editor::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.25rem;
+  content: '';
+  background: #0d6efd;
+}
+
+.adm-setting-editor:hover {
+  border-color: rgba(13, 110, 253, 0.35);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.07);
+}
+
+.adm-setting-editor--muted {
+  background: #f8fafc;
+}
+
+.adm-setting-editor--muted::before {
+  background: #94a3b8;
+}
+
+.adm-setting-editor__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.adm-setting-editor h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.adm-setting-editor code,
+.adm-settings-table code {
+  color: #0f5132;
+  font-size: 0.78rem;
+}
+
+.adm-setting-editor__description {
+  min-height: 2.45rem;
+  margin-bottom: 0.75rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.adm-setting-editor small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #64748b;
+}
+
+.adm-settings-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.adm-settings-summary__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 0.85rem;
+  background: #fff;
+}
+
+.adm-settings-summary__item strong,
+.adm-settings-summary__item small {
+  display: block;
+}
+
+.adm-settings-summary__item small {
+  color: #64748b;
+  font-size: 0.76rem;
+}
+
+.adm-settings-search {
+  min-width: min(100%, 22rem);
+}
+
+.adm-settings-search span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.adm-settings-loading,
+.adm-settings-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 9rem;
+  color: #64748b;
+}
+
+.adm-settings-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.adm-settings-table td {
+  vertical-align: middle;
+}
+
+.adm-settings-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.adm-settings-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+@media (max-width: 768px) {
+  .adm-settings-center__hero,
+  .adm-settings-panel__header,
+  .adm-setting-editor__top {
+    flex-direction: column;
+  }
+
+  .adm-settings-center__actions,
+  .adm-settings-panel__header .btn,
+  .adm-settings-search {
+    width: 100%;
+  }
+
+  .adm-settings-center__actions .btn {
+    flex: 1 1 auto;
+  }
+}

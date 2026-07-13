@@ -273,7 +273,7 @@
       </article>
     }
 
-    @if (dashboardMode() === 'ADMIN') {
+    @if (dashboardMode() === 'ADMIN' && afficherVentesEtStock()) {
       <div class="adm-ranking-grid">
         <article class="adm-card">
           <div class="adm-card__header">
@@ -325,7 +325,7 @@
       </div>
     }
 
-    @if (dashboardMode() === 'ADMIN' || dashboardMode() === 'BOUTIQUE') {
+    @if ((dashboardMode() === 'ADMIN' && afficherVentesEtStock()) || dashboardMode() === 'BOUTIQUE') {
       <article class="adm-card adm-card--table">
         <div class="adm-card__header">
           <div>
@@ -380,7 +380,7 @@
       </article>
     }
 
-    @if (permissionsUi.peutLireStock()) {
+    @if (afficherVentesEtStock() && permissionsUi.peutLireStock()) {
       <article class="adm-card adm-card--table">
         <div class="adm-card__header">
           <div>

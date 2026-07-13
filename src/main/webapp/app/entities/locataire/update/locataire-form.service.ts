@@ -76,7 +76,7 @@ export class LocataireFormService {
         validators: [Validators.maxLength(30)],
       }),
       email: new FormControl(locataireRawValue.email, {
-        validators: [Validators.maxLength(120)],
+        validators: [Validators.required, Validators.email, Validators.maxLength(120)],
       }),
       adresse: new FormControl(locataireRawValue.adresse, {
         validators: [Validators.maxLength(255)],

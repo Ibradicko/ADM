@@ -24,9 +24,16 @@
   <section class="adm-subsection">
     <div class="adm-section-heading">
       <div>
-        <h3>Locataire exploitant</h3>
-        <p>Le locataire affecte recevra le profil Manager boutique sur ce point de vente.</p>
+        <h3>Parties</h3>
+        <p>La boutique est preselectionnee; choisissez le locataire exploitant.</p>
       </div>
+    </div>
+
+    <div class="adm-form-grid">
+      <label class="adm-field adm-field--full">
+        <span>Boutique</span>
+        <input type="text" [value]="(boutique?.code || 'BTQ') + ' - ' + (boutique?.nom || 'Boutique')" readonly />
+      </label>
     </div>
 
     <label class="adm-search adm-search--panel">
@@ -89,6 +96,15 @@
       </label>
 
       <label class="adm-field">
+        <span>Statut</span>
+        <select [ngModel]="statut()" (ngModelChange)="definirStatut($event)">
+          @for (statutOption of statutGeneralValues; track statutOption) {
+            <option [value]="statutOption">{{ statutOption }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="adm-field">
         <span>Taux redevance (%)</span>
         <input
           type="number"
@@ -103,6 +119,40 @@
       <label class="adm-field adm-field--full">
         <span>Commentaire</span>
         <textarea rows="3" [ngModel]="commentaire()" (ngModelChange)="commentaire.set($event)"></textarea>
+      </label>
+    </div>
+  </section>
+
+  <section class="adm-subsection">
+    <div class="adm-section-heading">
+      <div>
+        <h3>Document contrat</h3>
+        <p>Ajoutez le contrat signe ou le document de reference.</p>
+      </div>
+    </div>
+
+    @if (documentContratNom(); as nomDocument) {
+      <div class="adm-inline-alert adm-inline-alert--info">
+        <fa-icon icon="file-alt" />
+        <span>{{ nomDocument }}</span>
+        @if (documentContrat(); as document) {
+          <small>{{ byteSize(document) }}</small>
+        }
+      </div>
+    }
+
+    <div class="adm-upload-zone">
+      <input
+        id="assign_documentContrat"
+        type="file"
+        class="adm-upload-zone__input"
+        accept="image/*,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        (change)="setDocumentContrat($event)"
+      />
+      <label for="assign_documentContrat" class="adm-upload-zone__label">
+        <fa-icon icon="cloud-upload-alt" class="adm-upload-zone__icon" />
+        <span class="adm-upload-zone__text">Importer un document de contrat</span>
+        <small class="adm-upload-zone__hint">PDF, Word ou image</small>
       </label>
     </div>
   </section>

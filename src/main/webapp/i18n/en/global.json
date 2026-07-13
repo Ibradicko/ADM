@@ -124,7 +124,7 @@
       "businessPermissions": "Business permissions",
       "paymentMethods": "Payment methods",
       "globalParameters": "Global settings",
-      "adminUsers": "Admin - users",
+      "adminUsers": "Users",
       "adminHealth": "Admin - health",
       "adminMetrics": "Admin - metrics",
       "adminLogs": "Admin - logs",

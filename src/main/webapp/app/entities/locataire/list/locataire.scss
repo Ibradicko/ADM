@@ -1,0 +1,122 @@
+:host {
+  display: block;
+}
+
+.locataire-list-page {
+  gap: 0.45rem;
+}
+
+.adm-page-header {
+  gap: 0.75rem;
+  margin-bottom: 0;
+  padding-block: 0.25rem;
+}
+
+.adm-page-header h1 {
+  margin-bottom: 0.1rem;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.adm-page-header p {
+  margin-bottom: 0;
+  line-height: 1.25;
+}
+
+.adm-page-header__actions {
+  gap: 0.45rem;
+}
+
+.adm-page-header__actions .adm-button {
+  min-height: 2.35rem;
+  padding-block: 0.45rem;
+}
+
+.adm-stats-grid--compact {
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+.adm-stats-grid--compact .adm-stat-card {
+  min-height: 3.85rem;
+  padding: 0.55rem 0.75rem;
+}
+
+.adm-stats-grid--compact .adm-stat-card span {
+  font-size: 0.74rem;
+  line-height: 1.15;
+}
+
+.adm-stats-grid--compact .adm-stat-card strong {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.adm-toolbar {
+  gap: 0.6rem;
+  margin-bottom: 0;
+  padding: 0.55rem;
+}
+
+.adm-toolbar__filters {
+  gap: 0.5rem;
+}
+
+.adm-toolbar .adm-field {
+  gap: 0.2rem;
+}
+
+.adm-toolbar .adm-search,
+.adm-toolbar .adm-select,
+.adm-toolbar .adm-button {
+  min-height: 2.35rem;
+}
+
+.adm-toolbar .adm-field span {
+  line-height: 1.1;
+}
+
+.adm-card__header {
+  gap: 0.6rem;
+  padding: 0.55rem 0.75rem;
+}
+
+.adm-card__header h2 {
+  margin-bottom: 0.05rem;
+  font-size: 1.05rem;
+  line-height: 1.15;
+}
+
+.adm-card__header p {
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+.adm-card__header .adm-pill {
+  min-height: 1.85rem;
+  padding-block: 0.25rem;
+}
+
+.adm-table th,
+.adm-table td {
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.adm-table-title {
+  gap: 0.1rem;
+}
+
+@media (max-width: 768px) {
+  .locataire-list-page {
+    gap: 0.65rem;
+  }
+
+  .adm-stats-grid--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adm-stats-grid--compact .adm-stat-card {
+    min-height: 4rem;
+  }
+}

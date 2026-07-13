@@ -1,0 +1,44 @@
+.adm-user-mgmt {
+  --manager-accent: #0f766e;
+  --manager-accent-strong: #115e59;
+  --manager-surface: #f8fafc;
+}
+
+.adm-user-mgmt .adm-page-header {
+  border: 1px solid #dbe4ea;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.1), rgba(37, 99, 235, 0.06)), #ffffff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+.adm-user-mgmt .adm-stat-card {
+  border: 1px solid #dbe4ea;
+  background: #ffffff;
+}
+
+.adm-user-mgmt .adm-stat-card strong {
+  color: var(--manager-accent-strong);
+}
+
+.adm-user-mgmt .adm-toolbar,
+.adm-user-mgmt .adm-card--table {
+  border: 1px solid #dbe4ea;
+  background: var(--manager-surface);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.adm-user-mgmt .adm-table tbody tr {
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.adm-user-mgmt .adm-table tbody tr:hover {
+  background: #ecfeff;
+  transform: translateY(-1px);
+}
+
+.adm-user-mgmt .adm-chip {
+  border-color: rgba(15, 118, 110, 0.22);
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--manager-accent-strong);
+}

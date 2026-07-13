@@ -7,6 +7,8 @@
       "refresh": "Refresh",
       "refreshing": "Refreshing...",
       "save": "Save",
+      "saveGlobal": "Save settings",
+      "reset": "Reset",
       "add": "Add",
       "enable": "Enable",
       "disable": "Disable",
@@ -30,7 +32,10 @@
       "businessProfiles": "Business profiles",
       "businessProfilesHint": "Active access roles",
       "activeAssignments": "Active assignments",
-      "activeAssignmentsHint": "Users assigned to shops"
+      "activeAssignmentsHint": "Users assigned to shops",
+      "controlledActive": "{{active}} / {{total}} active in the form",
+      "freeParameters": "Free parameters",
+      "inactiveInDatabase": "{{count}} inactive in the database"
     },
     "fields": {
       "search": "Search",
@@ -61,10 +66,15 @@
       "email": "Email",
       "profile": "Profile",
       "startDate": "Start date",
-      "endDate": "End date"
+      "endDate": "End date",
+      "code": "Code",
+      "value": "Value"
     },
     "sections": {
       "globalSettings": "Global settings",
+      "globalParameters": "Global parameters",
+      "currentGlobalParameters": "Saved parameters",
+      "configurationState": "Configuration state",
       "generalRules": "General rules",
       "shopRules": "Rules by shop",
       "paymentMethods": "Payment methods",
@@ -80,6 +90,9 @@
     },
     "hints": {
       "generalRules": "These values apply by default when a shop has no specific rule.",
+      "globalParameters": "Shared rules applied by default across the application.",
+      "currentGlobalParameters": "Values currently stored in the database.",
+      "configurationState": "Quick check before saving.",
       "shopRules": "Adapt selected behavior for a specific shop.",
       "paymentMethods": "Choose payment methods available for sales and royalty payments.",
       "newPaymentMethod": "Only add methods that shops actually accept.",
@@ -107,14 +120,16 @@
       "noPermission": "No permission",
       "noAssignment": "No assignment found.",
       "noPaymentMethod": "No payment method configured yet.",
-      "noBarcodeRule": "No barcode rule configured yet."
+      "noBarcodeRule": "No barcode rule configured yet.",
+      "noGlobalParameter": "No global parameter configured yet."
     },
     "readOnly": {
       "paymentMethods": "You have read-only access to payment methods.",
       "barcodeRules": "You have read-only access to barcode settings.",
       "profiles": "You can view profiles but cannot change permissions.",
       "users": "You can view assignments but cannot create users.",
-      "assignments": "You can view assignments but cannot create them."
+      "assignments": "You can view assignments but cannot create them.",
+      "global": "You have read-only access to global settings."
     },
     "help": {
       "shopName": "Trading name used in sales and reports.",
@@ -124,7 +139,8 @@
       "login": "Required identifier for sign-in.",
       "managerScope": "Managers only see shops within their scope.",
       "role": "The role determines visible menus and authorized actions.",
-      "userEmail": "Used for activation and password recovery."
+      "userEmail": "Used for activation and password recovery.",
+      "defaultValue": "Default value: {{value}}"
     },
     "validation": { "maliPhone": "A Mali phone number must contain exactly 8 digits.", "invalidEmail": "Invalid email address." },
     "accessibility": { "settingsScope": "Settings scope" },
@@ -193,7 +209,11 @@
       "activeStatusUpdated": "The active status was updated.",
       "activeStatusUpdateFailed": "The active status could not be updated.",
       "assignmentUpdated": "The assignment was updated.",
-      "assignmentUpdateFailed": "The assignment could not be updated."
+      "assignmentUpdateFailed": "The assignment could not be updated.",
+      "globalSaved": "Global settings were saved.",
+      "globalSaveFailed": "Global settings could not be saved.",
+      "statusUpdated": "The parameter status was updated.",
+      "statusUpdateFailed": "The parameter status could not be updated."
     }
   }
 }

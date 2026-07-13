@@ -1,4 +1,4 @@
-<section class="adm-page">
+<section class="adm-page boutique-list-page">
   <div class="adm-page-header" id="page-heading" data-cy="BoutiqueHeading">
     <div>
       <h1>{{ permissionsUi.peutGererBoutiques() ? 'Gestion des boutiques et locataires' : 'Ma boutique' }}</h1>
@@ -33,16 +33,16 @@
       <strong>{{ totalItems() || boutiques().length }}</strong>
     </article>
     <article class="adm-stat-card">
-      <span>Boutiques actives</span>
-      <strong>{{ activeCount() }}</strong>
+      <span>Boutiques affectees</span>
+      <strong>{{ assignedCount() }}</strong>
     </article>
     <article class="adm-stat-card">
-      <span>Points Duty Free</span>
-      <strong>{{ dutyFreeCount() }}</strong>
+      <span>Boutiques non affectees</span>
+      <strong>{{ unassignedCount() }}</strong>
     </article>
     <article class="adm-stat-card">
-      <span>Points service</span>
-      <strong>{{ serviceCount() }}</strong>
+      <span>Boutiques non actives</span>
+      <strong>{{ inactiveCount() }}</strong>
     </article>
   </div>
 

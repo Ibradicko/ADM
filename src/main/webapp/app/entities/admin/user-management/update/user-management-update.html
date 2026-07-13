@@ -1,10 +1,11 @@
-<section class="adm-page">
+<section class="adm-page adm-user-form">
   <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="adm-card adm-card--spaced adm-form-surface">
     <div class="adm-section-heading">
       <div>
         <h2 id="myUserLabel" data-cy="UserManagementCreateUpdateHeading" jhiTranslate="userManagement.home.createOrEditLabel">
           Create or edit a user
         </h2>
+        <p>Le compte sera cree actif avec un mot de passe initial reinitialisable a la premiere connexion.</p>
       </div>
     </div>
 
@@ -108,6 +109,22 @@
         </label>
       }
 
+      @if (!editForm.value.id) {
+        @let boutiqueRef = editForm.get('boutiqueId')!;
+        <label class="adm-field adm-field--full">
+          <span>Boutique de rattachement</span>
+          <select id="field_boutique" name="boutiqueId" formControlName="boutiqueId" data-cy="boutiqueId">
+            <option [ngValue]="null">Selectionner une boutique</option>
+            @for (boutique of boutiques(); track boutique.id) {
+              <option [ngValue]="boutique.id">{{ boutique.nom || boutique.code }}{{ boutique.code ? ' - ' + boutique.code : '' }}</option>
+            }
+          </select>
+          @if (boutiqueRef.invalid && (boutiqueRef.dirty || boutiqueRef.touched)) {
+            <small class="text-danger">La boutique est requise pour creer l'affectation Manager ADM.</small>
+          }
+        </label>
+      }
+
       <label class="adm-field adm-field--full">
         <span jhiTranslate="userManagement.profiles">Profiles</span>
         <select id="field_authority" multiple name="authority" formControlName="authorities">
@@ -115,6 +132,7 @@
             <option [value]="authority">{{ authority }}</option>
           }
         </select>
+        <small>Profil technique impose : ROLE_MANAGER_ADM + ROLE_USER.</small>
       </label>
     </div>
 

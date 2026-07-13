@@ -196,7 +196,11 @@ export default class Caisse implements OnInit {
   private readonly operationCorrectiveVenteService = inject(OperationCorrectiveVenteService);
   private readonly translateService = inject(TranslateService);
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
+    void this.initialiserPosteCaisse();
+  }
+
+  private async initialiserPosteCaisse(): Promise<void> {
     const compte = this.account() ?? (await firstValueFrom(this.accountService.identity()));
     await this.permissionsUi.chargerPermissions(compte);
     this.chargementPermissions.set(false);
@@ -302,7 +306,9 @@ export default class Caisse implements OnInit {
       return;
     }
     this.panier.update(panier =>
-      panier.map(ligne => (ligne.article.produitId === produitId ? { ...ligne, quantite: ligne.quantite + 1 } : ligne)),
+      panier.map(lignePanier =>
+        lignePanier.article.produitId === produitId ? { ...lignePanier, quantite: lignePanier.quantite + 1 } : lignePanier,
+      ),
     );
     this.ajusterPaiementUniqueAuTotal();
   }

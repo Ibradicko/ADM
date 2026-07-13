@@ -116,18 +116,18 @@ describe('Navbar Component', () => {
     expect(routes).toContain('/boutique');
     expect(routes).toContain('/exploitation-boutique');
     expect(routes).toContain('/locataire');
-    expect(routes).toContain('/reporting');
+    expect(routes).not.toContain('/reporting');
     expect(routes).toContain('/audit-supervision');
     expect(routes).not.toContain('/caisse');
     expect(routes).not.toContain('/vente');
     expect(routes).not.toContain('/produit');
     expect(routes).not.toContain('/depot-stock');
     expect(routes).not.toContain('/stock-produit');
-    expect(routes).not.toContain('/settings-center');
+    expect(routes).toContain('/settings-center');
     expect(routes).not.toContain('/admin/user-management');
   });
 
-  it('should limit boutique manager menus to boutique operations and users', () => {
+  it('should limit boutique manager menus to boutique operations without users', () => {
     accountService.authenticate({ ...account, login: 'manager_alpha', authorities: ['ROLE_USER'] });
     permissionsUi.codesProfil.set(new Set(['MANAGER_BOUTIQUE']));
     permissionsUi.permissionsMetier.set(
@@ -147,7 +147,6 @@ describe('Navbar Component', () => {
     const routes = items.map(item => item.route);
 
     expect(items.find(item => item.route === '/boutique')?.labelKey).toBe('global.navbar.myBoutique');
-    expect(routes).toContain('/settings-center');
     expect(routes).toContain('/caisse');
     expect(routes).toContain('/stock-operations');
     expect(routes).toContain('/produit');
@@ -155,11 +154,12 @@ describe('Navbar Component', () => {
     expect(routes).toContain('/reporting');
     expect(routes).not.toContain('/depot-stock');
     expect(routes).not.toContain('/stock-produit');
-    expect(routes).not.toContain('/royalties');
+    expect(routes).toContain('/royalties');
     expect(routes).not.toContain('/vente');
     expect(routes).not.toContain('/rapport-export');
     expect(routes).not.toContain('/locataire');
     expect(routes).not.toContain('/exploitation-boutique');
+    expect(routes).not.toContain('/settings-center');
     expect(routes).not.toContain('/admin/user-management');
   });
 
@@ -175,8 +175,8 @@ describe('Navbar Component', () => {
     expect(routes).not.toContain('/boutique');
     expect(routes).not.toContain('/produit');
     expect(routes).not.toContain('/stock-operations');
-    expect(routes).not.toContain('/royalties');
-    expect(routes).not.toContain('/reporting');
+    expect(routes).toContain('/royalties');
+    expect(routes).toContain('/reporting');
     expect(routes).not.toContain('/audit-supervision');
     expect(routes).not.toContain('/settings-center');
     expect(routes).not.toContain('/admin/user-management');
@@ -184,22 +184,23 @@ describe('Navbar Component', () => {
 
   it('should limit locataire menus to dashboard and mes boutiques', () => {
     accountService.authenticate({ ...account, login: 'locataire_alpha', authorities: ['ROLE_LOCATAIRE'] });
+    permissionsUi.boutiqueIds.set([1]);
 
     const items = comp.menuItemsAffiches();
     const routes = items.map(item => item.route);
 
     expect(routes).toContain('/dashboard');
     expect(routes).toContain('/mes-boutiques');
+    expect(routes).toContain('/settings-center');
     expect(routes).toContain('/royalties');
-    expect(items.find(item => item.feature === 'users')).toBeUndefined();
+    expect(items.find(item => item.feature === 'users')).toBeDefined();
     expect(routes).not.toContain('/boutique');
     expect(routes).not.toContain('/locataire');
     expect(routes).not.toContain('/produit');
     expect(routes).not.toContain('/caisse');
     expect(routes).not.toContain('/stock-operations');
-    expect(routes).not.toContain('/reporting');
+    expect(routes).toContain('/reporting');
     expect(routes).not.toContain('/audit-supervision');
-    expect(routes).not.toContain('/settings-center');
     expect(comp.roleLabel()).toBe('global.roles.locataire');
     expect(routes).not.toContain('/admin/user-management');
   });
@@ -213,7 +214,7 @@ describe('Navbar Component', () => {
     expect(routes).toContain('/boutique');
     expect(routes).toContain('/exploitation-boutique');
     expect(routes).toContain('/locataire');
-    expect(routes).toContain('/produit');
+    expect(routes).not.toContain('/produit');
     expect(routes).not.toContain('/caisse');
     expect(routes).not.toContain('/stock-operations');
     expect(routes).toContain('/royalties');

@@ -78,7 +78,9 @@ public class LocataireService {
         if (locataireDTO.getId() != null) {
             Optional<Locataire> existingLocataire = locataireRepository.findById(locataireDTO.getId());
             if (existingLocataire.isPresent()) {
-                locataire.setUser(existingLocataire.orElseThrow().getUser());
+                User user = existingLocataire.orElseThrow().getUser();
+                synchroniserEmailCompteLocataire(user, locataire.getEmail());
+                locataire.setUser(user);
             }
         }
         locataire = locataireRepository.save(locataire);
@@ -160,10 +162,7 @@ public class LocataireService {
             }
         }
 
-        String email =
-            locataire.getEmail() != null && !locataire.getEmail().isBlank()
-                ? locataire.getEmail().trim().toLowerCase()
-                : login + "@adm.local";
+        String email = normaliserEmailLocataire(locataire);
 
         // Réutiliser le compte existant si même email
         Optional<User> existingByEmail = userRepository.findOneByEmailIgnoreCase(email);
@@ -195,6 +194,25 @@ public class LocataireService {
             .toLowerCase()
             .replaceAll("[^a-z0-9_.@-]+", "-")
             .replaceAll("^-+|-+$", "");
+    }
+
+    private String normaliserEmailLocataire(Locataire locataire) {
+        if (locataire.getEmail() == null || locataire.getEmail().isBlank()) {
+            throw new IllegalArgumentException("L'email du locataire est obligatoire pour creer le compte utilisateur");
+        }
+        String email = locataire.getEmail().trim().toLowerCase();
+        locataire.setEmail(email);
+        return email;
+    }
+
+    private void synchroniserEmailCompteLocataire(User user, String email) {
+        if (user == null || email == null || email.isBlank()) {
+            return;
+        }
+        String normalizedEmail = email.trim().toLowerCase();
+        if (!normalizedEmail.equalsIgnoreCase(user.getEmail())) {
+            user.setEmail(normalizedEmail);
+        }
     }
 
     private String truncate(String value, int maxLength) {

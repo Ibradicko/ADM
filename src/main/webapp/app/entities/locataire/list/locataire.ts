@@ -27,6 +27,7 @@ import { LocataireService } from '../service/locataire.service';
 @Component({
   selector: 'jhi-locataire',
   templateUrl: './locataire.html',
+  styleUrl: './locataire.scss',
   imports: [
     RouterLink,
     FormsModule,

@@ -48,20 +48,14 @@ export class UiPermissionService {
   readonly estProfilBoutique = computed(() => !this.estLocataire() && this.hasAnyProfile(CODES_PROFIL_BOUTIQUE));
   readonly estProfilVente = computed(() => this.hasAnyProfile(CODES_PROFIL_VENTE));
   readonly estProfilStandard = computed(() => this.hasAnyProfile(CODES_PROFIL_STANDARD));
-  readonly peutLireUtilisateurs = computed(() => this.estAdmin() || this.estProfilAdm() || this.estLocataire() || this.estProfilBoutique());
-  readonly peutCreerUtilisateurBoutique = computed(
-    () =>
-      this.estAdmin() ||
-      this.estProfilAdm() ||
-      (this.estLocataire() && this.boutiqueIds().length > 0) ||
-      (this.estProfilBoutique() && this.boutiqueIds().length > 0),
-  );
+  readonly peutLireUtilisateurs = computed(() => this.estLocataire() && this.boutiqueIds().length > 0);
+  readonly peutCreerUtilisateurBoutique = computed(() => this.estLocataire() && this.boutiqueIds().length > 0);
   readonly peutGererAffectationsBoutique = computed(() => this.estAdmin() || this.estProfilAdm());
   readonly peutGererUtilisateurs = this.peutGererAffectationsBoutique;
-  readonly peutLireVentes = computed(() => this.estAdmin() || this.estProfilAdm() || this.estProfilBoutique() || this.estProfilVente());
-  readonly peutGererVentes = computed(() => this.estAdmin() || this.estProfilBoutique() || this.estProfilVente());
-  readonly peutLireStock = computed(() => this.estAdmin() || this.estProfilBoutique());
-  readonly peutGererStock = computed(() => this.estAdmin() || this.estProfilBoutique());
+  readonly peutLireVentes = computed(() => this.estProfilBoutique() || this.estProfilVente());
+  readonly peutGererVentes = computed(() => this.estProfilBoutique() || this.estProfilVente());
+  readonly peutLireStock = computed(() => this.estProfilBoutique() || this.estProfilVente());
+  readonly peutGererStock = computed(() => this.estProfilBoutique());
   readonly peutLireReporting = computed(
     () => this.estAdmin() || (this.estLocataire() && this.boutiqueIds().length > 0) || this.estProfilAdm() || this.estProfilBoutique(),
   );
@@ -85,6 +79,7 @@ export class UiPermissionService {
   readonly peutLireAudit = computed(
     () =>
       this.estAdmin() ||
+      (this.estLocataire() && this.boutiqueIds().length > 0) ||
       (this.estProfilAdm() && this.hasAnyBusinessPermission(PERMISSIONS.auditRead, PERMISSIONS.reportingRead, PERMISSIONS.reportingExport)),
   );
   readonly peutCreerBoutiques = computed(() => this.estAdmin());
@@ -166,7 +161,7 @@ export class UiPermissionService {
       case 'audit':
         return this.peutLireAudit();
       case 'users':
-        return this.peutLireUtilisateurs() || this.peutCreerUtilisateurBoutique();
+        return this.estLocataire() && (this.peutLireUtilisateurs() || this.peutCreerUtilisateurBoutique());
       case 'settings':
         return this.peutLireParametres();
       default:
@@ -219,7 +214,7 @@ export class UiPermissionService {
       case 'reporting':
         return this.peutExporterReporting();
       case 'users':
-        return this.peutGererAffectationsBoutique() || this.peutCreerUtilisateurBoutique();
+        return this.estLocataire() && this.peutCreerUtilisateurBoutique();
       case 'settings':
         return this.peutAdministrerParametresGlobaux() && this.peutGererParametres();
       default:

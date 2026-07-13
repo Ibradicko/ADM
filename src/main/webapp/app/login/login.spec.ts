@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, vitest } from 'vitest';
 import { ElementRef, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Navigation, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { AccountService } from 'app/core/auth/account.service';
+import { Account } from 'app/core/auth/account.model';
 
 import Login from './login';
 import { LoginService } from './login.service';
@@ -17,6 +18,16 @@ describe('Login', () => {
   let mockRouter: Router;
   let mockAccountService: AccountService;
   let mockLoginService: LoginService;
+  const account: Account = {
+    activated: true,
+    authorities: ['ROLE_USER'],
+    email: 'admin@localhost',
+    firstName: 'Admin',
+    langKey: 'fr',
+    lastName: 'User',
+    login: 'admin',
+    imageUrl: '',
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -29,7 +40,7 @@ describe('Login', () => {
         {
           provide: AccountService,
           useValue: {
-            isAuthenticated: vitest.fn(),
+            identity: vitest.fn(() => of(null)),
           },
         },
         {
@@ -63,27 +74,15 @@ describe('Login', () => {
       expect(mockAccountService.identity).toHaveBeenCalled();
     });
 
-    it('should call accountService.isAuthenticated on Init', () => {
+    it('should navigate to dashboard on Init if account is already authenticated', () => {
       // GIVEN
-      mockAccountService.identity = vitest.fn(() => of(null));
+      mockAccountService.identity = vitest.fn(() => of(account));
 
       // WHEN
       comp.ngOnInit();
 
       // THEN
-      expect(mockAccountService.isAuthenticated).toHaveBeenCalled();
-    });
-
-    it('should navigate to home page on Init if authenticated=true', () => {
-      // GIVEN
-      mockAccountService.identity = vitest.fn(() => of(null));
-      mockAccountService.isAuthenticated = () => true;
-
-      // WHEN
-      comp.ngOnInit();
-
-      // THEN
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['']);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
     });
   });
 
@@ -124,19 +123,19 @@ describe('Login', () => {
       // THEN
       expect(comp.authenticationError()).toEqual(false);
       expect(mockLoginService.login).toHaveBeenCalledWith(credentials);
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['']);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
     });
 
-    it('should authenticate the user but not navigate to home page if authentication process is already routing to cached url from localstorage', () => {
+    it('should navigate to password page if user must change initial password', () => {
       // GIVEN
-      vitest.spyOn(mockRouter, 'currentNavigation').mockReturnValue({} as Navigation);
+      mockLoginService.login = vitest.fn(() => of({ ...account, login: 'vendeur', mustChangePassword: true }));
 
       // WHEN
       comp.login();
 
       // THEN
       expect(comp.authenticationError()).toEqual(false);
-      expect(mockRouter.navigate).not.toHaveBeenCalled();
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/account/password']);
     });
 
     it('should stay on login form and show error message on login error', () => {

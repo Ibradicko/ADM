@@ -134,8 +134,8 @@ export default class Home implements OnInit {
   public readonly lignesPeriode = signal<ILigneVente[]>([]);
   public readonly tenantShopSummaries = signal<TenantShopSummary[]>([]);
 
-  public readonly dateDebut = signal(dayjs().subtract(29, 'day').format('YYYY-MM-DD'));
-  public readonly dateFin = signal(dayjs().format('YYYY-MM-DD'));
+  public readonly dateDebut = signal(dayjs().startOf('month').format('YYYY-MM-DD'));
+  public readonly dateFin = signal(dayjs().endOf('month').format('YYYY-MM-DD'));
   public readonly boutiqueId = signal<number | null>(null);
   public readonly locataireId = signal<number | null>(null);
 
@@ -164,6 +164,27 @@ export default class Home implements OnInit {
       ];
     }
 
+    if (mode === 'ADMIN') {
+      return [
+        { labelKey: 'home.dashboard.metrics.royaltyTurnover', value: this.formatMontant(overview?.netSales), tone: 'primary' },
+        {
+          labelKey: 'home.dashboard.metrics.pendingRoyalties',
+          value: this.formatMontant(overview?.royaltyOutstandingAmount),
+          tone: 'warning',
+        },
+        {
+          labelKey: 'home.dashboard.metrics.activeShops',
+          value: this.formatNombre(this.boutiques().filter(boutique => boutique.statut === 'ACTIF').length),
+          tone: 'neutral',
+        },
+        {
+          labelKey: 'home.dashboard.metrics.activeTenants',
+          value: this.formatNombre(this.locataires().filter(locataire => locataire.statut === 'ACTIF').length),
+          tone: 'success',
+        },
+      ];
+    }
+
     return [
       { labelKey: 'home.dashboard.metrics.grossSales', value: this.formatMontant(overview?.grossSales), tone: 'primary' },
       { labelKey: 'home.dashboard.metrics.netSales', value: this.formatMontant(overview?.netSales), tone: 'success' },
@@ -176,6 +197,7 @@ export default class Home implements OnInit {
     ];
   });
   public readonly afficherRedevanceParGroupe = computed(() => this.dashboardMode() === 'ADMIN' && this.permissionsUi.peutLireRedevances());
+  public readonly afficherVentesEtStock = computed(() => this.dashboardMode() !== 'ADMIN');
   public readonly activeTenantShops = computed(() => this.exploitationsLocataire().filter(exploitation => exploitation.statut === 'ACTIF'));
   public readonly tenantShopRows = computed<RankingRow[]>(() =>
     this.exploitationsLocataire().map(exploitation => ({
@@ -212,12 +234,17 @@ export default class Home implements OnInit {
   public readonly quickActions = computed<QuickAction[]>(() =>
     [
       { labelKey: 'global.navbar.mesBoutiques', route: '/mes-boutiques', icon: 'store', visible: this.permissionsUi.estLocataire() },
-      { labelKey: 'global.navbar.caisse', route: '/caisse', icon: 'cash-register', visible: this.permissionsUi.peutVoirEcran('caisse') },
+      {
+        labelKey: 'global.navbar.caisse',
+        route: '/caisse',
+        icon: 'cash-register',
+        visible: this.afficherVentesEtStock() && this.permissionsUi.peutVoirEcran('caisse'),
+      },
       {
         labelKey: 'global.navbar.stocks',
         route: '/stock-operations',
         icon: 'database',
-        visible: this.permissionsUi.peutVoirEcran('stock'),
+        visible: this.afficherVentesEtStock() && this.permissionsUi.peutVoirEcran('stock'),
       },
       { labelKey: 'global.navbar.reporting', route: '/reporting', icon: 'book', visible: this.permissionsUi.peutVoirEcran('reporting') },
       {
@@ -372,19 +399,21 @@ export default class Home implements OnInit {
     this.chargement.set(true);
     this.messageKey.set(null);
     try {
-      const stockAlertsRequest = this.permissionsUi.peutLireStock()
-        ? this.queryOptionnelle(
-            () =>
-              firstValueFrom(
-                this.dashboardReportingService.getStockAlerts({
-                  boutiqueId: this.boutiqueId() ?? undefined,
-                }),
-              ),
-            [],
-          )
-        : Promise.resolve<DashboardStockAlertResponse[]>([]);
+      const stockAlertsRequest =
+        this.afficherVentesEtStock() && this.permissionsUi.peutLireStock()
+          ? this.queryOptionnelle(
+              () =>
+                firstValueFrom(
+                  this.dashboardReportingService.getStockAlerts({
+                    boutiqueId: this.boutiqueId() ?? undefined,
+                  }),
+                ),
+              [],
+            )
+          : Promise.resolve<DashboardStockAlertResponse[]>([]);
 
       const shouldLoadRawSales =
+        this.afficherVentesEtStock() &&
         (this.permissionsUi.estAdmin() ||
           this.permissionsUi.estProfilAdm() ||
           this.permissionsUi.estProfilSupervision() ||

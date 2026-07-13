@@ -131,7 +131,6 @@ export default class Navbar implements OnInit {
         'redevances',
         'reporting',
         'audit',
-        'users',
         'settings',
         'adminUsers',
       ]);
@@ -147,27 +146,16 @@ export default class Navbar implements OnInit {
         'redevances',
         'reporting',
         'audit',
-        'users',
         'settings',
       ]);
     }
 
     if (this.account()?.authorities.includes('ROLE_LOCATAIRE')) {
-      return new Set(['dashboard', 'mesBoutiques', 'redevances', 'reporting']);
+      return new Set(['dashboard', 'mesBoutiques', 'users', 'redevances', 'reporting', 'audit']);
     }
 
     if (profils.has('MANAGER_BOUTIQUE')) {
-      return new Set([
-        'dashboard',
-        'boutiques',
-        'catalogue',
-        'catalogueIdentification',
-        'caisse',
-        'stocks',
-        'redevances',
-        'reporting',
-        'users',
-      ]);
+      return new Set(['dashboard', 'boutiques', 'catalogue', 'catalogueIdentification', 'caisse', 'stocks', 'redevances', 'reporting']);
     }
 
     if (profils.has('VENDEUR')) {

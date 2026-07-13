@@ -3,6 +3,7 @@ package com.adm.supervision.service;
 import com.adm.supervision.domain.Boutique;
 import com.adm.supervision.domain.CalculRedevance;
 import com.adm.supervision.domain.InventaireStock;
+import com.adm.supervision.domain.JournalAudit;
 import com.adm.supervision.domain.LigneVente;
 import com.adm.supervision.domain.MouvementStock;
 import com.adm.supervision.domain.Produit;
@@ -14,6 +15,7 @@ import com.adm.supervision.domain.TransfertStock;
 import com.adm.supervision.domain.Vente;
 import com.adm.supervision.repository.CalculRedevanceRepository;
 import com.adm.supervision.repository.InventaireStockRepository;
+import com.adm.supervision.repository.JournalAuditRepository;
 import com.adm.supervision.repository.LigneVenteRepository;
 import com.adm.supervision.repository.MouvementStockRepository;
 import com.adm.supervision.repository.ProduitRepository;
@@ -51,6 +53,7 @@ public class ResourceBoutiqueSecurityService {
     private final CalculRedevanceRepository calculRedevanceRepository;
     private final RegleRedevanceRepository regleRedevanceRepository;
     private final LigneVenteRepository ligneVenteRepository;
+    private final JournalAuditRepository journalAuditRepository;
 
     public ResourceBoutiqueSecurityService(
         ModuleSecurityService moduleSecurityService,
@@ -64,7 +67,8 @@ public class ResourceBoutiqueSecurityService {
         RapportExportRepository rapportExportRepository,
         CalculRedevanceRepository calculRedevanceRepository,
         RegleRedevanceRepository regleRedevanceRepository,
-        LigneVenteRepository ligneVenteRepository
+        LigneVenteRepository ligneVenteRepository,
+        JournalAuditRepository journalAuditRepository
     ) {
         this.moduleSecurityService = moduleSecurityService;
         this.venteRepository = venteRepository;
@@ -78,6 +82,7 @@ public class ResourceBoutiqueSecurityService {
         this.calculRedevanceRepository = calculRedevanceRepository;
         this.regleRedevanceRepository = regleRedevanceRepository;
         this.ligneVenteRepository = ligneVenteRepository;
+        this.journalAuditRepository = journalAuditRepository;
     }
 
     public void assertBoutique(BoutiqueDTO boutique) {
@@ -133,6 +138,10 @@ public class ResourceBoutiqueSecurityService {
 
     public boolean canAccessRegleRedevance(Long id) {
         return isAllowed(() -> assertRegleRedevance(id));
+    }
+
+    public boolean canAccessJournalAudit(Long id) {
+        return isAllowed(() -> assertJournalAudit(id));
     }
 
     public void assertVente(Long id) {
@@ -194,6 +203,26 @@ public class ResourceBoutiqueSecurityService {
 
     public void assertRegleRedevance(Long id) {
         assertEntity(regleRedevanceRepository.findById(id), RegleRedevance::getBoutique);
+    }
+
+    /**
+     * Une entree d'audit sans boutique (connexion, parametrage global, ...) reste visible par
+     * l'auteur de l'action meme sans perimetre boutique global.
+     */
+    public void assertJournalAudit(Long id) {
+        JournalAudit journalAudit = journalAuditRepository.findById(id).orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED));
+        Boutique boutique = journalAudit.getBoutique();
+        if (boutique != null && boutique.getId() != null) {
+            moduleSecurityService.assertBoutiqueAccess(boutique.getId(), ACCESS_DENIED);
+            return;
+        }
+        if (
+            !moduleSecurityService.hasGlobalBoutiqueAccess() &&
+            (journalAudit.getUtilisateur() == null ||
+                !Objects.equals(journalAudit.getUtilisateur().getId(), moduleSecurityService.getCurrentUser().getId()))
+        ) {
+            throw new AccessDeniedException(ACCESS_DENIED);
+        }
     }
 
     private <T> void assertEntity(java.util.Optional<T> entity, Function<T, Boutique> boutiqueExtractor) {

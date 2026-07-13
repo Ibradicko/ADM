@@ -189,9 +189,9 @@
 
           @let emailRef = editForm.get('email')!;
           <div class="adm-form-field adm-form-field--half">
-            <label class="adm-form-field__label" for="field_email">{{
-              'admSupervisionVentesApp.locataire.form.emailLabel' | translate
-            }}</label>
+            <label class="adm-form-field__label" for="field_email">
+              {{ 'admSupervisionVentesApp.locataire.form.emailLabel' | translate }} <span class="adm-required">*</span>
+            </label>
             <input
               type="email"
               class="form-control"
@@ -203,7 +203,17 @@
               [placeholder]="'admSupervisionVentesApp.locataire.form.emailPlaceholder' | translate"
             />
             @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
-              <div class="invalid-feedback">{{ 'entity.validation.maxlength' | translate: { max: 120 } }}</div>
+              <div class="invalid-feedback">
+                @if (emailRef.errors?.['required']) {
+                  {{ 'entity.validation.required' | translate }}
+                }
+                @if (emailRef.errors?.['email']) {
+                  {{ 'global.messages.validate.email.invalid' | translate }}
+                }
+                @if (emailRef.errors?.['maxlength']) {
+                  {{ 'entity.validation.maxlength' | translate: { max: 120 } }}
+                }
+              </div>
             }
           </div>
         </div>

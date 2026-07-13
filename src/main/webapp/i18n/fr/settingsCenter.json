@@ -7,6 +7,8 @@
       "refresh": "Actualiser",
       "refreshing": "Actualisation...",
       "save": "Enregistrer",
+      "saveGlobal": "Enregistrer les paramètres",
+      "reset": "Réinitialiser",
       "add": "Ajouter",
       "enable": "Activer",
       "disable": "Désactiver",
@@ -31,7 +33,10 @@
       "businessProfiles": "Profils métier",
       "businessProfilesHint": "Rôles d’accès actifs",
       "activeAssignments": "Affectations actives",
-      "activeAssignmentsHint": "Utilisateurs rattachés aux boutiques"
+      "activeAssignmentsHint": "Utilisateurs rattachés aux boutiques",
+      "controlledActive": "{{active}} / {{total}} actifs dans le formulaire",
+      "freeParameters": "Paramètres libres",
+      "inactiveInDatabase": "{{count}} inactif(s) dans la base"
     },
     "fields": {
       "search": "Recherche",
@@ -62,10 +67,15 @@
       "email": "Email",
       "profile": "Profil",
       "startDate": "Date de début",
-      "endDate": "Date de fin"
+      "endDate": "Date de fin",
+      "code": "Code",
+      "value": "Valeur"
     },
     "sections": {
       "globalSettings": "Paramètres globaux",
+      "globalParameters": "Paramètres globaux",
+      "currentGlobalParameters": "Paramètres enregistrés",
+      "configurationState": "État de configuration",
       "generalRules": "Règles générales",
       "shopRules": "Règles par boutique",
       "paymentMethods": "Modes de paiement",
@@ -82,6 +92,9 @@
     },
     "hints": {
       "generalRules": "Ces valeurs s’appliquent par défaut à toute la plateforme lorsqu’une boutique n’a pas sa propre règle.",
+      "globalParameters": "Règles communes appliquées par défaut dans l’application.",
+      "currentGlobalParameters": "Valeurs actuellement enregistrées en base.",
+      "configurationState": "Contrôle rapide avant validation.",
       "shopRules": "Adaptez certains comportements à une boutique précise.",
       "paymentMethods": "Choisissez les moyens d’encaissement disponibles pour les ventes et les règlements de redevance.",
       "newPaymentMethod": "Ajoutez uniquement les modes réellement acceptés par les boutiques.",
@@ -110,14 +123,16 @@
       "noPermission": "Aucune permission",
       "noAssignment": "Aucune affectation trouvée.",
       "noPaymentMethod": "Aucun mode de paiement configuré pour le moment.",
-      "noBarcodeRule": "Aucune règle code-barres configurée pour le moment."
+      "noBarcodeRule": "Aucune règle code-barres configurée pour le moment.",
+      "noGlobalParameter": "Aucun paramètre global configuré pour le moment."
     },
     "readOnly": {
       "paymentMethods": "Vous êtes en lecture seule sur les moyens de paiement.",
       "barcodeRules": "Vous êtes en lecture seule sur le paramétrage code-barres.",
       "profiles": "Vous pouvez consulter les profils, mais pas modifier les habilitations.",
       "users": "Vous pouvez consulter vos affectations, mais pas créer d’utilisateur.",
-      "assignments": "Vous pouvez consulter vos affectations, mais pas en créer."
+      "assignments": "Vous pouvez consulter vos affectations, mais pas en créer.",
+      "global": "Vous êtes en lecture seule sur les paramètres globaux."
     },
     "help": {
       "shopName": "Nom commercial utilisé dans les ventes et rapports.",
@@ -127,7 +142,8 @@
       "login": "Identifiant obligatoire pour la connexion.",
       "managerScope": "Le manager ne voit que les boutiques de son périmètre.",
       "role": "Le rôle détermine les menus et actions autorisées.",
-      "userEmail": "Utilisé pour l’activation et la récupération du mot de passe."
+      "userEmail": "Utilisé pour l’activation et la récupération du mot de passe.",
+      "defaultValue": "Valeur par défaut : {{value}}"
     },
     "validation": { "maliPhone": "Le numéro au Mali doit contenir exactement 8 chiffres.", "invalidEmail": "Adresse email invalide." },
     "accessibility": { "settingsScope": "Portée des paramètres" },
@@ -202,7 +218,11 @@
       "activeStatusUpdated": "Le statut actif a été mis à jour.",
       "activeStatusUpdateFailed": "La mise à jour du statut actif a échoué.",
       "assignmentUpdated": "L’affectation a été mise à jour.",
-      "assignmentUpdateFailed": "La mise à jour de l’affectation a échoué."
+      "assignmentUpdateFailed": "La mise à jour de l’affectation a échoué.",
+      "globalSaved": "Les paramètres globaux ont été enregistrés.",
+      "globalSaveFailed": "Impossible d’enregistrer les paramètres globaux.",
+      "statusUpdated": "Le statut du paramètre a été mis à jour.",
+      "statusUpdateFailed": "Impossible de mettre à jour le statut du paramètre."
     }
   }
 }

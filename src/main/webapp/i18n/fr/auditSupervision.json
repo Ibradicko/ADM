@@ -1,93 +1,81 @@
 {
   "auditSupervision": {
-    "eyebrow": "Contrôle et traçabilité",
+    "eyebrow": "Contr\u00f4le et tra\u00e7abilit\u00e9",
     "title": "Audit et supervision",
-    "subtitle": "Journal des actions sensibles, alertes d’exploitation et signaux de contrôle.",
+    "subtitle": "Journal des actions sensibles et des traces de contr\u00f4le.",
     "actions": {
       "reporting": "Centre de reporting",
       "refresh": "Actualiser",
-      "refreshing": "Actualisation...",
-      "openModule": "Ouvrir le module",
-      "viewStock": "Voir le stock"
+      "refreshing": "Actualisation..."
     },
     "restricted": {
-      "title": "Accès limité",
-      "description": "Votre profil ne permet pas la consultation des données de supervision."
+      "title": "Acc\u00e8s limit\u00e9",
+      "description": "Votre profil ne permet pas la consultation des donn\u00e9es de supervision."
+    },
+    "scope": {
+      "tenant": "Vous consultez l'audit des boutiques de vos utilisateurs, en lecture seule.",
+      "admin": "Vue globale : tous les \u00e9v\u00e9nements d'audit, toutes boutiques confondues."
     },
     "kpis": {
-      "filteredEvents": "Événements filtrés",
-      "sensitiveEvents": "Événements sensibles",
-      "unknownScans": "Scans inconnus ouverts",
-      "stockAlerts": "Alertes stock",
-      "recentExports": "Exports récents",
-      "impactedShops": "Boutiques impactées"
+      "filteredEvents": "\u00c9v\u00e9nements filtr\u00e9s",
+      "sensitiveEvents": "\u00c9v\u00e9nements sensibles",
+      "recentExports": "Exports r\u00e9cents",
+      "impactedShops": "Boutiques impact\u00e9es"
     },
     "fields": {
       "shop": "Boutique",
       "action": "Action",
-      "startDate": "Date de début",
+      "startDate": "Date de d\u00e9but",
       "endDate": "Date de fin",
       "search": "Recherche",
       "date": "Date",
-      "entity": "Entité",
+      "entity": "Entit\u00e9",
       "user": "Utilisateur",
       "identifier": "Identifiant",
       "ipAddress": "Adresse IP",
       "description": "Description",
-      "scannedCode": "Code scanné",
-      "sourceScreen": "Écran d’origine",
-      "product": "Produit",
-      "quantity": "Quantité",
-      "threshold": "Seuil",
-      "reference": "Référence",
+      "reference": "R\u00e9f\u00e9rence",
       "type": "Type",
       "format": "Format"
     },
     "filters": {
       "allShops": "Toutes les boutiques",
+      "allMyShops": "Toutes mes boutiques",
       "allActions": "Toutes les actions",
-      "searchPlaceholder": "Action, entité, utilisateur, boutique..."
+      "searchPlaceholder": "Action, entit\u00e9, utilisateur, boutique..."
     },
     "sections": {
-      "auditLog": "Journal d’audit",
-      "eventDetail": "Détail de l’événement",
-      "unknownScans": "Scans inconnus à traiter",
-      "stockAndExports": "Alertes stock et exports récents"
+      "auditLog": "Journal d'audit",
+      "recentExports": "Exports r\u00e9cents"
     },
     "count": {
-      "events": "{{count}} événement(s) après filtrage.",
-      "unresolvedScans": "{{count}} scan(s) non résolu(s)."
+      "events": "{{count}} \u00e9v\u00e9nement(s) apr\u00e8s filtrage."
     },
     "hints": {
-      "eventDetail": "Lecture rapide d’une action pour audit ou contrôle.",
-      "selectEvent": "Sélectionnez une ligne du journal pour afficher son détail.",
-      "crossFunctionalView": "Vue de supervision transversale."
+      "recentExports": "Derniers fichiers g\u00e9n\u00e9r\u00e9s depuis le reporting."
     },
     "empty": {
-      "noEvent": "Aucun événement pour les filtres courants.",
-      "noDescription": "Aucune description détaillée.",
-      "noSelectedEvent": "Aucun événement sélectionné",
-      "noUnknownScan": "Aucun scan inconnu en attente.",
-      "noStockAlert": "Aucune alerte stock pour la sélection.",
-      "noRecentExport": "Aucun export récent."
+      "noEvent": "Aucun \u00e9v\u00e9nement pour les filtres courants.",
+      "noDescription": "Aucune description d\u00e9taill\u00e9e.",
+      "noRecentExport": "Aucun export r\u00e9cent."
     },
     "messages": {
-      "loadFailed": "Le chargement du module audit et supervision a échoué."
+      "loadFailed": "Le chargement du module audit et supervision a \u00e9chou\u00e9."
     },
     "actionTypes": {
       "CONNEXION": "Connexion",
-      "CREATION": "Création",
+      "CREATION": "Cr\u00e9ation",
       "MODIFICATION": "Modification",
-      "DESACTIVATION": "Désactivation",
+      "DESACTIVATION": "D\u00e9sactivation",
       "CHANGEMENT_PRIX": "Changement de prix",
       "CHANGEMENT_TAUX_REDEVANCE": "Changement du taux de redevance",
       "CHANGEMENT_CODE_BARRES": "Changement de code-barres",
-      "VENTE_VALIDEE": "Vente validée",
-      "VENTE_ANNULEE": "Vente annulée",
+      "VENTE_VALIDEE": "Vente valid\u00e9e",
+      "VENTE_ANNULEE": "Vente annul\u00e9e",
       "RETOUR_VENTE": "Retour de vente",
       "MOUVEMENT_STOCK": "Mouvement de stock",
       "INVENTAIRE": "Inventaire",
-      "PARAMETRAGE": "Paramétrage",
+      "PARAMETRAGE": "Param\u00e9trage",
       "EXPORT": "Export"
     }
   }

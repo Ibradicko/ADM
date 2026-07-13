@@ -30,9 +30,9 @@ public class BusinessAuthorizationService {
 
     private static final Set<String> MANAGEMENT_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM");
     private static final Set<String> USER_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE");
-    private static final Set<String> SALES_READ_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE", "VENDEUR");
-    private static final Set<String> SALES_MANAGE_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE", "VENDEUR");
-    private static final Set<String> STOCK_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE", "VENDEUR");
+    private static final Set<String> SALES_READ_PROFILE_CODES = Set.of("MANAGER_BOUTIQUE", "VENDEUR");
+    private static final Set<String> SALES_MANAGE_PROFILE_CODES = Set.of("MANAGER_BOUTIQUE", "VENDEUR");
+    private static final Set<String> STOCK_PROFILE_CODES = Set.of("MANAGER_BOUTIQUE", "VENDEUR");
     private static final Set<String> SUPERVISION_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE");
     private static final Set<String> ROYALTY_READ_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE", "VENDEUR");
     private static final Set<String> DASHBOARD_PROFILE_CODES = Set.of("ADMINISTRATEUR", "MANAGER_ADM", "MANAGER_BOUTIQUE", "VENDEUR");
@@ -126,14 +126,23 @@ public class BusinessAuthorizationService {
     }
 
     public boolean canReadSales() {
+        if (isAdmin() || hasActiveProfile("MANAGER_ADM")) {
+            return false;
+        }
         return hasProfileAndPermission(SALES_READ_PROFILE_CODES, BusinessPermissions.SALES_MANAGE, BusinessPermissions.SALES_READ);
     }
 
     public boolean canManageSales() {
+        if (isAdmin() || hasActiveProfile("MANAGER_ADM")) {
+            return false;
+        }
         return hasProfileAndPermission(SALES_MANAGE_PROFILE_CODES, BusinessPermissions.SALES_MANAGE);
     }
 
     public boolean canReadStock() {
+        if (isAdmin() || hasActiveProfile("MANAGER_ADM")) {
+            return false;
+        }
         return (
             hasProfileAndPermission(STOCK_PROFILE_CODES, BusinessPermissions.STOCK_MANAGE, BusinessPermissions.STOCK_READ) ||
             hasProfileAndPermission(Set.of("VENDEUR"), BusinessPermissions.SALES_MANAGE, BusinessPermissions.SALES_READ)
@@ -141,7 +150,10 @@ public class BusinessAuthorizationService {
     }
 
     public boolean canManageStock() {
-        return hasProfileAndPermission(Set.of("ADMINISTRATEUR", "MANAGER_BOUTIQUE"), BusinessPermissions.STOCK_MANAGE);
+        if (isAdmin() || hasActiveProfile("MANAGER_ADM")) {
+            return false;
+        }
+        return hasProfileAndPermission(Set.of("MANAGER_BOUTIQUE"), BusinessPermissions.STOCK_MANAGE);
     }
 
     public boolean canManageCatalogue() {

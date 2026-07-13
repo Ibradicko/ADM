@@ -20,11 +20,11 @@ export class RoyaltyReceiptPrinterService {
     const montantPaye = paiementsDuCalcul.reduce((total, item) => total + (item.montant ?? 0), 0);
     const reste = Math.max(0, (calcul.montantRedevance ?? 0) - montantPaye);
 
-    const t = (key: string, params?: Record<string, unknown>) => `${this.translateService.instant(key, params)}`;
-    const formatMontant = (valeur: number | null | undefined) =>
+    const t = (key: string, params?: Record<string, unknown>): string => `${this.translateService.instant(key, params)}`;
+    const formatMontant = (valeur: number | null | undefined): string =>
       typeof valeur === 'number' ? `${valeur.toLocaleString('fr-FR')} F CFA` : '--';
-    const formatDate = (valeur: dayjs.Dayjs | null | undefined, pattern = 'DD/MM/YYYY') => (valeur ? valeur.format(pattern) : '--');
-    const ligne = (label: string, valeur: string, accent = false) => `
+    const formatDate = (valeur: dayjs.Dayjs | null | undefined, pattern = 'DD/MM/YYYY'): string => (valeur ? valeur.format(pattern) : '--');
+    const ligne = (label: string, valeur: string, accent = false): string => `
       <tr class="${accent ? 'is-accent' : ''}">
         <td class="label">${this.echapperHtml(label)}</td>
         <td class="value">${this.echapperHtml(valeur)}</td>
@@ -230,7 +230,7 @@ export class RoyaltyReceiptPrinterService {
 </html>`;
 
     fenetre.document.open();
-    fenetre.document.write(contenu);
+    fenetre.document.documentElement.innerHTML = contenu;
     fenetre.document.close();
     fenetre.focus();
     setTimeout(() => fenetre.print(), 250);

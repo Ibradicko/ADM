@@ -7,11 +7,14 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import dayjs from 'dayjs/esm';
 import { finalize, map, switchMap } from 'rxjs/operators';
 
+import { DataUtils } from 'app/core/util/data-util.service';
 import { DATE_FORMAT } from 'app/config/input.constants';
+import { StatutGeneral } from 'app/entities/enumerations/statut-general.model';
 import { IExploitationBoutique, NewExploitationBoutique } from 'app/entities/exploitation-boutique/exploitation-boutique.model';
 import { ExploitationBoutiqueService } from 'app/entities/exploitation-boutique/service/exploitation-boutique.service';
 import { ILocataire } from 'app/entities/locataire/locataire.model';
 import { LocataireService } from 'app/entities/locataire/service/locataire.service';
+import { toBase64 } from 'app/shared/jhipster/data-utils';
 import { IBoutique } from '../boutique.model';
 
 @Component({
@@ -30,8 +33,13 @@ export class BoutiqueAssignDialog implements OnInit {
   readonly dateDebut = signal(dayjs().format(DATE_FORMAT));
   readonly dateFin = signal('');
   readonly tauxRedevanceDefaut = signal<number | null>(null);
+  readonly statut = signal<keyof typeof StatutGeneral>('ACTIF');
   readonly commentaire = signal('');
+  readonly documentContrat = signal<string | null>(null);
+  readonly documentContratContentType = signal<string | null>(null);
+  readonly documentContratNom = signal<string | null>(null);
   readonly messageErreur = signal<string | null>(null);
+  readonly statutGeneralValues = Object.values(StatutGeneral);
 
   readonly locatairesFiltres = computed(() => {
     const recherche = this.normaliser(this.recherche());
@@ -48,6 +56,7 @@ export class BoutiqueAssignDialog implements OnInit {
   protected readonly activeModal = inject(NgbActiveModal);
   protected readonly locataireService = inject(LocataireService);
   protected readonly exploitationBoutiqueService = inject(ExploitationBoutiqueService);
+  protected readonly dataUtils = inject(DataUtils);
 
   ngOnInit(): void {
     this.locataireService
@@ -63,6 +72,30 @@ export class BoutiqueAssignDialog implements OnInit {
   choisirLocataire(locataire: ILocataire): void {
     this.locataireSelectionne.set(locataire);
     this.recherche.set('');
+  }
+
+  definirStatut(statut: string): void {
+    this.statut.set(statut as keyof typeof StatutGeneral);
+  }
+
+  setDocumentContrat(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.documentContratNom.set(input.files?.[0]?.name ?? null);
+    const file = input.files?.[0];
+    if (!file) {
+      this.documentContrat.set(null);
+      this.documentContratContentType.set(null);
+      return;
+    }
+
+    toBase64(file, base64Data => {
+      this.documentContrat.set(base64Data);
+      this.documentContratContentType.set(file.type || 'application/octet-stream');
+    });
+  }
+
+  byteSize(base64String: string): string {
+    return this.dataUtils.byteSize(base64String);
   }
 
   assigner(): void {
@@ -84,8 +117,10 @@ export class BoutiqueAssignDialog implements OnInit {
       dateDebut: dayjs(this.dateDebut(), DATE_FORMAT),
       dateFin: this.dateFin().trim() ? dayjs(this.dateFin(), DATE_FORMAT) : null,
       tauxRedevanceDefaut: this.tauxRedevanceDefaut(),
-      statut: 'ACTIF',
+      statut: this.statut(),
       commentaire: this.commentaire().trim() || null,
+      documentContrat: this.documentContrat(),
+      documentContratContentType: this.documentContratContentType(),
       boutique,
       locataire,
     };
@@ -121,6 +156,9 @@ export class BoutiqueAssignDialog implements OnInit {
     }
     if (message.includes('tenantAdminProfileMissing')) {
       return 'Le profil MANAGER_BOUTIQUE est introuvable. Creez ce profil metier avant de continuer.';
+    }
+    if (message.includes('contractNumberExists')) {
+      return 'Ce numero de contrat est deja utilise par une autre exploitation.';
     }
     return "Impossible d'affecter ce locataire pour le moment. Verifiez les donnees puis reessayez.";
   }

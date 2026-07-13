@@ -6,9 +6,9 @@
         "loadError": "The dashboard could not be loaded correctly. Check the connection and the assigned permissions."
       },
       "hero": {
-        "eyebrow": "Business steering",
+        "eyebrow": "ADM steering",
         "title": "ADM dashboard",
-        "description": "Track sales, stock and royalties for the scope authorized by your profile.",
+        "description": "Track shops, tenants and royalties for the scope authorized by your profile.",
         "quickActions": "Quick actions"
       },
       "tenant": {
@@ -88,8 +88,10 @@
       "metrics": {
         "grossSales": "Gross turnover",
         "netSales": "Net turnover",
+        "royaltyTurnover": "Royalties turnover",
         "validatedSales": "Validated sales",
         "activeShops": "Active shops",
+        "activeTenants": "Active tenants",
         "pendingRoyalties": "Pending royalties"
       },
       "charts": {

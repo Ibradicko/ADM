@@ -1,8 +1,8 @@
-<section class="adm-page">
+<section class="adm-page adm-user-mgmt">
   <div class="adm-page-header" id="page-heading" data-cy="UserManagementHeading">
     <div>
       <h1>Administration des utilisateurs</h1>
-      <p>Gestion des acces, activations et comptes internes</p>
+      <p>Gestion des comptes manager ADM, activations et premieres connexions</p>
     </div>
 
     <div class="adm-page-header__actions">
@@ -12,7 +12,7 @@
       </button>
       <a class="adm-button adm-button--primary" [routerLink]="['./new']" data-cy="entityCreateButton">
         <fa-icon icon="plus" />
-        <span>Nouvel utilisateur</span>
+        <span>Nouveau manager ADM</span>
       </a>
     </div>
   </div>
@@ -22,8 +22,8 @@
 
   <div class="adm-stats-grid adm-stats-grid--compact">
     <article class="adm-stat-card">
-      <span>Total comptes</span>
-      <strong>{{ totalItems() || users().length }}</strong>
+      <span>Managers ADM</span>
+      <strong>{{ managerAdmCount() }}</strong>
     </article>
     <article class="adm-stat-card">
       <span>Comptes actifs</span>
@@ -34,15 +34,15 @@
       <strong>{{ inactiveCount() }}</strong>
     </article>
     <article class="adm-stat-card">
-      <span>Administrateurs</span>
-      <strong>{{ adminCount() }}</strong>
+      <span>Mot de passe</span>
+      <strong>Force</strong>
     </article>
   </div>
 
   <section class="adm-toolbar" aria-label="Filtres utilisateurs">
     <label class="adm-search adm-search--panel">
       <fa-icon icon="search" />
-      <input type="search" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Rechercher un utilisateur..." />
+      <input type="search" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Rechercher un manager ADM..." />
     </label>
 
     <div class="adm-toolbar__filters">
@@ -56,7 +56,7 @@
       </label>
 
       <label class="adm-field">
-        <span>Role</span>
+        <span>Role technique</span>
         <select class="adm-select" [ngModel]="selectedAuthority()" (ngModelChange)="selectedAuthority.set($event)">
           <option value="ALL">Tous les roles</option>
           @for (authority of availableAuthorities(); track authority) {
@@ -72,16 +72,16 @@
   <article class="adm-card adm-card--table">
     <div class="adm-card__header">
       <div>
-        <h2>Liste des utilisateurs</h2>
-        <p>Controle des comptes, profils et activation des acces</p>
+        <h2>Managers ADM</h2>
+        <p>Creation, modification et desactivation des comptes de supervision ADM</p>
       </div>
       <span class="adm-pill adm-pill--primary">{{ visibleUsers().length }} affiches</span>
     </div>
 
     @if (visibleUsers().length === 0) {
       <div class="adm-empty-state" id="no-result">
-        <strong>Aucun utilisateur ne correspond aux criteres selectionnes</strong>
-        <p>Ajoutez un compte ou ajustez les filtres pour retrouver un profil plus rapidement.</p>
+        <strong>Aucun manager ADM ne correspond aux criteres selectionnes</strong>
+        <p>Ajoutez un compte manager ADM ou ajustez les filtres.</p>
       </div>
     } @else {
       <div class="adm-table-wrapper">
@@ -183,7 +183,7 @@
     }
   </article>
 
-  @if (users().length > 0) {
+  @if (managerAdmUsers().length > 0) {
     <div class="adm-pagination">
       <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
 

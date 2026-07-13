@@ -32,6 +32,8 @@ public class LocataireDTO implements Serializable {
     @Size(max = 30)
     private String telephone;
 
+    @NotBlank
+    @Email
     @Size(max = 120)
     private String email;
 

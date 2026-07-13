@@ -2,23 +2,23 @@
   "auditSupervision": {
     "eyebrow": "Control and traceability",
     "title": "Audit and supervision",
-    "subtitle": "Sensitive action log, operational alerts and control signals.",
+    "subtitle": "Sensitive action log and control trail.",
     "actions": {
       "reporting": "Reporting center",
       "refresh": "Refresh",
-      "refreshing": "Refreshing...",
-      "openModule": "Open module",
-      "viewStock": "View stock"
+      "refreshing": "Refreshing..."
     },
     "restricted": {
       "title": "Limited access",
       "description": "Your profile cannot view supervision data."
     },
+    "scope": {
+      "tenant": "You are viewing the read-only audit log for users assigned to your shops.",
+      "admin": "Global view: every audit event, across all shops."
+    },
     "kpis": {
       "filteredEvents": "Filtered events",
       "sensitiveEvents": "Sensitive events",
-      "unknownScans": "Open unknown scans",
-      "stockAlerts": "Stock alerts",
       "recentExports": "Recent exports",
       "impactedShops": "Impacted shops"
     },
@@ -34,41 +34,29 @@
       "identifier": "Identifier",
       "ipAddress": "IP address",
       "description": "Description",
-      "scannedCode": "Scanned code",
-      "sourceScreen": "Source screen",
-      "product": "Product",
-      "quantity": "Quantity",
-      "threshold": "Threshold",
       "reference": "Reference",
       "type": "Type",
       "format": "Format"
     },
     "filters": {
       "allShops": "All shops",
+      "allMyShops": "All my shops",
       "allActions": "All actions",
       "searchPlaceholder": "Action, entity, user, shop..."
     },
     "sections": {
       "auditLog": "Audit log",
-      "eventDetail": "Event details",
-      "unknownScans": "Unknown scans to process",
-      "stockAndExports": "Stock alerts and recent exports"
+      "recentExports": "Recent exports"
     },
     "count": {
-      "events": "{{count}} event(s) after filtering.",
-      "unresolvedScans": "{{count}} unresolved scan(s)."
+      "events": "{{count}} event(s) after filtering."
     },
     "hints": {
-      "eventDetail": "Quick view of an action for audit or control.",
-      "selectEvent": "Select a log row to display its details.",
-      "crossFunctionalView": "Cross-functional supervision view."
+      "recentExports": "Latest files generated from reporting."
     },
     "empty": {
       "noEvent": "No event for the current filters.",
       "noDescription": "No detailed description.",
-      "noSelectedEvent": "No event selected",
-      "noUnknownScan": "No unknown scan awaiting processing.",
-      "noStockAlert": "No stock alert for the selection.",
       "noRecentExport": "No recent export."
     },
     "messages": {

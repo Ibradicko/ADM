@@ -9,12 +9,8 @@ import { Subject, from, of } from 'rxjs';
 
 import { IBoutique } from 'app/entities/boutique/boutique.model';
 import { BoutiqueService } from 'app/entities/boutique/service/boutique.service';
-import { IFamilleArticle } from 'app/entities/famille-article/famille-article.model';
-import { FamilleArticleService } from 'app/entities/famille-article/service/famille-article.service';
 import { IGroupeArticle } from 'app/entities/groupe-article/groupe-article.model';
 import { GroupeArticleService } from 'app/entities/groupe-article/service/groupe-article.service';
-import { SousFamilleArticleService } from 'app/entities/sous-famille-article/service/sous-famille-article.service';
-import { ISousFamilleArticle } from 'app/entities/sous-famille-article/sous-famille-article.model';
 import { UniteMesureService } from 'app/entities/unite-mesure/service/unite-mesure.service';
 import { IUniteMesure } from 'app/entities/unite-mesure/unite-mesure.model';
 import { IProduit } from '../produit.model';
@@ -31,8 +27,6 @@ describe('Produit Management Update Component', () => {
   let produitService: ProduitService;
   let boutiqueService: BoutiqueService;
   let groupeArticleService: GroupeArticleService;
-  let familleArticleService: FamilleArticleService;
-  let sousFamilleArticleService: SousFamilleArticleService;
   let uniteMesureService: UniteMesureService;
 
   beforeEach(() => {
@@ -55,8 +49,6 @@ describe('Produit Management Update Component', () => {
     produitService = TestBed.inject(ProduitService);
     boutiqueService = TestBed.inject(BoutiqueService);
     groupeArticleService = TestBed.inject(GroupeArticleService);
-    familleArticleService = TestBed.inject(FamilleArticleService);
-    sousFamilleArticleService = TestBed.inject(SousFamilleArticleService);
     uniteMesureService = TestBed.inject(UniteMesureService);
 
     comp = fixture.componentInstance;
@@ -107,50 +99,6 @@ describe('Produit Management Update Component', () => {
       expect(comp.groupeArticlesSharedCollection()).toEqual(expectedCollection);
     });
 
-    it('should call FamilleArticle query and add missing value', () => {
-      const produit: IProduit = { id: 21239 };
-      const familleArticle: IFamilleArticle = { id: 29368 };
-      produit.familleArticle = familleArticle;
-
-      const familleArticleCollection: IFamilleArticle[] = [{ id: 29368 }];
-      vitest.spyOn(familleArticleService, 'query').mockReturnValue(of(new HttpResponse({ body: familleArticleCollection })));
-      const additionalFamilleArticles = [familleArticle];
-      const expectedCollection: IFamilleArticle[] = [...additionalFamilleArticles, ...familleArticleCollection];
-      vitest.spyOn(familleArticleService, 'addFamilleArticleToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ produit });
-      comp.ngOnInit();
-
-      expect(familleArticleService.query).toHaveBeenCalled();
-      expect(familleArticleService.addFamilleArticleToCollectionIfMissing).toHaveBeenCalledWith(
-        familleArticleCollection,
-        ...additionalFamilleArticles.map(i => expect.objectContaining(i) as typeof i),
-      );
-      expect(comp.familleArticlesSharedCollection()).toEqual(expectedCollection);
-    });
-
-    it('should call SousFamilleArticle query and add missing value', () => {
-      const produit: IProduit = { id: 21239 };
-      const sousFamilleArticle: ISousFamilleArticle = { id: 30207 };
-      produit.sousFamilleArticle = sousFamilleArticle;
-
-      const sousFamilleArticleCollection: ISousFamilleArticle[] = [{ id: 30207 }];
-      vitest.spyOn(sousFamilleArticleService, 'query').mockReturnValue(of(new HttpResponse({ body: sousFamilleArticleCollection })));
-      const additionalSousFamilleArticles = [sousFamilleArticle];
-      const expectedCollection: ISousFamilleArticle[] = [...additionalSousFamilleArticles, ...sousFamilleArticleCollection];
-      vitest.spyOn(sousFamilleArticleService, 'addSousFamilleArticleToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ produit });
-      comp.ngOnInit();
-
-      expect(sousFamilleArticleService.query).toHaveBeenCalled();
-      expect(sousFamilleArticleService.addSousFamilleArticleToCollectionIfMissing).toHaveBeenCalledWith(
-        sousFamilleArticleCollection,
-        ...additionalSousFamilleArticles.map(i => expect.objectContaining(i) as typeof i),
-      );
-      expect(comp.sousFamilleArticlesSharedCollection()).toEqual(expectedCollection);
-    });
-
     it('should call UniteMesure query and add missing value', () => {
       const produit: IProduit = { id: 21239 };
       const uniteMesure: IUniteMesure = { id: 4120 };
@@ -179,10 +127,6 @@ describe('Produit Management Update Component', () => {
       produit.boutique = boutique;
       const groupeArticle: IGroupeArticle = { id: 2930 };
       produit.groupeArticle = groupeArticle;
-      const familleArticle: IFamilleArticle = { id: 29368 };
-      produit.familleArticle = familleArticle;
-      const sousFamilleArticle: ISousFamilleArticle = { id: 30207 };
-      produit.sousFamilleArticle = sousFamilleArticle;
       const uniteMesure: IUniteMesure = { id: 4120 };
       produit.uniteMesure = uniteMesure;
 
@@ -191,8 +135,6 @@ describe('Produit Management Update Component', () => {
 
       expect(comp.boutiquesSharedCollection()).toContainEqual(boutique);
       expect(comp.groupeArticlesSharedCollection()).toContainEqual(groupeArticle);
-      expect(comp.familleArticlesSharedCollection()).toContainEqual(familleArticle);
-      expect(comp.sousFamilleArticlesSharedCollection()).toContainEqual(sousFamilleArticle);
       expect(comp.uniteMesuresSharedCollection()).toContainEqual(uniteMesure);
       expect(comp.produit).toEqual(produit);
     });
@@ -284,26 +226,6 @@ describe('Produit Management Update Component', () => {
         vitest.spyOn(groupeArticleService, 'compareGroupeArticle');
         comp.compareGroupeArticle(entity, entity2);
         expect(groupeArticleService.compareGroupeArticle).toHaveBeenCalledWith(entity, entity2);
-      });
-    });
-
-    describe('compareFamilleArticle', () => {
-      it('should forward to familleArticleService', () => {
-        const entity = { id: 29368 };
-        const entity2 = { id: 14702 };
-        vitest.spyOn(familleArticleService, 'compareFamilleArticle');
-        comp.compareFamilleArticle(entity, entity2);
-        expect(familleArticleService.compareFamilleArticle).toHaveBeenCalledWith(entity, entity2);
-      });
-    });
-
-    describe('compareSousFamilleArticle', () => {
-      it('should forward to sousFamilleArticleService', () => {
-        const entity = { id: 30207 };
-        const entity2 = { id: 5132 };
-        vitest.spyOn(sousFamilleArticleService, 'compareSousFamilleArticle');
-        comp.compareSousFamilleArticle(entity, entity2);
-        expect(sousFamilleArticleService.compareSousFamilleArticle).toHaveBeenCalledWith(entity, entity2);
       });
     });
 

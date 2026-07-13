@@ -1,23 +1,24 @@
 import dayjs from 'dayjs/esm';
 
+import { NgClass } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 import { firstValueFrom } from 'rxjs';
 
 import { UiPermissionService } from 'app/core/services/ui-permission.service';
 import { TranslateDirective } from 'app/shared/language';
-import { AdmDashboardReportingService, DashboardStockAlertResponse } from 'app/core/services/adm-dashboard-reporting.service';
+import { AffectationUtilisateurService } from 'app/entities/affectation-utilisateur/service/affectation-utilisateur.service';
 import { IBoutique } from 'app/entities/boutique/boutique.model';
 import { BoutiqueService } from 'app/entities/boutique/service/boutique.service';
 import { IJournalAudit } from 'app/entities/journal-audit/journal-audit.model';
 import { JournalAuditService } from 'app/entities/journal-audit/service/journal-audit.service';
 import { IRapportExport } from 'app/entities/rapport-export/rapport-export.model';
 import { RapportExportService } from 'app/entities/rapport-export/service/rapport-export.service';
-import { IScanInconnu } from 'app/entities/scan-inconnu/scan-inconnu.model';
-import { ScanInconnuService } from 'app/entities/scan-inconnu/service/scan-inconnu.service';
 
 interface MessageAudit {
   type: 'success' | 'danger' | 'info';
@@ -35,19 +36,22 @@ const ACTIONS_SENSIBLES = new Set([
   'EXPORT',
 ]);
 
+const ACTIONS_SUCCES = new Set(['CONNEXION', 'CREATION', 'VENTE_VALIDEE']);
+const ACTIONS_DANGER = new Set(['DESACTIVATION', 'VENTE_ANNULEE']);
+const ACTIONS_AVERTISSEMENT = new Set(['DECONNEXION', 'RETOUR_VENTE']);
+
 @Component({
   selector: 'jhi-audit-supervision',
   templateUrl: './audit-supervision.html',
-  imports: [FormsModule, RouterLink, TranslateDirective, TranslateModule],
+  styleUrl: './audit-supervision.scss',
+  imports: [NgClass, FormsModule, RouterLink, TranslateDirective, TranslateModule, FontAwesomeModule],
 })
 export default class AuditSupervisionComponent implements OnInit {
   readonly permissionsUi = inject(UiPermissionService);
 
   readonly boutiques = signal<IBoutique[]>([]);
   readonly journaux = signal<IJournalAudit[]>([]);
-  readonly scansInconnus = signal<IScanInconnu[]>([]);
   readonly exportsRecents = signal<IRapportExport[]>([]);
-  readonly alertesStock = signal<DashboardStockAlertResponse[]>([]);
   readonly chargement = signal(false);
   readonly message = signal<MessageAudit | null>(null);
 
@@ -56,7 +60,9 @@ export default class AuditSupervisionComponent implements OnInit {
   readonly dateDebut = signal<string>(dayjs().subtract(7, 'day').format('YYYY-MM-DD'));
   readonly dateFin = signal<string>(dayjs().format('YYYY-MM-DD'));
   readonly recherche = signal('');
-  readonly auditSelectionneId = signal<number | null>(null);
+
+  /** Locataire : perimetre restreint aux boutiques de ses utilisateurs (lecture seule). Admin et manager ADM : vue globale. */
+  readonly estVueLocataire = computed(() => this.permissionsUi.estLocataire());
 
   readonly typesActions = [
     'CONNEXION',
@@ -112,14 +118,8 @@ export default class AuditSupervisionComponent implements OnInit {
       return haystack.includes(texte);
     });
   });
-  readonly auditSelectionne = computed(
-    () => this.journaux().find(evenement => evenement.id === this.auditSelectionneId()) ?? this.journauxFiltres()[0] ?? null,
-  );
   readonly evenementsSensibles = computed(() =>
     this.journauxFiltres().filter(evenement => ACTIONS_SENSIBLES.has(evenement.typeAction ?? '')),
-  );
-  readonly scansNonResolus = computed(() =>
-    this.scansInconnus().filter(scan => !scan.resolu && (!this.boutiqueId() || scan.boutique?.id === this.boutiqueId())),
   );
   readonly boutiquesImpactees = computed(
     () =>
@@ -132,17 +132,14 @@ export default class AuditSupervisionComponent implements OnInit {
   readonly resume = computed(() => ({
     totalEvenements: this.journauxFiltres().length,
     totalSensibles: this.evenementsSensibles().length,
-    scansNonResolus: this.scansNonResolus().length,
-    alertesStock: this.alertesStock().length,
     exportsRecents: this.exportsRecents().length,
     boutiquesImpactees: this.boutiquesImpactees(),
   }));
 
   private readonly boutiqueService = inject(BoutiqueService);
+  private readonly affectationUtilisateurService = inject(AffectationUtilisateurService);
   private readonly journalAuditService = inject(JournalAuditService);
-  private readonly scanInconnuService = inject(ScanInconnuService);
   private readonly rapportExportService = inject(RapportExportService);
-  private readonly dashboardReportingService = inject(AdmDashboardReportingService);
 
   ngOnInit(): void {
     void this.recharger();
@@ -152,8 +149,25 @@ export default class AuditSupervisionComponent implements OnInit {
     return valeur ? valeur.format('DD/MM/YYYY HH:mm') : '--';
   }
 
-  selectionnerAudit(id: number): void {
-    this.auditSelectionneId.set(id);
+  classePourAction(typeAction: string | null | undefined): string {
+    const action = typeAction ?? '';
+    if (ACTIONS_DANGER.has(action)) {
+      return 'audit-pill--danger';
+    }
+    if (ACTIONS_AVERTISSEMENT.has(action)) {
+      return 'audit-pill--warning';
+    }
+    if (ACTIONS_SUCCES.has(action)) {
+      return 'audit-pill--success';
+    }
+    if (ACTIONS_SENSIBLES.has(action)) {
+      return 'audit-pill--info';
+    }
+    return 'audit-pill--neutral';
+  }
+
+  estActionSensible(typeAction: string | null | undefined): boolean {
+    return ACTIONS_SENSIBLES.has(typeAction ?? '');
   }
 
   async recharger(): Promise<void> {
@@ -161,35 +175,37 @@ export default class AuditSupervisionComponent implements OnInit {
     this.message.set(null);
 
     try {
-      const scansRequest = this.permissionsUi.peutLireStock()
-        ? this.queryOptionnelle(() => firstValueFrom(this.scanInconnuService.query({ size: 200, sort: ['dateScan,desc'] })))
-        : Promise.resolve(null);
       const exportsRequest = this.permissionsUi.peutExporterReporting()
         ? this.queryOptionnelle(() => firstValueFrom(this.rapportExportService.query({ size: 20, sort: ['dateGeneration,desc'] })))
         : Promise.resolve(null);
-      const alertesStockRequest = this.permissionsUi.peutLireStock()
-        ? this.queryOptionnelle(() =>
-            firstValueFrom(
-              this.dashboardReportingService.getStockAlerts({
-                boutiqueId: this.boutiqueId() ?? undefined,
-              }),
-            ),
-          )
-        : Promise.resolve<DashboardStockAlertResponse[] | null>(null);
 
-      const [boutiquesResponse, journauxResponse, scansResponse, exportsResponse, alertesStock] = await Promise.all([
-        this.queryOptionnelle(() => firstValueFrom(this.boutiqueService.query({ size: 500, sort: ['nom,asc'] }))),
-        firstValueFrom(this.journalAuditService.query({ size: 500, sort: ['dateAction,desc'] })),
-        scansRequest,
+      const perimetreLocataire = this.estVueLocataire() ? this.permissionsUi.boutiqueIds() : null;
+      const utilisateursLocataire = perimetreLocataire ? await this.chargerUtilisateurIdsLocataire(perimetreLocataire) : null;
+      const boutiqueQueryParams = perimetreLocataire
+        ? perimetreLocataire.length
+          ? { size: 500, sort: ['nom,asc'], 'id.in': perimetreLocataire.join(',') }
+          : { size: 500, sort: ['nom,asc'], 'id.equals': -1 }
+        : { size: 500, sort: ['nom,asc'] };
+      const journalQueryParams = perimetreLocataire
+        ? perimetreLocataire.length
+          ? {
+              size: 500,
+              sort: ['dateAction,desc'],
+              'boutiqueId.in': perimetreLocataire.join(','),
+              'utilisateurId.in': utilisateursLocataire?.length ? utilisateursLocataire.join(',') : '-1',
+            }
+          : { size: 500, sort: ['dateAction,desc'], 'boutiqueId.equals': -1 }
+        : { size: 500, sort: ['dateAction,desc'] };
+
+      const [boutiquesResponse, journauxResponse, exportsResponse] = await Promise.all([
+        this.queryOptionnelle(() => firstValueFrom(this.boutiqueService.query(boutiqueQueryParams))),
+        firstValueFrom(this.journalAuditService.query(journalQueryParams)),
         exportsRequest,
-        alertesStockRequest,
       ]);
 
       this.boutiques.set(boutiquesResponse?.body ?? []);
       this.journaux.set(journauxResponse.body ?? []);
-      this.scansInconnus.set(scansResponse?.body ?? []);
       this.exportsRecents.set(exportsResponse?.body ?? []);
-      this.alertesStock.set(alertesStock ?? []);
     } catch {
       this.message.set({
         type: 'danger',
@@ -206,5 +222,26 @@ export default class AuditSupervisionComponent implements OnInit {
     } catch {
       return null;
     }
+  }
+
+  private async chargerUtilisateurIdsLocataire(boutiqueIds: number[]): Promise<number[]> {
+    if (!boutiqueIds.length) {
+      return [];
+    }
+
+    const affectationsResponse = await this.queryOptionnelle(() =>
+      firstValueFrom(
+        this.affectationUtilisateurService.query({
+          size: 500,
+          sort: ['user.login,asc'],
+          'actif.equals': true,
+          'boutiqueId.in': boutiqueIds.join(','),
+        }),
+      ),
+    );
+
+    return Array.from(
+      new Set((affectationsResponse?.body ?? []).map(affectation => affectation.user?.id).filter((id): id is number => !!id)),
+    );
   }
 }

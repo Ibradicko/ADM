@@ -28,6 +28,7 @@ import { BoutiqueService } from '../service/boutique.service';
 @Component({
   selector: 'jhi-boutique',
   templateUrl: './boutique.html',
+  styleUrl: './boutique.scss',
   imports: [
     RouterLink,
     FormsModule,
@@ -52,22 +53,22 @@ export class Boutique implements OnInit {
     const selectedType = this.selectedType();
     const selectedStatus = this.selectedStatus();
 
-    return this.boutiques().filter(boutique => {
-      const matchesSearch =
-        !searchTerm ||
-        [boutique.code, boutique.nom, boutique.emplacement, boutique.telephone]
-          .filter(Boolean)
-          .some(value => value!.toLowerCase().includes(searchTerm));
-      const matchesType = selectedType === 'ALL' || boutique.type === selectedType;
-      const matchesStatus = selectedStatus === 'ALL' || boutique.statut === selectedStatus;
+    const exploitationsActives = this.activeExploitationByBoutiqueId();
 
-      return matchesSearch && matchesType && matchesStatus;
-    });
+    return this.boutiques()
+      .filter(boutique => {
+        const matchesSearch =
+          !searchTerm ||
+          [boutique.code, boutique.nom, boutique.emplacement, boutique.telephone]
+            .filter(Boolean)
+            .some(value => value!.toLowerCase().includes(searchTerm));
+        const matchesType = selectedType === 'ALL' || boutique.type === selectedType;
+        const matchesStatus = selectedStatus === 'ALL' || boutique.statut === selectedStatus;
+
+        return matchesSearch && matchesType && matchesStatus;
+      })
+      .sort((a, b) => Number(exploitationsActives.has(b.id)) - Number(exploitationsActives.has(a.id)));
   });
-  readonly activeCount = computed(() => this.boutiques().filter(boutique => boutique.statut === 'ACTIF').length);
-  readonly dutyFreeCount = computed(() => this.boutiques().filter(boutique => boutique.type === 'DUTY_FREE').length);
-  readonly serviceCount = computed(() => this.boutiques().filter(boutique => boutique.type === 'SERVICE').length);
-
   readonly activeExploitations = signal<IExploitationBoutique[]>([]);
   readonly activeExploitationByBoutiqueId = computed(() => {
     const exploitationsByBoutiqueId = new Map<number, IExploitationBoutique>();
@@ -78,6 +79,11 @@ export class Boutique implements OnInit {
     }
     return exploitationsByBoutiqueId;
   });
+  readonly assignedCount = computed(
+    () => this.boutiques().filter(boutique => this.activeExploitationByBoutiqueId().has(boutique.id)).length,
+  );
+  readonly unassignedCount = computed(() => Math.max(0, this.boutiques().length - this.assignedCount()));
+  readonly inactiveCount = computed(() => this.boutiques().filter(boutique => boutique.statut !== 'ACTIF').length);
 
   sortState = sortStateSignal({});
   filters: IFilterOptions = new FilterOptions();

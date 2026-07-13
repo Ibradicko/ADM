@@ -6,9 +6,9 @@
         "loadError": "Le dashboard n'a pas pu etre charge correctement. Verifiez la connexion et les droits associes."
       },
       "hero": {
-        "eyebrow": "Pilotage commercial",
+        "eyebrow": "Pilotage ADM",
         "title": "Tableau de bord ADM",
-        "description": "Suivez les ventes, les stocks et les redevances sur le perimetre autorise pour votre profil.",
+        "description": "Suivez les boutiques, les locataires et les redevances sur le perimetre autorise pour votre profil.",
         "quickActions": "Actions rapides"
       },
       "tenant": {
@@ -88,8 +88,10 @@
       "metrics": {
         "grossSales": "Chiffre d'affaires brut",
         "netSales": "Chiffre d'affaires net",
+        "royaltyTurnover": "CA redevances",
         "validatedSales": "Ventes validees",
         "activeShops": "Boutiques actives",
+        "activeTenants": "Locataires actifs",
         "pendingRoyalties": "Redevances en attente"
       },
       "charts": {

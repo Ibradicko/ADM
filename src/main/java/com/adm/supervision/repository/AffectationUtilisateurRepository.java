@@ -4,6 +4,7 @@ import com.adm.supervision.domain.AffectationUtilisateur;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -86,4 +87,16 @@ public interface AffectationUtilisateurRepository
         @Param("login") String login,
         @Param("currentDate") LocalDate currentDate
     );
+
+    @Query(
+        """
+        select distinct affectationUtilisateur.user.id
+        from AffectationUtilisateur affectationUtilisateur
+        where affectationUtilisateur.actif = true
+            and affectationUtilisateur.boutique.id in :boutiqueIds
+            and affectationUtilisateur.dateDebut <= :currentDate
+            and (affectationUtilisateur.dateFin is null or affectationUtilisateur.dateFin >= :currentDate)
+        """
+    )
+    Set<Long> findActiveUserIdsByBoutiqueIds(@Param("boutiqueIds") Set<Long> boutiqueIds, @Param("currentDate") LocalDate currentDate);
 }
