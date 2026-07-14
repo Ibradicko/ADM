@@ -89,6 +89,8 @@ out/
 *.war
 *.ear
 *.db
+*.tar
+.env
 
 ######################
 # Windows

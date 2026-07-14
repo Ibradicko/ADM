@@ -1,0 +1,38 @@
+services:
+  adm-postgresql:
+    image: postgres:17.4
+    container_name: adm-postgresql
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - adm_postgresql_data:/var/lib/postgresql/data
+    networks:
+      - adm-network
+    restart: unless-stopped
+
+  adm-app:
+    image: ${APP_IMAGE}
+    container_name: adm-supervision-ventes
+    depends_on:
+      - adm-postgresql
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET: ${JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET}
+      SERVER_PORT: ${SERVER_PORT}
+    ports:
+      - '${ADM_PUBLIC_PORT}:8080'
+    networks:
+      - adm-network
+    restart: unless-stopped
+
+volumes:
+  adm_postgresql_data:
+
+networks:
+  adm-network:
+    driver: bridge
