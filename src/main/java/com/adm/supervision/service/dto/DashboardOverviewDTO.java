@@ -11,6 +11,8 @@ public class DashboardOverviewDTO {
     private long stockAlertCount;
     private long unresolvedUnknownScans;
     private BigDecimal royaltyOutstandingAmount;
+    private BigDecimal royaltyTotalAmount;
+    private BigDecimal royaltyPaidAmount;
 
     public BigDecimal getGrossSales() {
         return grossSales;
@@ -66,5 +68,21 @@ public class DashboardOverviewDTO {
 
     public void setRoyaltyOutstandingAmount(BigDecimal royaltyOutstandingAmount) {
         this.royaltyOutstandingAmount = royaltyOutstandingAmount;
+    }
+
+    public BigDecimal getRoyaltyTotalAmount() {
+        return royaltyTotalAmount;
+    }
+
+    public void setRoyaltyTotalAmount(BigDecimal royaltyTotalAmount) {
+        this.royaltyTotalAmount = royaltyTotalAmount;
+    }
+
+    public BigDecimal getRoyaltyPaidAmount() {
+        return royaltyPaidAmount;
+    }
+
+    public void setRoyaltyPaidAmount(BigDecimal royaltyPaidAmount) {
+        this.royaltyPaidAmount = royaltyPaidAmount;
     }
 }

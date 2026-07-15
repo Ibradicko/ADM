@@ -408,6 +408,8 @@ public class VenteService {
         dto.setCodeInterne(produit.getCodeInterne());
         dto.setDesignation(produit.getDesignation());
         dto.setDescription(produit.getDescription());
+        dto.setImage(produit.getImage());
+        dto.setImageContentType(produit.getImageContentType());
         dto.setPrixVente(produit.getPrixVente());
         if (produit.getGroupeArticle() != null) {
             dto.setGroupeArticleId(produit.getGroupeArticle().getId());

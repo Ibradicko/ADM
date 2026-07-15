@@ -75,6 +75,8 @@ export interface CaissePosteArticle {
   codeInterne?: string | null;
   designation?: string | null;
   description?: string | null;
+  image?: string | null;
+  imageContentType?: string | null;
   prixVente?: number | null;
   groupeArticleId?: number | null;
   groupeArticleLibelle?: string | null;

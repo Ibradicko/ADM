@@ -112,5 +112,6 @@
     <include file="config/liquibase/changelog/20260701120000_add_groupe_article_taux_redevance.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260702150000_grant_royalty_read_vendeur.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260708122000_add_unique_numero_contrat_exploitation_boutique.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260715150000_add_image_to_produit.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

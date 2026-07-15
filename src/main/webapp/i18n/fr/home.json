@@ -88,11 +88,13 @@
       "metrics": {
         "grossSales": "Chiffre d'affaires brut",
         "netSales": "Chiffre d'affaires net",
-        "royaltyTurnover": "CA redevances",
+        "royaltyTurnover": "CA",
         "validatedSales": "Ventes validees",
         "activeShops": "Boutiques actives",
         "activeTenants": "Locataires actifs",
-        "pendingRoyalties": "Redevances en attente"
+        "pendingRoyalties": "Redevances en attente",
+        "totalRoyalties": "Redevance total",
+        "paidRoyalties": "Redevance payé"
       },
       "charts": {
         "netSalesEvolution": {

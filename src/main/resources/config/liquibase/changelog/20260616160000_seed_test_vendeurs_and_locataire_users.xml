@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
 
-    <changeSet id="20260616160000-1" author="adm">
+    <changeSet id="20260616160000-1" author="adm" context="dev">
         <comment>Seed vendeur accounts and link locataire user accounts for recette testing.</comment>
         <sql>
             -- Vendeur accounts (password: admin)

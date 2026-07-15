@@ -35,6 +35,8 @@ type ProduitFormGroupContent = {
   codeInterne: FormControl<ProduitFormRawValue['codeInterne']>;
   designation: FormControl<ProduitFormRawValue['designation']>;
   description: FormControl<ProduitFormRawValue['description']>;
+  image: FormControl<ProduitFormRawValue['image']>;
+  imageContentType: FormControl<ProduitFormRawValue['imageContentType']>;
   typePrix: FormControl<ProduitFormRawValue['typePrix']>;
   prixVente: FormControl<ProduitFormRawValue['prixVente']>;
   tauxRedevanceApplicable: FormControl<ProduitFormRawValue['tauxRedevanceApplicable']>;
@@ -71,6 +73,8 @@ export class ProduitFormService {
         validators: [Validators.required, Validators.maxLength(200)],
       }),
       description: new FormControl(produitRawValue.description),
+      image: new FormControl(produitRawValue.image),
+      imageContentType: new FormControl(produitRawValue.imageContentType),
       typePrix: new FormControl(produitRawValue.typePrix, {
         validators: [Validators.required],
       }),

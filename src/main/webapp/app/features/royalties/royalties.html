@@ -100,10 +100,6 @@
         <span class="adm-kpi-card__label"><fa-icon icon="check-circle" /> {{ 'royalties.kpis.paymentsReceived' | translate }}</span>
         <strong>{{ formatMontant(resume().montantPaye) }}</strong>
       </article>
-      <article class="adm-kpi-card royalties-kpi-card">
-        <span class="adm-kpi-card__label"><fa-icon icon="file-alt" /> {{ 'royalties.kpis.adjustments' | translate }}</span>
-        <strong>{{ formatMontant(resume().montantRegularise) }}</strong>
-      </article>
       <article class="adm-kpi-card royalties-kpi-card royalties-kpi-card--balance">
         <span class="adm-kpi-card__label"
           ><fa-icon icon="exclamation-triangle" /> {{ 'royalties.kpis.outstandingBalance' | translate }}</span

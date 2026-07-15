@@ -215,6 +215,10 @@ export default class Caisse implements OnInit {
     return valeur?.trim() ? valeur : '--';
   }
 
+  imageArticleSrc(article: CaissePosteArticle): string | null {
+    return article.image && article.imageContentType ? `data:${article.imageContentType};base64,${article.image}` : null;
+  }
+
   selectionnerBoutique(boutiqueId: number | null): void {
     if (!boutiqueId || boutiqueId === this.boutique()?.id) {
       return;

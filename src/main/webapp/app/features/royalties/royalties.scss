@@ -257,7 +257,7 @@
 
 .royalties-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   align-items: stretch;
   margin: 1rem 0;
@@ -265,7 +265,6 @@
 
 .royalties-kpi-card {
   position: relative;
-  grid-column: span 4;
   min-height: 9rem;
   overflow: hidden;
   justify-content: space-between;
@@ -279,14 +278,6 @@
     transform 0.18s ease,
     box-shadow 0.18s ease,
     border-color 0.18s ease;
-}
-
-.royalties-kpi-card:nth-child(4) {
-  grid-column: 3 / span 4;
-}
-
-.royalties-kpi-card:nth-child(5) {
-  grid-column: 7 / span 4;
 }
 
 .royalties-kpi-card::after {
@@ -860,12 +851,6 @@ input.is-invalid {
 
   .royalties-kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .royalties-kpi-card,
-  .royalties-kpi-card:nth-child(4),
-  .royalties-kpi-card:nth-child(5) {
-    grid-column: auto;
   }
 
   .royalty-payment-columns {

@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
 
-    <changeSet id="20260611110000-1" author="codex">
+    <changeSet id="20260611110000-1" author="codex" context="dev">
         <comment>Seed separated Alpha/Beta business data to validate boutique scoping.</comment>
         <sql>
             INSERT INTO locataire (id, code, nom, type_locataire, numero_identification, telephone, email, adresse, statut, date_creation) VALUES

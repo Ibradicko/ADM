@@ -167,9 +167,10 @@ public class LocataireService {
         // Réutiliser le compte existant si même email
         Optional<User> existingByEmail = userRepository.findOneByEmailIgnoreCase(email);
         if (existingByEmail.isPresent()) {
-            locataire.setUser(existingByEmail.get());
-            LOG.info("Compte existant réutilisé pour locataire '{}': login='{}'", locataire.getCode(), existingByEmail.get().getLogin());
-            return existingByEmail.get().getLogin();
+            User user = existingByEmail.orElseThrow();
+            locataire.setUser(user);
+            LOG.info("Compte existant réutilisé pour locataire '{}': login='{}'", locataire.getCode(), user.getLogin());
+            return user.getLogin();
         }
 
         AdminUserDTO userDTO = new AdminUserDTO();

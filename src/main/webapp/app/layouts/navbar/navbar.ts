@@ -151,7 +151,7 @@ export default class Navbar implements OnInit {
     }
 
     if (this.account()?.authorities.includes('ROLE_LOCATAIRE')) {
-      return new Set(['dashboard', 'mesBoutiques', 'users', 'redevances', 'reporting', 'audit']);
+      return new Set(['dashboard', 'mesBoutiques', 'redevances', 'reporting', 'audit']);
     }
 
     if (profils.has('MANAGER_BOUTIQUE')) {
@@ -159,7 +159,7 @@ export default class Navbar implements OnInit {
     }
 
     if (profils.has('VENDEUR')) {
-      return new Set(['dashboard', 'caisse', 'redevances']);
+      return new Set(['dashboard', 'caisse']);
     }
 
     return new Set(['dashboard']);

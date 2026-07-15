@@ -271,6 +271,10 @@ export default class CatalogueIdentificationComponent implements OnInit {
     return this.produits().find(produit => produit.id === produitId);
   }
 
+  imageProduitSrc(produit: IProduit | null | undefined): string | null {
+    return produit?.image && produit.imageContentType ? `data:${produit.imageContentType};base64,${produit.image}` : null;
+  }
+
   reinitialiserFiltres(): void {
     this.rechercheGlobale.set('');
     this.rechercheCodeBarres.set('');

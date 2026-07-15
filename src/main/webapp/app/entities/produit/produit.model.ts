@@ -13,6 +13,8 @@ export interface IProduit {
   codeInterne?: string | null;
   designation?: string | null;
   description?: string | null;
+  image?: string | null;
+  imageContentType?: string | null;
   typePrix?: keyof typeof TypePrix | null;
   prixVente?: number | null;
   tauxRedevanceApplicable?: number | null;

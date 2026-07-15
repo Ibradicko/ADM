@@ -28,6 +28,11 @@ public class ProduitDTO implements Serializable {
     @Lob
     private String description;
 
+    @Lob
+    private byte[] image;
+
+    private String imageContentType;
+
     @NotNull
     private TypePrix typePrix;
 
@@ -88,6 +93,22 @@ public class ProduitDTO implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
+    public String getImageContentType() {
+        return imageContentType;
+    }
+
+    public void setImageContentType(String imageContentType) {
+        this.imageContentType = imageContentType;
     }
 
     public TypePrix getTypePrix() {

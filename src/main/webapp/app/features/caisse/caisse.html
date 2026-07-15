@@ -259,6 +259,13 @@
                   [disabled]="!peutAjouterProduit(article)"
                   (click)="ajouterProduitDepuisRecherche(article)"
                 >
+                  <div class="adm-pos-tile__image" aria-hidden="true">
+                    @if (imageArticleSrc(article); as imageSrc) {
+                      <img [src]="imageSrc" [alt]="formatValeur(article.designation)" />
+                    } @else {
+                      <fa-icon icon="box" />
+                    }
+                  </div>
                   <div>
                     <strong>{{ formatValeur(article.designation) }}</strong>
                     <small>{{ formatValeur(article.codeInterne) }}</small>

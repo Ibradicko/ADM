@@ -63,6 +63,16 @@
         </div>
 
         <div class="adm-detail-grid">
+          @if (imageSrc(produitRef.image, produitRef.imageContentType); as src) {
+            <div class="adm-detail-block adm-detail-block--full">
+              <span class="adm-detail-block__label">Image</span>
+              <img
+                class="adm-product-image-preview adm-product-image-preview--large"
+                [src]="src"
+                [alt]="formatValeur(produitRef.designation)"
+              />
+            </div>
+          }
           <div class="adm-detail-block">
             <span class="adm-detail-block__label" jhiTranslate="admSupervisionVentesApp.produit.codeInterne">Internal code</span>
             <strong class="adm-code">{{ formatValeur(produitRef.codeInterne) }}</strong>

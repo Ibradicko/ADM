@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.32.xsd">
+
+    <changeSet id="20260715150000-1" author="adm">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="produit" columnName="image"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="produit">
+            <column name="image" type="${blobType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="image_content_type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -14,6 +14,8 @@ export interface DashboardOverviewResponse {
   stockAlertCount?: number | null;
   unresolvedUnknownScans?: number | null;
   royaltyOutstandingAmount?: number | null;
+  royaltyTotalAmount?: number | null;
+  royaltyPaidAmount?: number | null;
 }
 
 export interface DashboardSalesByDayPointResponse {

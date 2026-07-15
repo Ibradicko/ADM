@@ -49,7 +49,11 @@
                 "output": "swagger-ui/"
               }
             ],
-            "styles": ["src/main/webapp/content/scss/vendor.scss", "src/main/webapp/content/scss/global.scss"],
+            "styles": [
+              "src/main/webapp/content/css/loading.css",
+              "src/main/webapp/content/scss/vendor.scss",
+              "src/main/webapp/content/scss/global.scss"
+            ],
             "scripts": [],
             "define": {
               "SERVER_API_URL": "''"

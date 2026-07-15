@@ -175,8 +175,8 @@ describe('Navbar Component', () => {
     expect(routes).not.toContain('/boutique');
     expect(routes).not.toContain('/produit');
     expect(routes).not.toContain('/stock-operations');
-    expect(routes).toContain('/royalties');
-    expect(routes).toContain('/reporting');
+    expect(routes).not.toContain('/royalties');
+    expect(routes).not.toContain('/reporting');
     expect(routes).not.toContain('/audit-supervision');
     expect(routes).not.toContain('/settings-center');
     expect(routes).not.toContain('/admin/user-management');
@@ -191,9 +191,9 @@ describe('Navbar Component', () => {
 
     expect(routes).toContain('/dashboard');
     expect(routes).toContain('/mes-boutiques');
-    expect(routes).toContain('/settings-center');
+    expect(routes).not.toContain('/settings-center');
     expect(routes).toContain('/royalties');
-    expect(items.find(item => item.feature === 'users')).toBeDefined();
+    expect(items.find(item => item.feature === 'users')).toBeUndefined();
     expect(routes).not.toContain('/boutique');
     expect(routes).not.toContain('/locataire');
     expect(routes).not.toContain('/produit');

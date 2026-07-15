@@ -143,6 +143,10 @@ export class Produit implements OnInit {
     return valeur?.trim() ? valeur : '--';
   }
 
+  imageProduitSrc(produit: IProduit): string | null {
+    return produit.image && produit.imageContentType ? `data:${produit.imageContentType};base64,${produit.image}` : null;
+  }
+
   formatMontant(valeur: number | null | undefined): string {
     return typeof valeur === 'number' ? `${valeur.toLocaleString('fr-FR')} F CFA` : '--';
   }

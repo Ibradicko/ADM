@@ -95,7 +95,7 @@
                   <article class="adm-setting-editor" [class.adm-setting-editor--muted]="!actifGlobal(definition.code)">
                     <div class="adm-setting-editor__top">
                       <div>
-                        <h3 [jhiTranslate]="definition.labelKey"></h3>
+                        <h3 [jhiTranslate]="definition.labelKey">{{ definition.labelKey }}</h3>
                         <code>{{ definition.code }}</code>
                       </div>
                       <div class="form-check form-switch">

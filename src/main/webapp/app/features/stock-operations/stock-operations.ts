@@ -4,6 +4,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -58,7 +59,7 @@ type QueryParams = Record<string, string | number | boolean | readonly string[]>
 @Component({
   selector: 'jhi-stock-operations',
   templateUrl: './stock-operations.html',
-  imports: [FormsModule, RouterLink, TranslateDirective, TranslateModule],
+  imports: [FormsModule, RouterLink, FontAwesomeModule, TranslateDirective, TranslateModule],
 })
 export default class StockOperationsComponent implements OnInit {
   readonly permissionsUi = inject(UiPermissionService);
@@ -262,6 +263,19 @@ export default class StockOperationsComponent implements OnInit {
 
   formatDate(valeur?: dayjs.Dayjs | null): string {
     return valeur ? valeur.format('DD/MM/YYYY HH:mm') : '--';
+  }
+
+  produitParId(produitId: number | null | undefined): IProduit | undefined {
+    if (!produitId) {
+      return undefined;
+    }
+    return (
+      this.produitsAccessibles().find(produit => produit.id === produitId) ?? this.produits().find(produit => produit.id === produitId)
+    );
+  }
+
+  imageProduitSrc(produit: IProduit | null | undefined): string | null {
+    return produit?.image && produit.imageContentType ? `data:${produit.imageContentType};base64,${produit.image}` : null;
   }
 
   definirOnglet(onglet: OngletStock): void {

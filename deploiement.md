@@ -1180,3 +1180,116 @@ Explication :
 - Mettre `JHIPSTER_MAIL_BASE_URL` avec l'URL finale publique.
 - Configurer SMTP si les emails de reinitialisation doivent partir reellement.
 - Prevoir une sauvegarde PostgreSQL avant les mises a jour.
+
+### 16. Mettre a jour ADM apres une modification locale
+
+Quand le code est modifie sur le poste local, il faut reconstruire une nouvelle image Docker, l'envoyer au serveur, puis redemarrer uniquement le service applicatif.
+
+Important : une mise a jour normale ne doit pas supprimer le volume PostgreSQL. Ne pas utiliser `docker compose down -v`, sauf si l'objectif est de vider completement la base.
+
+#### Etape A - Tester et reconstruire sur le poste local
+
+Dans PowerShell :
+
+```powershell
+cd C:\Users\ibrah\Music\DEV2026\ADM
+```
+
+Verifier TypeScript :
+
+```powershell
+node node_modules\typescript\bin\tsc -p tsconfig.app.json --noEmit
+```
+
+Construire l'image Docker JHipster avec Jib :
+
+```powershell
+.\mvnw.cmd -ntp "-Dmaven.test.skip=true" -Pprod jib:dockerBuild
+```
+
+Verifier que l'image existe :
+
+```powershell
+docker images admsupervisionventes
+```
+
+Exporter l'image en archive Docker :
+
+```powershell
+docker save admsupervisionventes:latest -o adm-supervision-ventes.tar
+```
+
+Envoyer l'archive sur le serveur :
+
+```powershell
+scp adm-supervision-ventes.tar craadmin@187.77.178.216:/home/craadmin/applications/adm-supervision-ventes/
+```
+
+#### Etape B - Charger et relancer sur le serveur
+
+Se connecter au serveur :
+
+```powershell
+ssh craadmin@187.77.178.216
+```
+
+Aller dans le dossier ADM :
+
+```bash
+cd /home/craadmin/applications/adm-supervision-ventes
+```
+
+Charger la nouvelle image :
+
+```bash
+docker load -i adm-supervision-ventes.tar
+```
+
+Redemarrer uniquement l'application :
+
+```bash
+docker compose up -d adm-app
+```
+
+Verifier l'etat :
+
+```bash
+docker compose ps
+```
+
+Verifier les logs :
+
+```bash
+docker logs --tail=80 adm-supervision-ventes
+```
+
+Message attendu :
+
+```text
+Started AdmSupervisionVentesApp
+Application 'admSupervisionVentes' is running
+```
+
+Tester dans le navigateur :
+
+```text
+http://187.77.178.216:8094
+```
+
+#### Commandes a eviter pendant une mise a jour normale
+
+Ne pas faire :
+
+```bash
+docker compose down -v
+```
+
+Pourquoi : l'option `-v` supprime les volumes Docker, donc le volume PostgreSQL `adm_postgresql_data`. Cela efface toutes les donnees ADM.
+
+Pour une mise a jour applicative simple, utiliser :
+
+```bash
+docker compose up -d adm-app
+```
+
+La base reste intacte.

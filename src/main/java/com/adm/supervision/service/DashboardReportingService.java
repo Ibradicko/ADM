@@ -117,35 +117,25 @@ public class DashboardReportingService {
         LocalDate effectiveTo = to == null ? LocalDate.now() : to;
         validatePeriodRange(effectiveFrom, effectiveTo);
 
-        boolean royaltyScopedDashboard = moduleSecurityService.hasGlobalBoutiqueAccess() && moduleSecurityService.canReadRoyalties();
-        List<Vente> ventes = royaltyScopedDashboard
-            ? List.of()
-            : loadSales(effectiveFrom, effectiveTo, boutiqueId, locataireId, null, null);
-        BigDecimal royaltyTurnover = royaltyScopedDashboard
-            ? calculateRoyaltyTurnover(effectiveFrom, effectiveTo, boutiqueId, locataireId)
-            : ZERO;
+        List<Vente> ventes = loadSales(effectiveFrom, effectiveTo, boutiqueId, locataireId, null, null);
         DashboardOverviewDTO overview = new DashboardOverviewDTO();
         overview.setGrossSales(
-            royaltyScopedDashboard
-                ? royaltyTurnover
-                : sum(
-                      ventes
-                          .stream()
-                          .filter(vente -> vente.getStatut() == StatutVente.VALIDEE)
-                          .map(Vente::getMontantBrut)
-                          .toList()
-                  )
+            sum(
+                ventes
+                    .stream()
+                    .filter(vente -> vente.getStatut() == StatutVente.VALIDEE)
+                    .map(Vente::getMontantBrut)
+                    .toList()
+            )
         );
         overview.setNetSales(
-            royaltyScopedDashboard
-                ? royaltyTurnover
-                : sum(
-                      ventes
-                          .stream()
-                          .filter(vente -> vente.getStatut() == StatutVente.VALIDEE)
-                          .map(Vente::getMontantNet)
-                          .toList()
-                  )
+            sum(
+                ventes
+                    .stream()
+                    .filter(vente -> vente.getStatut() == StatutVente.VALIDEE)
+                    .map(Vente::getMontantNet)
+                    .toList()
+            )
         );
         overview.setValidatedSalesCount(
             ventes
@@ -165,7 +155,10 @@ public class DashboardReportingService {
                 ? scanInconnuRepository.countByResoluFalse()
                 : scanInconnuRepository.countByBoutique_IdAndResoluFalse(boutiqueId)
         );
-        overview.setRoyaltyOutstandingAmount(calculateOutstandingRoyalty(boutiqueId, locataireId));
+        RoyaltyOverview royaltyOverview = calculateRoyaltyOverview(effectiveFrom, effectiveTo, boutiqueId, locataireId);
+        overview.setRoyaltyOutstandingAmount(royaltyOverview.outstanding());
+        overview.setRoyaltyTotalAmount(royaltyOverview.total());
+        overview.setRoyaltyPaidAmount(royaltyOverview.paid());
         return overview;
     }
 
@@ -411,7 +404,7 @@ public class DashboardReportingService {
         return dto;
     }
 
-    private BigDecimal calculateOutstandingRoyalty(Long boutiqueId, Long locataireId) {
+    private RoyaltyOverview calculateRoyaltyOverview(LocalDate from, LocalDate to, Long boutiqueId, Long locataireId) {
         List<CalculRedevance> calculs = calculRedevanceRepository
             .findAllWithEagerRelationships()
             .stream()
@@ -419,6 +412,8 @@ public class DashboardReportingService {
             .filter(calcul -> isBoutiqueVisible(calcul.getBoutique().getId()))
             .filter(calcul -> boutiqueId == null || Objects.equals(calcul.getBoutique().getId(), boutiqueId))
             .filter(calcul -> locataireId == null || Objects.equals(calcul.getLocataire().getId(), locataireId))
+            .filter(calcul -> !calcul.getPeriodeFin().isBefore(from) && !calcul.getPeriodeDebut().isAfter(to))
+            .filter(calcul -> safe(calcul.getChiffreAffaires()).signum() > 0)
             .toList();
         BigDecimal totalDue = sum(calculs.stream().map(CalculRedevance::getMontantRedevance).toList());
         List<Long> calculIds = calculs.stream().map(CalculRedevance::getId).toList();
@@ -431,22 +426,10 @@ public class DashboardReportingService {
                 .toList()
         );
         BigDecimal outstanding = totalDue.subtract(totalPaid);
-        return outstanding.compareTo(ZERO) < 0 ? ZERO : outstanding;
+        return new RoyaltyOverview(totalDue, totalPaid, outstanding.compareTo(ZERO) < 0 ? ZERO : outstanding);
     }
 
-    private BigDecimal calculateRoyaltyTurnover(LocalDate from, LocalDate to, Long boutiqueId, Long locataireId) {
-        List<BigDecimal> turnovers = calculRedevanceRepository
-            .findAllWithEagerRelationships()
-            .stream()
-            .filter(calcul -> calcul.getStatut() != com.adm.supervision.domain.enumeration.StatutRedevance.ANNULEE)
-            .filter(calcul -> isBoutiqueVisible(calcul.getBoutique().getId()))
-            .filter(calcul -> boutiqueId == null || Objects.equals(calcul.getBoutique().getId(), boutiqueId))
-            .filter(calcul -> locataireId == null || Objects.equals(calcul.getLocataire().getId(), locataireId))
-            .filter(calcul -> !calcul.getPeriodeDebut().isBefore(from) && !calcul.getPeriodeFin().isAfter(to))
-            .map(CalculRedevance::getChiffreAffaires)
-            .toList();
-        return sum(turnovers);
-    }
+    private record RoyaltyOverview(BigDecimal total, BigDecimal paid, BigDecimal outstanding) {}
 
     private ReportDocument buildReportDocument(GenerateRapportExportRequest request, Boutique boutique, Locataire locataire) {
         String normalizedType = normalizeReportType(request.getTypeRapport());

@@ -88,11 +88,13 @@
       "metrics": {
         "grossSales": "Gross turnover",
         "netSales": "Net turnover",
-        "royaltyTurnover": "Royalties turnover",
+        "royaltyTurnover": "Turnover",
         "validatedSales": "Validated sales",
         "activeShops": "Active shops",
         "activeTenants": "Active tenants",
-        "pendingRoyalties": "Pending royalties"
+        "pendingRoyalties": "Pending royalties",
+        "totalRoyalties": "Total royalty",
+        "paidRoyalties": "Paid royalty"
       },
       "charts": {
         "netSalesEvolution": {

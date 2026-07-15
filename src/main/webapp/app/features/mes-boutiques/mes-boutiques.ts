@@ -225,6 +225,10 @@ export default class MesBoutiquesComponent implements OnInit {
     return !!this.compte()?.id && affectation.user?.id === this.compte()?.id;
   }
 
+  profilAffiche(affectation: IAffectationUtilisateur): string {
+    return this.estAffectationCompteCourant(affectation) ? 'LOCATAIRE' : (affectation.profil?.code ?? '-');
+  }
+
   formatMontant(valeur: number | null | undefined): string {
     return typeof valeur === 'number' ? `${valeur.toLocaleString('fr-FR')} F CFA` : '0 F CFA';
   }

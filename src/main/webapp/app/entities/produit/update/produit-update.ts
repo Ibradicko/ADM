@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
 import { UiPermissionService } from 'app/core/services/ui-permission.service';
+import { DataUtils } from 'app/core/util/data-util.service';
 import { IBoutique } from 'app/entities/boutique/boutique.model';
 import { BoutiqueService } from 'app/entities/boutique/service/boutique.service';
 import { StatutGeneral } from 'app/entities/enumerations/statut-general.model';
@@ -49,6 +50,7 @@ export class ProduitUpdate implements OnInit {
   protected boutiqueService = inject(BoutiqueService);
   protected groupeArticleService = inject(GroupeArticleService);
   protected uniteMesureService = inject(UniteMesureService);
+  protected dataUtils = inject(DataUtils);
   protected activatedRoute = inject(ActivatedRoute);
   protected router = inject(Router);
 
@@ -101,6 +103,22 @@ export class ProduitUpdate implements OnInit {
 
   formatValeur(valeur: string | null | undefined): string {
     return valeur?.trim() ? valeur : '--';
+  }
+
+  imageSrc(image: string | null | undefined, contentType: string | null | undefined): string | null {
+    return image && contentType ? `data:${contentType};base64,${image}` : null;
+  }
+
+  byteSize(base64String: string): string {
+    return this.dataUtils.byteSize(base64String);
+  }
+
+  setFileData(event: Event, field: string, isImage: boolean): void {
+    this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe({ error: () => undefined });
+  }
+
+  clearImage(): void {
+    this.editForm.patchValue({ image: null, imageContentType: null });
   }
 
   previousState(): void {

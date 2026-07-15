@@ -46,6 +46,13 @@ public class Produit implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
+
+    @Column(name = "image_content_type")
+    private String imageContentType;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "type_prix", nullable = false)
@@ -143,6 +150,32 @@ public class Produit implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public byte[] getImage() {
+        return this.image;
+    }
+
+    public Produit image(byte[] image) {
+        this.setImage(image);
+        return this;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
+    public String getImageContentType() {
+        return this.imageContentType;
+    }
+
+    public Produit imageContentType(String imageContentType) {
+        this.setImageContentType(imageContentType);
+        return this;
+    }
+
+    public void setImageContentType(String imageContentType) {
+        this.imageContentType = imageContentType;
     }
 
     public TypePrix getTypePrix() {

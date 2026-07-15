@@ -17,6 +17,10 @@ public class CaissePosteArticleDTO implements Serializable {
 
     private String description;
 
+    private byte[] image;
+
+    private String imageContentType;
+
     private BigDecimal prixVente;
 
     private Long groupeArticleId;
@@ -55,6 +59,22 @@ public class CaissePosteArticleDTO implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
+    public String getImageContentType() {
+        return imageContentType;
+    }
+
+    public void setImageContentType(String imageContentType) {
+        this.imageContentType = imageContentType;
     }
 
     public BigDecimal getPrixVente() {

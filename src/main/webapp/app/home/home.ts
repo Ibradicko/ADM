@@ -153,6 +153,16 @@ export default class Home implements OnInit {
           value: this.formatMontant(overview?.royaltyOutstandingAmount),
           tone: 'warning',
         },
+        {
+          labelKey: 'home.dashboard.metrics.totalRoyalties',
+          value: this.formatMontant(overview?.royaltyTotalAmount),
+          tone: 'neutral',
+        },
+        {
+          labelKey: 'home.dashboard.metrics.paidRoyalties',
+          value: this.formatMontant(overview?.royaltyPaidAmount),
+          tone: 'success',
+        },
       ];
     }
 
@@ -171,6 +181,16 @@ export default class Home implements OnInit {
           labelKey: 'home.dashboard.metrics.pendingRoyalties',
           value: this.formatMontant(overview?.royaltyOutstandingAmount),
           tone: 'warning',
+        },
+        {
+          labelKey: 'home.dashboard.metrics.totalRoyalties',
+          value: this.formatMontant(overview?.royaltyTotalAmount),
+          tone: 'neutral',
+        },
+        {
+          labelKey: 'home.dashboard.metrics.paidRoyalties',
+          value: this.formatMontant(overview?.royaltyPaidAmount),
+          tone: 'success',
         },
         {
           labelKey: 'home.dashboard.metrics.activeShops',
@@ -193,6 +213,16 @@ export default class Home implements OnInit {
         labelKey: 'home.dashboard.metrics.pendingRoyalties',
         value: this.formatMontant(overview?.royaltyOutstandingAmount),
         tone: 'warning',
+      },
+      {
+        labelKey: 'home.dashboard.metrics.totalRoyalties',
+        value: this.formatMontant(overview?.royaltyTotalAmount),
+        tone: 'neutral',
+      },
+      {
+        labelKey: 'home.dashboard.metrics.paidRoyalties',
+        value: this.formatMontant(overview?.royaltyPaidAmount),
+        tone: 'success',
       },
     ];
   });

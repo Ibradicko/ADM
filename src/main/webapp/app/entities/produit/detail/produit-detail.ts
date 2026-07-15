@@ -27,6 +27,10 @@ export class ProduitDetail {
     this.dataUtils.openFile(base64String, contentType);
   }
 
+  imageSrc(image: string | null | undefined, contentType: string | null | undefined): string | null {
+    return image && contentType ? `data:${contentType};base64,${image}` : null;
+  }
+
   formatMontant(valeur: number | null | undefined): string {
     return typeof valeur === 'number' ? `${valeur.toLocaleString('fr-FR')} F CFA` : '--';
   }

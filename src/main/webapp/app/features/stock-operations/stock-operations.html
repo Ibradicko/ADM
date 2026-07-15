@@ -5,22 +5,7 @@
       <p jhiTranslate="stockOperations.subtitle">Stock, receiving, inventory, transfer and corrective movement supervision.</p>
     </div>
 
-    <div class="adm-page-header__actions">
-      @if (permissionsUi.peutGererStock()) {
-        <a
-          class="adm-button adm-button--ghost"
-          [routerLink]="['/reception-produit/new']"
-          jhiTranslate="stockOperations.actions.newReception"
-          >New reception</a
-        >
-        <a class="adm-button adm-button--ghost" [routerLink]="['/inventaire-stock/new']" jhiTranslate="stockOperations.actions.newInventory"
-          >New inventory</a
-        >
-        <a class="adm-button adm-button--ghost" [routerLink]="['/transfert-stock/new']" jhiTranslate="stockOperations.actions.newTransfer"
-          >New transfer</a
-        >
-      }
-    </div>
+    <div class="adm-page-header__actions"></div>
   </div>
 
   @if (message(); as messageRef) {
@@ -69,30 +54,6 @@
           (click)="definirOnglet('approvisionnement')"
         >
           <span jhiTranslate="stockOperations.tabs.supply">Approvisionnement</span>
-        </button>
-        <button
-          type="button"
-          class="adm-chip"
-          [class.adm-pill--primary]="ongletActif() === 'receptions'"
-          (click)="definirOnglet('receptions')"
-        >
-          <span jhiTranslate="stockOperations.tabs.receptions">Receptions</span>
-        </button>
-        <button
-          type="button"
-          class="adm-chip"
-          [class.adm-pill--primary]="ongletActif() === 'inventaires'"
-          (click)="definirOnglet('inventaires')"
-        >
-          <span jhiTranslate="stockOperations.tabs.inventories">Inventories</span>
-        </button>
-        <button
-          type="button"
-          class="adm-chip"
-          [class.adm-pill--primary]="ongletActif() === 'transferts'"
-          (click)="definirOnglet('transferts')"
-        >
-          <span jhiTranslate="stockOperations.tabs.transfers">Transfers</span>
         </button>
       </div>
 
@@ -162,7 +123,18 @@
                 <tbody>
                   @for (stock of stocksFiltres().slice(0, 100); track stock.id) {
                     <tr [class.adm-row--alert]="(stock.quantiteTheorique ?? 0) <= (stock.stockAlerte ?? 0)">
-                      <td>{{ stock.produit?.designation ?? '--' }}</td>
+                      <td>
+                        <div class="adm-entity-media">
+                          <span class="adm-entity-thumb adm-entity-thumb--sm" aria-hidden="true">
+                            @if (imageProduitSrc(produitParId(stock.produit?.id)); as imageSrc) {
+                              <img [src]="imageSrc" [alt]="stock.produit?.designation ?? 'Article'" />
+                            } @else {
+                              <fa-icon icon="box" />
+                            }
+                          </span>
+                          <span>{{ stock.produit?.designation ?? '--' }}</span>
+                        </div>
+                      </td>
                       <td>{{ formatMontant(stock.quantiteTheorique) }}</td>
                       <td>{{ formatMontant(stock.stockAlerte) }}</td>
                       <td>{{ formatDate(stock.dateDernierMouvement) }}</td>
@@ -397,7 +369,16 @@
             <div class="adm-detail-grid">
               <div class="adm-detail-block adm-detail-block--full">
                 <span class="adm-detail-block__label">Article</span>
-                <strong>{{ articleApprovisionnement()?.designation ?? '--' }}</strong>
+                <div class="adm-entity-media">
+                  <span class="adm-entity-thumb" aria-hidden="true">
+                    @if (imageProduitSrc(articleApprovisionnement()); as imageSrc) {
+                      <img [src]="imageSrc" [alt]="articleApprovisionnement()?.designation ?? 'Article'" />
+                    } @else {
+                      <fa-icon icon="box" />
+                    }
+                  </span>
+                  <strong>{{ articleApprovisionnement()?.designation ?? '--' }}</strong>
+                </div>
               </div>
               <div class="adm-detail-block">
                 <span class="adm-detail-block__label">Code</span>

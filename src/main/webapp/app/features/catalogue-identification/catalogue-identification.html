@@ -154,14 +154,23 @@
             <div class="adm-list-panel">
               @for (codeBarres of resultatsRechercheCodeBarres(); track codeBarres.id) {
                 <div class="adm-list-panel__row">
-                  <div>
-                    <strong class="adm-code">{{ codeBarres.code }}</strong>
-                    <small
-                      >{{ codeBarres.produit?.designation || ('catalogueIdentification.common.productNotProvided' | translate) }} -
-                      {{
-                        produitParId(codeBarres.produit?.id)?.boutique?.nom || ('catalogueIdentification.common.noShop' | translate)
-                      }}</small
-                    >
+                  <div class="adm-entity-media">
+                    <span class="adm-entity-thumb adm-entity-thumb--sm" aria-hidden="true">
+                      @if (imageProduitSrc(produitParId(codeBarres.produit?.id)); as imageSrc) {
+                        <img [src]="imageSrc" [alt]="codeBarres.produit?.designation ?? 'Article'" />
+                      } @else {
+                        <fa-icon icon="box" />
+                      }
+                    </span>
+                    <div>
+                      <strong class="adm-code">{{ codeBarres.code }}</strong>
+                      <small
+                        >{{ codeBarres.produit?.designation || ('catalogueIdentification.common.productNotProvided' | translate) }} -
+                        {{
+                          produitParId(codeBarres.produit?.id)?.boutique?.nom || ('catalogueIdentification.common.noShop' | translate)
+                        }}</small
+                      >
+                    </div>
                   </div>
                   <div class="adm-inline-actions">
                     <span class="adm-pill" [class.adm-pill--success]="codeBarres.actif" [class.adm-pill--warning]="!codeBarres.actif">
@@ -224,7 +233,18 @@
                           (scan.resolu ? 'catalogueIdentification.status.resolved' : 'catalogueIdentification.status.toProcess') | translate
                         }}
                       </td>
-                      <td>{{ scan.produitAffecte?.designation ?? '--' }}</td>
+                      <td>
+                        <div class="adm-entity-media">
+                          <span class="adm-entity-thumb adm-entity-thumb--xs" aria-hidden="true">
+                            @if (imageProduitSrc(produitParId(scan.produitAffecte?.id)); as imageSrc) {
+                              <img [src]="imageSrc" [alt]="scan.produitAffecte?.designation ?? 'Article'" />
+                            } @else {
+                              <fa-icon icon="box" />
+                            }
+                          </span>
+                          <span>{{ scan.produitAffecte?.designation ?? '--' }}</span>
+                        </div>
+                      </td>
                     </tr>
                   }
                 </tbody>
@@ -273,7 +293,18 @@
                 @for (codeBarres of codesBarresFiltres(); track codeBarres.id) {
                   <tr>
                     <td class="adm-code">{{ codeBarres.code ?? '--' }}</td>
-                    <td>{{ codeBarres.produit?.designation ?? '--' }}</td>
+                    <td>
+                      <div class="adm-entity-media">
+                        <span class="adm-entity-thumb adm-entity-thumb--xs" aria-hidden="true">
+                          @if (imageProduitSrc(produitParId(codeBarres.produit?.id)); as imageSrc) {
+                            <img [src]="imageSrc" [alt]="codeBarres.produit?.designation ?? 'Article'" />
+                          } @else {
+                            <fa-icon icon="box" />
+                          }
+                        </span>
+                        <span>{{ codeBarres.produit?.designation ?? '--' }}</span>
+                      </div>
+                    </td>
                     <td>{{ produitParId(codeBarres.produit?.id)?.boutique?.nom ?? '--' }}</td>
                     <td>{{ codeBarres.type ? ('admSupervisionVentesApp.TypeCodeBarres.' + codeBarres.type | translate) : '--' }}</td>
                     <td>
@@ -403,9 +434,18 @@
                     </td>
                     <td>
                       @if (scan.resolu) {
-                        <span class="adm-pill adm-pill--success">{{
-                          scan.produitAffecte?.designation || ('catalogueIdentification.status.resolved' | translate)
-                        }}</span>
+                        <div class="adm-entity-media">
+                          <span class="adm-entity-thumb adm-entity-thumb--xs" aria-hidden="true">
+                            @if (imageProduitSrc(produitParId(scan.produitAffecte?.id)); as imageSrc) {
+                              <img [src]="imageSrc" [alt]="scan.produitAffecte?.designation ?? 'Article'" />
+                            } @else {
+                              <fa-icon icon="box" />
+                            }
+                          </span>
+                          <span class="adm-pill adm-pill--success">{{
+                            scan.produitAffecte?.designation || ('catalogueIdentification.status.resolved' | translate)
+                          }}</span>
+                        </div>
                       } @else if (permissionsUi.peutGererArticlesBoutique()) {
                         <div class="adm-inline-form">
                           <select class="adm-select" [(ngModel)]="resolutionProduitParScan[scan.id]">
@@ -498,7 +538,18 @@
                 @for (lotSynthese of lotsSynthese(); track lotSynthese.lot.id) {
                   <tr>
                     <td>{{ lotSynthese.lot.reference ?? '--' }}</td>
-                    <td>{{ lotSynthese.produitPrincipal || ('catalogueIdentification.common.productNotProvided' | translate) }}</td>
+                    <td>
+                      <div class="adm-entity-media">
+                        <span class="adm-entity-thumb adm-entity-thumb--xs" aria-hidden="true">
+                          @if (imageProduitSrc(produitParId(lotSynthese.etiquettes[0]?.produit?.id)); as imageSrc) {
+                            <img [src]="imageSrc" [alt]="lotSynthese.produitPrincipal || 'Article'" />
+                          } @else {
+                            <fa-icon icon="box" />
+                          }
+                        </span>
+                        <span>{{ lotSynthese.produitPrincipal || ('catalogueIdentification.common.productNotProvided' | translate) }}</span>
+                      </div>
+                    </td>
                     <td>{{ lotSynthese.lot.formatImpression ?? '--' }}</td>
                     <td>{{ lotSynthese.quantiteTotale }}</td>
                     <td>
@@ -618,7 +669,18 @@
               @for (historique of historiquesFiltres(); track historique.id) {
                 <tr>
                   <td>{{ historique.dateChangement | formatMediumDatetime }}</td>
-                  <td>{{ historique.produit?.designation ?? '--' }}</td>
+                  <td>
+                    <div class="adm-entity-media">
+                      <span class="adm-entity-thumb adm-entity-thumb--xs" aria-hidden="true">
+                        @if (imageProduitSrc(produitParId(historique.produit?.id)); as imageSrc) {
+                          <img [src]="imageSrc" [alt]="historique.produit?.designation ?? 'Article'" />
+                        } @else {
+                          <fa-icon icon="box" />
+                        }
+                      </span>
+                      <span>{{ historique.produit?.designation ?? '--' }}</span>
+                    </div>
+                  </td>
                   <td class="adm-code">{{ historique.ancienCode ?? '--' }}</td>
                   <td class="adm-code">{{ historique.nouveauCode ?? '--' }}</td>
                   <td>{{ historique.motif ?? '--' }}</td>

@@ -93,6 +93,23 @@
               placeholder="Description courte utile aux vendeurs et au catalogue"
             ></textarea>
           </label>
+
+          <div class="adm-field adm-field--full">
+            <span>Image de l'article</span>
+            <div class="adm-doc-preview">
+              @if (imageSrc(editForm.controls.image.value, editForm.controls.imageContentType.value); as src) {
+                <img class="adm-product-image-preview" [src]="src" [alt]="formatValeur(editForm.controls.designation.value)" />
+                <span class="adm-doc-preview__size">{{ byteSize(editForm.controls.image.value!) }}</span>
+                <button type="button" class="adm-button adm-button--ghost adm-button--small" (click)="clearImage()">
+                  <fa-icon icon="ban" />
+                  <span>Retirer</span>
+                </button>
+              } @else {
+                <span class="adm-text--muted">Aucune image renseignee.</span>
+              }
+            </div>
+            <input id="field_image" class="adm-input" type="file" accept="image/*" (change)="setFileData($event, 'image', true)" />
+          </div>
         </div>
       </article>
 

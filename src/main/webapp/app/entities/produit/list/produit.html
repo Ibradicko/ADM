@@ -147,7 +147,16 @@
             @for (produit of filteredProduits(); track trackId(produit); let even = $even) {
               <tr data-cy="entityTable" [class.adm-table__row--pair]="even" [class.adm-table__row--impair]="!even">
                 <td>
-                  <span class="adm-code">{{ formatValeur(produit.codeInterne) }}</span>
+                  <div class="adm-entity-media">
+                    <span class="adm-entity-thumb adm-entity-thumb--sm" aria-hidden="true">
+                      @if (imageProduitSrc(produit); as imageSrc) {
+                        <img [src]="imageSrc" [alt]="produit.designation ?? 'Article'" />
+                      } @else {
+                        <fa-icon icon="box" />
+                      }
+                    </span>
+                    <span class="adm-code">{{ formatValeur(produit.codeInterne) }}</span>
+                  </div>
                 </td>
                 <td>
                   <div class="adm-table-title">
