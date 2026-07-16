@@ -543,7 +543,8 @@ public class StockWorkflowService {
         for (MouvementStock original : mouvementsToReverse) {
             for (LigneMouvementStock ligne : ligneMouvementStockRepository.findAllByMouvement_Id(original.getId())) {
                 StockProduit stockProduit = getExistingUniqueStock(ligne.getProduit(), ligne.getDepot(), "mouvementStock", "missingStock");
-                if (safe(stockProduit.getQuantiteTheorique()).compareTo(safe(ligne.getStockApres())) != 0) {
+                BigDecimal delta = safe(ligne.getStockApres()).subtract(safe(ligne.getStockAvant()));
+                if (delta.signum() > 0 && safe(stockProduit.getQuantiteTheorique()).compareTo(safe(ligne.getStockApres())) != 0) {
                     throw new BusinessValidationException(
                         "mouvementStock",
                         "movementOutdated",

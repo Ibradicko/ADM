@@ -29,7 +29,7 @@
   } @else {
     @if (message(); as messageRef) {
       <div
-        class="adm-inline-alert"
+        class="adm-inline-alert adm-feedback-modal"
         [class.adm-inline-alert--danger]="messageRef.type === 'danger'"
         [class.adm-inline-alert--success]="messageRef.type === 'success'"
         [class.adm-inline-alert--info]="messageRef.type === 'info'"

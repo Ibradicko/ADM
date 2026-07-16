@@ -10,7 +10,7 @@
 
   @if (message(); as messageRef) {
     <div
-      class="adm-inline-alert"
+      class="adm-inline-alert adm-feedback-modal"
       [class.adm-inline-alert--danger]="messageRef.type === 'danger'"
       [class.adm-inline-alert--success]="messageRef.type === 'success'"
       [class.adm-inline-alert--info]="messageRef.type === 'info'"
@@ -25,15 +25,16 @@
       <p jhiTranslate="stockOperations.access.description">Your profile cannot view stock operations.</p>
     </div>
   } @else {
-    <div class="adm-inline-alert adm-inline-alert--info">
-      <strong>{{ libellePerimetre() | translate }}</strong>
-      <span>
-        @if (boutiqueFiltreId()) {
-          {{ boutiquesAccessibles().length }} {{ 'stockOperations.scope.filteredCount' | translate }}
-        } @else {
-          {{ boutiquesAccessibles().length }} {{ 'stockOperations.scope.visibleCount' | translate }}
-        }
-      </span>
+    <div class="stock-scope-banner">
+      <div>
+        <span>{{ libellePerimetre() | translate }}</span>
+        <strong>{{ boutiqueOperationnelleNom() ?? ('stockOperations.scope.noShop' | translate) }}</strong>
+      </div>
+      @if (peutVoirToutesBoutiques()) {
+        <small>{{ boutiquesAccessibles().length }} {{ 'stockOperations.scope.visibleCount' | translate }}</small>
+      } @else {
+        <small>{{ 'stockOperations.scope.managerHint' | translate }}</small>
+      }
     </div>
 
     <div class="adm-toolbar">
@@ -58,15 +59,17 @@
       </div>
 
       <div class="adm-toolbar__filters">
-        <label class="adm-field">
-          <span jhiTranslate="stockOperations.fields.shop">Shop</span>
-          <select class="adm-select" [ngModel]="boutiqueFiltreId()" (ngModelChange)="changerBoutiqueFiltre($event ? +$event : null)">
-            <option [ngValue]="null" jhiTranslate="stockOperations.common.allFeminine">All</option>
-            @for (boutique of boutiquesAccessibles(); track boutique.id) {
-              <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
-            }
-          </select>
-        </label>
+        @if (peutVoirToutesBoutiques()) {
+          <label class="adm-field">
+            <span jhiTranslate="stockOperations.fields.shop">Shop</span>
+            <select class="adm-select" [ngModel]="boutiqueFiltreId()" (ngModelChange)="changerBoutiqueFiltre($event ? +$event : null)">
+              <option [ngValue]="null" jhiTranslate="stockOperations.common.allFeminine">All</option>
+              @for (boutique of boutiquesAccessibles(); track boutique.id) {
+                <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
+              }
+            </select>
+          </label>
+        }
 
         <label class="adm-search adm-search--panel">
           <input
@@ -252,19 +255,26 @@
             </div>
 
             <div class="adm-form-grid">
-              <label class="adm-field">
-                <span jhiTranslate="stockOperations.fields.shop">Boutique</span>
-                <select
-                  class="adm-select"
-                  [ngModel]="approvisionnementBoutiqueId()"
-                  (ngModelChange)="changerBoutiqueApprovisionnement($event ? +$event : null)"
-                >
-                  <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Selectionner</option>
-                  @for (boutique of boutiquesAccessibles(); track boutique.id) {
-                    <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
-                  }
-                </select>
-              </label>
+              @if (peutVoirToutesBoutiques()) {
+                <label class="adm-field">
+                  <span jhiTranslate="stockOperations.fields.shop">Boutique</span>
+                  <select
+                    class="adm-select"
+                    [ngModel]="approvisionnementBoutiqueId()"
+                    (ngModelChange)="changerBoutiqueApprovisionnement($event ? +$event : null)"
+                  >
+                    <option [ngValue]="null" jhiTranslate="stockOperations.common.select">Selectionner</option>
+                    @for (boutique of boutiquesAccessibles(); track boutique.id) {
+                      <option [ngValue]="boutique.id">{{ boutique.nom }}</option>
+                    }
+                  </select>
+                </label>
+              } @else {
+                <div class="stock-readonly-field">
+                  <span jhiTranslate="stockOperations.fields.shop">Boutique</span>
+                  <strong>{{ boutiqueOperationnelleNom() ?? '--' }}</strong>
+                </div>
+              }
 
               <label class="adm-field">
                 <span>Groupe d'article</span>
@@ -303,6 +313,19 @@
                   step="0.01"
                   [ngModel]="approvisionnementQuantite()"
                   (ngModelChange)="approvisionnementQuantite.set(+$event || 0)"
+                />
+              </label>
+
+              <label class="adm-field">
+                <span jhiTranslate="stockOperations.fields.alertThreshold">Seuil d'alerte</span>
+                <input
+                  class="adm-input"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  [ngModel]="approvisionnementSeuilAlerte()"
+                  (ngModelChange)="approvisionnementSeuilAlerte.set($event === '' || $event === null ? null : +$event)"
+                  [placeholder]="'stockOperations.placeholders.alertThreshold' | translate"
                 />
               </label>
 

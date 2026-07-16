@@ -59,6 +59,7 @@ type QueryParams = Record<string, string | number | boolean | readonly string[]>
 @Component({
   selector: 'jhi-stock-operations',
   templateUrl: './stock-operations.html',
+  styleUrl: './stock-operations.scss',
   imports: [FormsModule, RouterLink, FontAwesomeModule, TranslateDirective, TranslateModule],
 })
 export default class StockOperationsComponent implements OnInit {
@@ -98,6 +99,7 @@ export default class StockOperationsComponent implements OnInit {
   readonly approvisionnementGroupeId = signal<number | null>(null);
   readonly approvisionnementProduitId = signal<number | null>(null);
   readonly approvisionnementQuantite = signal<number>(1);
+  readonly approvisionnementSeuilAlerte = signal<number | null>(null);
   readonly approvisionnementDate = signal(dayjs().format('YYYY-MM-DDTHH:mm'));
   readonly approvisionnementReference = signal('');
   readonly approvisionnementObservation = signal('');
@@ -130,6 +132,11 @@ export default class StockOperationsComponent implements OnInit {
     const ids = this.boutiqueIdsAccessibles();
     return this.boutiques().filter(boutique => ids.has(boutique.id));
   });
+  readonly boutiqueOperationnelle = computed(() => {
+    const filtre = this.boutiqueFiltreId();
+    return this.boutiquesAccessibles().find(boutique => boutique.id === filtre) ?? this.boutiquesAccessibles()[0] ?? null;
+  });
+  readonly boutiqueOperationnelleNom = computed(() => this.boutiqueOperationnelle()?.nom ?? null);
   readonly stocksFiltres = computed(() => {
     const recherche = this.rechercheStock().trim().toLowerCase();
     const boutiqueFiltre = this.boutiqueFiltreId();
@@ -275,7 +282,9 @@ export default class StockOperationsComponent implements OnInit {
   }
 
   imageProduitSrc(produit: IProduit | null | undefined): string | null {
-    return produit?.image && produit.imageContentType ? `data:${produit.imageContentType};base64,${produit.image}` : null;
+    return produit?.image && produit.imageContentType
+      ? `data:${produit.imageContentType};base64,${produit.image}`
+      : 'content/images/default-article.svg';
   }
 
   definirOnglet(onglet: OngletStock): void {
@@ -320,6 +329,8 @@ export default class StockOperationsComponent implements OnInit {
     if (produit.groupeArticle?.id) {
       this.approvisionnementGroupeId.set(produit.groupeArticle.id);
     }
+    const stock = this.stockArticleApprovisionnement();
+    this.approvisionnementSeuilAlerte.set(stock?.stockAlerte ?? null);
   }
 
   preparerApprovisionnement(produit?: IProduit | null): void {
@@ -449,10 +460,12 @@ export default class StockOperationsComponent implements OnInit {
 
       await firstValueFrom(this.stockWorkflowService.scanReception(reception.id, { produitId, codeBarres: null, quantiteRecue: quantite }));
       await firstValueFrom(this.stockWorkflowService.validateReception(reception.id, { depotId }));
+      await this.chargerStocks();
+      await this.enregistrerSeuilAlerteApprovisionnement(produitId, depotId);
       this.approvisionnementQuantite.set(1);
       this.approvisionnementReference.set('');
       this.approvisionnementObservation.set('');
-      await Promise.all([this.chargerReceptions(), this.chargerStocks(), this.chargerMouvements(), this.chargerAlertes()]);
+      await Promise.all([this.chargerReceptions(), this.chargerMouvements(), this.chargerAlertes()]);
       this.message.set({ type: 'success', key: 'stockOperations.messages.supplyValidated' });
     });
   }
@@ -703,6 +716,21 @@ export default class StockOperationsComponent implements OnInit {
       this.ligneTransfertStockService.query({ 'transfertId.equals': transfertId, size: 200, sort: ['id,desc'] }),
     );
     this.lignesTransfert.set(response.body ?? []);
+  }
+
+  private async enregistrerSeuilAlerteApprovisionnement(produitId: number, depotId: number): Promise<void> {
+    const seuil = this.approvisionnementSeuilAlerte();
+    if (seuil === null || seuil < 0) {
+      return;
+    }
+
+    const stock = this.stocks().find(item => item.produit?.id === produitId && item.depot?.id === depotId);
+    if (!stock?.id || stock.stockAlerte === seuil) {
+      return;
+    }
+
+    await firstValueFrom(this.stockProduitService.partialUpdate({ id: stock.id, stockAlerte: seuil }));
+    await this.chargerStocks();
   }
 
   private async executerAction(cle: string, action: () => Promise<void>): Promise<void> {

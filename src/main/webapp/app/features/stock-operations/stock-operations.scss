@@ -1,0 +1,67 @@
+.stock-scope-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(20, 184, 166, 0.24);
+  border-radius: 0.55rem;
+  background: #ecfdf8;
+  color: var(--adm-text);
+}
+
+.stock-scope-banner div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.stock-scope-banner span,
+.stock-scope-banner small {
+  color: var(--adm-text-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.stock-scope-banner strong {
+  font-size: 1rem;
+}
+
+.stock-readonly-field {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 4.5rem;
+  padding: 0.66rem 0.75rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+
+.stock-readonly-field span {
+  color: var(--adm-text-soft);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.stock-readonly-field strong {
+  align-self: center;
+  color: var(--adm-text);
+  font-size: 0.92rem;
+}
+
+.adm-entity-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.adm-row--alert {
+  background: #fff7ed;
+}
+
+@media (max-width: 760px) {
+  .stock-scope-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

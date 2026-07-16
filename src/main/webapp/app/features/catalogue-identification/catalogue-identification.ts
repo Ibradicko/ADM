@@ -544,7 +544,7 @@ export default class CatalogueIdentificationComponent implements OnInit {
     }
   }
 
-  async imprimerLotEtiquettes(lotSynthese: LotEtiquetteSynthese): Promise<void> {
+  imprimerLotEtiquettes(lotSynthese: LotEtiquetteSynthese): void {
     if (lotSynthese.etiquettes.length === 0) {
       this.message.set({ type: 'info', key: 'catalogueIdentification.messages.noLabelsInBatch' });
       return;
@@ -560,7 +560,7 @@ export default class CatalogueIdentificationComponent implements OnInit {
       .flatMap(etiquette => {
         const produitComplet = this.produitParId(etiquette.produit?.id);
         const produit = produitComplet ?? etiquette.produit;
-        const quantite = Math.max(1, Number(etiquette.quantite ?? 1));
+        const quantite = Math.max(1, etiquette.quantite ?? 1);
         const codePrincipal = this.codePrincipalProduit(produit?.id);
         const code = codePrincipal?.code ?? produitComplet?.codeInterne ?? '';
         const codeBarresSvg = this.genererCodeBarresSvg(code, codePrincipal?.type);
@@ -580,6 +580,7 @@ export default class CatalogueIdentificationComponent implements OnInit {
 
     const titre = this.echapperHtml(lotSynthese.lot.reference ?? 'Etiquettes');
     fenetreImpression.document.open();
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     fenetreImpression.document.write(`<!doctype html>
 <html lang="fr">
   <head>

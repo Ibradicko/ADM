@@ -157,8 +157,29 @@ a:hover {
 }
 
 .alerts {
+  position: fixed;
+  z-index: 2140;
+  top: 5rem;
+  right: 1rem;
+  display: grid;
+  gap: 0.75rem;
+  width: min(26rem, calc(100vw - 2rem));
+  pointer-events: none;
+
   .alert {
+    width: 100%;
+    max-height: min(48vh, 22rem);
+    overflow: auto;
+    margin: 0;
+    padding: 1rem 3rem 1rem 1.1rem;
+    border: 1px solid rgba(148, 163, 184, 0.32);
+    border-left-width: 0.35rem;
+    border-radius: 0.75rem;
+    background: var(--adm-surface);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+    color: var(--adm-text);
     text-overflow: ellipsis;
+    pointer-events: auto;
 
     pre {
       background: none;
@@ -175,30 +196,40 @@ a:hover {
   }
 
   .jhi-toast {
-    position: fixed;
+    position: static;
     width: 100%;
 
     &.left {
-      left: 5px;
+      transform: none;
     }
 
     &.right {
-      right: 5px;
+      transform: none;
     }
 
     &.top {
-      top: 55px;
+      transform: none;
     }
 
     &.bottom {
-      bottom: 55px;
+      transform: none;
     }
   }
 }
 
 @media screen and (min-width: 480px) {
   .alerts .jhi-toast {
-    width: 50%;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .alerts {
+    top: auto;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    width: auto;
   }
 }
 
@@ -1669,6 +1700,29 @@ body.adm-sidebar-compact .adm-topbar {
   padding: 0.9rem 1rem;
   margin-top: 1rem;
   font-weight: 600;
+}
+
+.adm-feedback-modal {
+  position: fixed;
+  z-index: 2130;
+  top: 5rem;
+  right: 1rem;
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: min(48vh, 22rem);
+  overflow: auto;
+  margin: 0;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+  pointer-events: auto;
+}
+
+@media screen and (max-width: 760px) {
+  .adm-feedback-modal {
+    top: auto;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+  }
 }
 
 .adm-inline-alert--danger {

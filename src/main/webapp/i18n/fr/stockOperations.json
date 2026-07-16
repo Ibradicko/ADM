@@ -23,7 +23,9 @@
       "myShop": "Périmètre manager : votre boutique uniquement",
       "myShops": "Périmètre manager : vos boutiques uniquement",
       "visibleCount": "boutique(s) visible(s)",
-      "filteredCount": "boutique(s) dans le filtre actif"
+      "filteredCount": "boutique(s) dans le filtre actif",
+      "noShop": "Aucune boutique",
+      "managerHint": "Les opérations sont automatiquement limitées à la boutique associée au manager."
     },
     "kpis": {
       "stockLines": "Lignes de stock",
@@ -58,12 +60,14 @@
       "theoretical": "Théorique",
       "theoreticalQuantity": "Quantité théorique",
       "threshold": "Seuil",
+      "alertThreshold": "Seuil d'alerte",
       "variance": "Écart",
       "warehouse": "Dépôt"
     },
     "placeholders": {
       "searchStock": "Rechercher un article ou un dépôt",
       "optionalReference": "Optionnelle, générée automatiquement si vide",
+      "alertThreshold": "Seuil minimum avant alerte",
       "reverseReason": "Expliquer pourquoi le mouvement doit être reversé"
     },
     "actions": {

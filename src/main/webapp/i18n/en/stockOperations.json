@@ -23,7 +23,9 @@
       "myShop": "Manager scope: your shop only",
       "myShops": "Manager scope: your shops only",
       "visibleCount": "visible shop(s)",
-      "filteredCount": "shop(s) in the active filter"
+      "filteredCount": "shop(s) in the active filter",
+      "noShop": "No shop",
+      "managerHint": "Operations are automatically limited to the manager's assigned shop."
     },
     "kpis": {
       "stockLines": "Stock lines",
@@ -58,12 +60,14 @@
       "theoretical": "Theoretical",
       "theoreticalQuantity": "Theoretical quantity",
       "threshold": "Threshold",
+      "alertThreshold": "Alert threshold",
       "variance": "Variance",
       "warehouse": "Warehouse"
     },
     "placeholders": {
       "searchStock": "Search by article or warehouse",
       "optionalReference": "Optional, generated automatically when empty",
+      "alertThreshold": "Minimum level before alert",
       "reverseReason": "Explain why the movement must be reversed"
     },
     "actions": {

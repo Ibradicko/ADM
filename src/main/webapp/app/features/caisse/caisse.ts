@@ -640,6 +640,7 @@ export default class Caisse implements OnInit {
     const contenu = this.echapperHtml(ticket.contenu);
 
     fenetreImpression.document.open();
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     fenetreImpression.document.write(`<!doctype html>
 <html lang="${this.localeCourante()}">
   <head>
