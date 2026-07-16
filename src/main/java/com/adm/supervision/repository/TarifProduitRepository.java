@@ -14,6 +14,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TarifProduitRepository extends JpaRepository<TarifProduit, Long>, JpaSpecificationExecutor<TarifProduit> {
+    List<TarifProduit> findByProduit_IdInAndActifTrue(List<Long> produitIds);
+
+    List<TarifProduit> findByProduit_IdAndActifTrue(Long produitId);
+
     default Optional<TarifProduit> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }

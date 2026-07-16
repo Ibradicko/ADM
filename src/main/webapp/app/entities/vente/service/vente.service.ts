@@ -29,6 +29,7 @@ export interface CaisseVenteLignePayload {
   quantite: number;
   remise?: number | null;
   codeBarresScanne?: string | null;
+  typePrix?: string | null;
 }
 
 export interface CaisseVentePaiementPayload {
@@ -78,6 +79,7 @@ export interface CaissePosteArticle {
   image?: string | null;
   imageContentType?: string | null;
   prixVente?: number | null;
+  tarifsParType?: Record<string, number | null> | null;
   groupeArticleId?: number | null;
   groupeArticleLibelle?: string | null;
   stockDisponible?: number | null;

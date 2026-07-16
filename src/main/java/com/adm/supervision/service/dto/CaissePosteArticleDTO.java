@@ -2,6 +2,8 @@ package com.adm.supervision.service.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Article vendable au poste de caisse : fusion du produit actif de la boutique et de son stock
@@ -22,6 +24,8 @@ public class CaissePosteArticleDTO implements Serializable {
     private String imageContentType;
 
     private BigDecimal prixVente;
+
+    private Map<String, BigDecimal> tarifsParType = new HashMap<>();
 
     private Long groupeArticleId;
 
@@ -83,6 +87,14 @@ public class CaissePosteArticleDTO implements Serializable {
 
     public void setPrixVente(BigDecimal prixVente) {
         this.prixVente = prixVente;
+    }
+
+    public Map<String, BigDecimal> getTarifsParType() {
+        return tarifsParType;
+    }
+
+    public void setTarifsParType(Map<String, BigDecimal> tarifsParType) {
+        this.tarifsParType = tarifsParType;
     }
 
     public Long getGroupeArticleId() {

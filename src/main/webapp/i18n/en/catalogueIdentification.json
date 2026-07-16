@@ -78,10 +78,12 @@
       "markPrinted": "Mark as printed",
       "open": "Open",
       "preparing": "Preparing...",
+      "printLabels": "Print",
       "productCatalogue": "Article catalogue",
       "refresh": "Refresh",
       "refreshing": "Refreshing...",
       "reset": "Reset",
+      "reprintLabels": "Reprint",
       "resolve": "Resolve",
       "saving": "Saving...",
       "select": "Select",
@@ -118,7 +120,9 @@
       "title": "Label batches",
       "description": "Prepare, track and validate article printing.",
       "prepareTitle": "Prepare a batch",
-      "prepareDescription": "Create a label batch linked to an article and print quantity."
+      "prepareDescription": "Create a label batch linked to an article and print quantity.",
+      "existingBarcodeShort": "active code",
+      "existingBarcodeNotice": "This article already has an active barcode: {{ code }}. A label is only useful for showing a price, internal code, or shelf information."
     },
     "history": {
       "title": "Code change history",
@@ -140,6 +144,8 @@
       "labelBatchPreparationFailed": "The label batch could not be prepared.",
       "noLabelsInBatch": "No article labels are linked to this batch.",
       "labelBatchPrinted": "The label batch was marked as printed.",
+      "labelPrintOpened": "The label print window is open.",
+      "printWindowFailed": "Could not open the print window. Check the pop-up blocker.",
       "printUpdateFailed": "The print status could not be updated."
     }
   }

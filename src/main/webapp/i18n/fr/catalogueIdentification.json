@@ -78,10 +78,12 @@
       "markPrinted": "Marquer comme imprimé",
       "open": "Ouvrir",
       "preparing": "Préparation...",
+      "printLabels": "Imprimer",
       "productCatalogue": "Catalogue articles",
       "refresh": "Actualiser",
       "refreshing": "Actualisation...",
       "reset": "Réinitialiser",
+      "reprintLabels": "Réimprimer",
       "resolve": "Résoudre",
       "saving": "Enregistrement...",
       "select": "Sélectionner",
@@ -118,7 +120,9 @@
       "title": "Lots d'étiquettes",
       "description": "Préparation, suivi et validation des impressions article.",
       "prepareTitle": "Préparer un lot",
-      "prepareDescription": "Création d'un lot d'étiquettes rattaché à un article et à un volume d'impression."
+      "prepareDescription": "Création d'un lot d'étiquettes rattaché à un article et à un volume d'impression.",
+      "existingBarcodeShort": "code actif",
+      "existingBarcodeNotice": "Cet article possède déjà un code-barres actif : {{ code }}. Une étiquette n'est utile que pour afficher un prix, un code interne ou une information rayon."
     },
     "history": {
       "title": "Historique des changements de code",
@@ -140,6 +144,8 @@
       "labelBatchPreparationFailed": "La préparation du lot d'étiquettes a échoué.",
       "noLabelsInBatch": "Aucune étiquette article n'est liée à ce lot.",
       "labelBatchPrinted": "Le lot d'étiquettes a été marqué comme imprimé.",
+      "labelPrintOpened": "La fenêtre d'impression des étiquettes est ouverte.",
+      "printWindowFailed": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez le bloqueur de pop-up.",
       "printUpdateFailed": "La mise à jour de l'impression a échoué."
     }
   }

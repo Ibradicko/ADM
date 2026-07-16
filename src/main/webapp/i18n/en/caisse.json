@@ -25,6 +25,7 @@
       "reprint": "Reprint",
       "reprinting": "Reprinting...",
       "reprintTicket": "Reprint ticket",
+      "printTicket": "Print ticket",
       "viewTicketLarge": "View ticket large",
       "registerReturn": "Register return",
       "processing": "Processing...",
@@ -76,7 +77,9 @@
       "items": "Items",
       "product": "Product",
       "currentStatus": "Current status",
-      "requiredReason": "Required reason"
+      "requiredReason": "Required reason",
+      "priceType": "Price type",
+      "appliedPriceType": "Applied price"
     },
     "placeholders": {
       "passengerReference": "Customer or passenger number",
@@ -199,6 +202,7 @@
     },
     "ticket": {
       "title": "ADM Manage - Cash ticket",
+      "receiptPrefix": "Ticket",
       "number": "Number",
       "date": "Date",
       "shop": "Shop",
@@ -235,6 +239,9 @@
       "selectSaleBeforeReprint": "Select a sale before launching a reprint.",
       "ticketReprinted": "The ticket has been regenerated and the reprint has been registered.",
       "reprintError": "Ticket reprint failed.",
+      "ticketPrinted": "The ticket print window is open.",
+      "printError": "Could not open the print window. Check the pop-up blocker.",
+      "selectTicketBeforePrint": "No ticket is available to print.",
       "saleCancelled": "The sale has been cancelled successfully.",
       "saleReturned": "The sale return has been registered.",
       "operationError": "The operation could not be finalized.",

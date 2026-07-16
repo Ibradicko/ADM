@@ -22,6 +22,7 @@ import { IPaiementVente } from 'app/entities/paiement-vente/paiement-vente.model
 import { PaiementVenteService } from 'app/entities/paiement-vente/service/paiement-vente.service';
 import { IProduit } from 'app/entities/produit/produit.model';
 import { TypeOperationCorrective } from 'app/entities/enumerations/type-operation-corrective.model';
+import { TypePrix } from 'app/entities/enumerations/type-prix.model';
 import { ITicketCaisse } from 'app/entities/ticket-caisse/ticket-caisse.model';
 import { TicketCaisseService } from 'app/entities/ticket-caisse/service/ticket-caisse.service';
 import { IVente } from 'app/entities/vente/vente.model';
@@ -32,6 +33,8 @@ interface CaisseLignePanier {
   article: CaissePosteArticle;
   quantite: number;
   remise: number;
+  typePrix: keyof typeof TypePrix;
+  prixUnitaire: number;
   codeBarresScanne?: string | null;
 }
 
@@ -87,6 +90,8 @@ export default class Caisse implements OnInit {
   readonly activeTab = signal<OngletCaisse>('caisse');
   readonly categorieActive = signal<number | null>(null);
   readonly chargementPermissions = signal(true);
+  readonly typePrixActif = signal<keyof typeof TypePrix>(TypePrix.STANDARD);
+  readonly typesPrix = Object.values(TypePrix);
 
   readonly rechercheHistorique = signal('');
   readonly statutHistorique = signal<string>('TOUS');
@@ -135,7 +140,7 @@ export default class Caisse implements OnInit {
         .some(value => value!.toLowerCase().includes(recherche));
     });
   });
-  readonly sousTotal = computed(() => this.panier().reduce((total, ligne) => total + (ligne.article.prixVente ?? 0) * ligne.quantite, 0));
+  readonly sousTotal = computed(() => this.panier().reduce((total, ligne) => total + ligne.prixUnitaire * ligne.quantite, 0));
   readonly totalRemise = computed(() => this.panier().reduce((total, ligne) => total + ligne.remise, 0));
   readonly totalNet = computed(() => this.arrondirMontant(this.sousTotal() - this.totalRemise()));
   readonly totalPaiements = computed(() =>
@@ -216,7 +221,9 @@ export default class Caisse implements OnInit {
   }
 
   imageArticleSrc(article: CaissePosteArticle): string | null {
-    return article.image && article.imageContentType ? `data:${article.imageContentType};base64,${article.image}` : null;
+    return article.image && article.imageContentType
+      ? `data:${article.imageContentType};base64,${article.image}`
+      : 'content/images/default-article.svg';
   }
 
   selectionnerBoutique(boutiqueId: number | null): void {
@@ -243,6 +250,41 @@ export default class Caisse implements OnInit {
 
   peutAjouterProduit(article: CaissePosteArticle): boolean {
     return this.stockDisponible(article.produitId) > this.quantiteDansPanier(article.produitId);
+  }
+
+  prixArticle(article: CaissePosteArticle, typePrix: keyof typeof TypePrix = this.typePrixActif()): number {
+    const tarif = article.tarifsParType?.[typePrix];
+    return typeof tarif === 'number' ? tarif : (article.prixVente ?? 0);
+  }
+
+  libelleTypePrix(typePrix: keyof typeof TypePrix): string {
+    return this.translateService.instant(`admSupervisionVentesApp.TypePrix.${typePrix}`) as string;
+  }
+
+  selectionnerTypePrix(typePrix: string): void {
+    if (this.typesPrix.includes(typePrix as TypePrix)) {
+      this.typePrixActif.set(typePrix as keyof typeof TypePrix);
+    }
+  }
+
+  changerTypePrixLigne(produitId: number, ancienTypePrix: keyof typeof TypePrix, nouveauTypePrix: string): void {
+    if (!this.typesPrix.includes(nouveauTypePrix as TypePrix)) {
+      return;
+    }
+
+    const typePrix = nouveauTypePrix as keyof typeof TypePrix;
+    this.panier.update(panier =>
+      panier.map(ligne =>
+        ligne.article.produitId === produitId && ligne.typePrix === ancienTypePrix
+          ? {
+              ...ligne,
+              typePrix,
+              prixUnitaire: this.prixArticle(ligne.article, typePrix),
+            }
+          : ligne,
+      ),
+    );
+    this.ajusterPaiementUniqueAuTotal();
   }
 
   solderPaiement(uid: number): void {
@@ -299,8 +341,8 @@ export default class Caisse implements OnInit {
     });
   }
 
-  incrementerQuantite(produitId: number): void {
-    const ligne = this.panier().find(item => item.article.produitId === produitId);
+  incrementerQuantite(produitId: number, typePrix?: keyof typeof TypePrix): void {
+    const ligne = this.panier().find(item => item.article.produitId === produitId && (!typePrix || item.typePrix === typePrix));
     if (ligne && !this.peutAjouterProduit(ligne.article)) {
       this.message.set({
         type: 'info',
@@ -311,23 +353,31 @@ export default class Caisse implements OnInit {
     }
     this.panier.update(panier =>
       panier.map(lignePanier =>
-        lignePanier.article.produitId === produitId ? { ...lignePanier, quantite: lignePanier.quantite + 1 } : lignePanier,
+        lignePanier.article.produitId === produitId && (!typePrix || lignePanier.typePrix === typePrix)
+          ? { ...lignePanier, quantite: lignePanier.quantite + 1 }
+          : lignePanier,
       ),
     );
     this.ajusterPaiementUniqueAuTotal();
   }
 
-  decrementerQuantite(produitId: number): void {
+  decrementerQuantite(produitId: number, typePrix?: keyof typeof TypePrix): void {
     this.panier.update(panier =>
       panier
-        .map(ligne => (ligne.article.produitId === produitId ? { ...ligne, quantite: Math.max(0, ligne.quantite - 1) } : ligne))
+        .map(ligne =>
+          ligne.article.produitId === produitId && (!typePrix || ligne.typePrix === typePrix)
+            ? { ...ligne, quantite: Math.max(0, ligne.quantite - 1) }
+            : ligne,
+        )
         .filter(ligne => ligne.quantite > 0),
     );
     this.ajusterPaiementUniqueAuTotal();
   }
 
-  retirerProduit(produitId: number): void {
-    this.panier.update(panier => panier.filter(ligne => ligne.article.produitId !== produitId));
+  retirerProduit(produitId: number, typePrix?: keyof typeof TypePrix): void {
+    this.panier.update(panier =>
+      panier.filter(ligne => ligne.article.produitId !== produitId || (typePrix && ligne.typePrix !== typePrix)),
+    );
     this.ajusterPaiementUniqueAuTotal();
   }
 
@@ -395,6 +445,7 @@ export default class Caisse implements OnInit {
             produitId: ligne.article.produitId,
             quantite: ligne.quantite,
             remise: ligne.remise,
+            typePrix: ligne.typePrix,
             codeBarresScanne: ligne.codeBarresScanne ?? null,
           })),
           paiements: this.paiements()
@@ -573,6 +624,99 @@ export default class Caisse implements OnInit {
     }
   }
 
+  imprimerTicket(ticket: ITicketCaisse | null | undefined): void {
+    if (!ticket?.contenu) {
+      this.message.set({ type: 'info', key: 'caisse.messages.selectTicketBeforePrint' });
+      return;
+    }
+
+    const fenetreImpression = window.open('', '_blank', 'width=420,height=720');
+    if (!fenetreImpression) {
+      this.message.set({ type: 'danger', key: 'caisse.messages.printError' });
+      return;
+    }
+
+    const titre = this.echapperHtml(ticket.numero ?? this.translateService.instant('caisse.ticket.title'));
+    const contenu = this.echapperHtml(ticket.contenu);
+
+    fenetreImpression.document.open();
+    fenetreImpression.document.write(`<!doctype html>
+<html lang="${this.localeCourante()}">
+  <head>
+    <meta charset="utf-8">
+    <title>${titre}</title>
+    <style>
+      @page {
+        size: 80mm auto;
+        margin: 4mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: #111827;
+        background: #fff;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .ticket {
+        width: 72mm;
+        margin: 0 auto;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      .ticket__header {
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px dashed #94a3b8;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      pre {
+        margin: 0;
+        font: inherit;
+        white-space: pre-wrap;
+      }
+
+      @media screen {
+        body {
+          padding: 16px;
+          background: #f8fafc;
+        }
+
+        .ticket {
+          padding: 14px;
+          border: 1px solid #e2e8f0;
+          background: #fff;
+          box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="ticket">
+      <div class="ticket__header">${titre}</div>
+      <pre>${contenu}</pre>
+    </main>
+    <script>
+      window.addEventListener('load', () => {
+        window.focus();
+        window.print();
+      });
+    </script>
+  </body>
+</html>`);
+    fenetreImpression.document.close();
+    this.message.set({ type: 'success', key: 'caisse.messages.ticketPrinted' });
+  }
+
   private async initialiser(): Promise<void> {
     this.chargement.set(true);
     try {
@@ -737,10 +881,12 @@ export default class Caisse implements OnInit {
 
   private ajouterArticleAuPanier(article: CaissePosteArticle, codeBarresScanne?: string): void {
     this.panier.update(panier => {
-      const ligneExistante = panier.find(ligne => ligne.article.produitId === article.produitId);
+      const typePrix = this.typePrixActif();
+      const prixUnitaire = this.prixArticle(article, typePrix);
+      const ligneExistante = panier.find(ligne => ligne.article.produitId === article.produitId && ligne.typePrix === typePrix);
       if (ligneExistante) {
         return panier.map(ligne =>
-          ligne.article.produitId === article.produitId
+          ligne.article.produitId === article.produitId && ligne.typePrix === typePrix
             ? {
                 ...ligne,
                 quantite: ligne.quantite + 1,
@@ -756,6 +902,8 @@ export default class Caisse implements OnInit {
           article,
           quantite: 1,
           remise: 0,
+          typePrix,
+          prixUnitaire,
           codeBarresScanne: codeBarresScanne ?? null,
         },
       ];
@@ -798,7 +946,7 @@ export default class Caisse implements OnInit {
       .join('\n');
 
     return [
-      this.translateService.instant('caisse.ticket.title'),
+      `${this.translateService.instant('caisse.ticket.receiptPrefix')} ${vente.boutique?.nom ?? '--'}`,
       `${this.translateService.instant('caisse.ticket.number')}: ${vente.numeroTicket ?? '--'}`,
       `${this.translateService.instant('caisse.ticket.date')}: ${vente.dateHeure?.format('DD/MM/YYYY HH:mm') ?? '--'}`,
       `${this.translateService.instant('caisse.ticket.shop')}: ${vente.boutique?.nom ?? '--'}`,
@@ -813,6 +961,15 @@ export default class Caisse implements OnInit {
       '',
       `${this.translateService.instant('caisse.ticket.netTotal')}: ${this.formatMontant(vente.montantNet ?? 0)}`,
     ].join('\n');
+  }
+
+  private echapperHtml(valeur: string): string {
+    return valeur
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
   }
 
   private reinitialiserSessionCaisse(): void {

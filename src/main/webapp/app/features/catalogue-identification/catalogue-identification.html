@@ -338,10 +338,18 @@
                 @for (produit of produitsTries(); track produit.id) {
                   <option [ngValue]="produit.id">
                     {{ produit.designation }} - {{ produit.codeInterne || ('catalogueIdentification.common.noCode' | translate) }}
+                    @if (libelleCodeArticle(produit.id)) {
+                      - {{ 'catalogueIdentification.labels.existingBarcodeShort' | translate }} {{ libelleCodeArticle(produit.id) }}
+                    }
                   </option>
                 }
               </select>
             </label>
+            @if (codePrincipalProduit(formulaireEtiquettes.produitId); as codeActif) {
+              <div class="alert alert-info adm-field--full">
+                {{ 'catalogueIdentification.labels.existingBarcodeNotice' | translate: { code: codeActif.code } }}
+              </div>
+            }
             <label class="adm-field">
               <span jhiTranslate="catalogueIdentification.fields.type">Type</span>
               <select class="adm-select" [(ngModel)]="formulaireCodeBarres.type">
@@ -570,11 +578,28 @@
                         @if (!lotSynthese.imprime && permissionsUi.peutGererArticlesBoutique()) {
                           <button
                             type="button"
+                            class="adm-button adm-button--primary"
+                            (click)="imprimerLotEtiquettes(lotSynthese)"
+                            [disabled]="enregistrement()"
+                          >
+                            <span jhiTranslate="catalogueIdentification.actions.printLabels">Imprimer</span>
+                          </button>
+                          <button
+                            type="button"
                             class="adm-button adm-button--ghost"
                             (click)="marquerLotImprime(lotSynthese)"
                             [disabled]="enregistrement()"
                           >
                             <span jhiTranslate="catalogueIdentification.actions.markPrinted">Mark as printed</span>
+                          </button>
+                        } @else {
+                          <button
+                            type="button"
+                            class="adm-button adm-button--ghost"
+                            (click)="imprimerLotEtiquettes(lotSynthese)"
+                            [disabled]="enregistrement()"
+                          >
+                            <span jhiTranslate="catalogueIdentification.actions.reprintLabels">Reimprimer</span>
                           </button>
                         }
                       </div>

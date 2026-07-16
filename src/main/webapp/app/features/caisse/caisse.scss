@@ -6,31 +6,45 @@
   --pos-accent: #0f766e;
   --pos-accent-strong: #115e59;
   --pos-warn: #f59e0b;
-  background: linear-gradient(180deg, rgba(15, 118, 110, 0.08), rgba(255, 255, 255, 0) 18rem), var(--adm-page-bg, #f6f8fb);
+  --pos-ticket-bg: #fbfcfd;
+  --pos-panel-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
+  gap: 0.75rem;
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.06), rgba(255, 255, 255, 0) 12rem), var(--adm-page-bg, #f6f8fb);
 }
 
 .adm-pos-header {
-  align-items: flex-start;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.adm-pos-header h1 {
+  margin-bottom: 0.2rem;
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+}
+
+.adm-pos-header p {
+  max-width: 48rem;
+  margin-bottom: 0;
 }
 
 .adm-pos-tabs {
   display: inline-flex;
-  gap: 0.35rem;
-  padding: 0.3rem;
+  gap: 0.25rem;
+  padding: 0.22rem;
   border: 1px solid var(--adm-border);
-  border-radius: 0.75rem;
+  border-radius: 0.6rem;
   background: #fff;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--pos-panel-shadow);
 }
 
 .adm-pos-tab {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.1rem;
+  gap: 0.42rem;
+  padding: 0.48rem 0.85rem;
   border: none;
-  border-radius: 0.55rem;
+  border-radius: 0.42rem;
   background: transparent;
   color: var(--adm-text-soft);
   font-weight: 600;
@@ -39,7 +53,7 @@
 .adm-pos-tab--active {
   background: var(--pos-accent);
   color: #fff;
-  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.22);
+  box-shadow: 0 6px 14px rgba(15, 118, 110, 0.2);
 }
 
 .adm-pos-context {
@@ -48,13 +62,13 @@
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
-  padding: 0.85rem;
+  padding: 0.62rem 0.75rem;
   border: 1px solid var(--adm-border);
-  border-radius: 0.75rem;
+  border-radius: 0.6rem;
   background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.07);
+  box-shadow: var(--pos-panel-shadow);
   backdrop-filter: blur(10px);
 }
 
@@ -70,13 +84,14 @@
 .adm-pos-shop-context {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
+  min-height: 2rem;
 }
 
 .adm-pos-shop-context__label {
   color: var(--adm-text-soft);
-  font-size: 0.76rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -93,13 +108,13 @@
 }
 
 .adm-pos-shop-pill {
-  padding: 0.35rem 0.8rem;
+  padding: 0.28rem 0.65rem;
   border-radius: 999px;
   border: 1px solid var(--adm-border);
   background: #fff;
   color: var(--adm-text);
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .adm-pos-shop-pill--active {
@@ -112,84 +127,85 @@
   cursor: pointer;
   font-weight: 700;
   color: var(--adm-text);
+  font-size: 0.84rem;
 }
 
 .adm-pos-summary {
   display: grid;
-  grid-template-columns: minmax(12rem, 1.4fr) minmax(12rem, 1.2fr) repeat(3, minmax(8rem, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: minmax(11rem, 1.25fr) minmax(11rem, 1.1fr) repeat(3, minmax(7rem, 0.85fr));
+  gap: 0.55rem;
 }
 
 .adm-pos-summary > div {
-  min-height: 4.4rem;
-  padding: 0.8rem 1rem;
+  min-height: 3.45rem;
+  padding: 0.58rem 0.75rem;
   border: 1px solid var(--adm-border);
-  border-radius: 0.7rem;
+  border-radius: 0.55rem;
   background: #fff;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.045);
 }
 
 .adm-pos-summary span {
   display: block;
   color: var(--adm-text-soft);
-  font-size: 0.76rem;
+  font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .adm-pos-summary strong {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
   color: var(--adm-text);
-  font-size: 1.15rem;
+  font-size: 0.98rem;
   line-height: 1.2;
 }
 
 .adm-pos-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(22rem, 25rem);
-  gap: 1rem;
+  grid-template-columns: minmax(30rem, 1.55fr) minmax(21rem, 24rem);
+  gap: 0.75rem;
   align-items: start;
 }
 
 .adm-pos-main {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 0.65rem;
 }
 
 .adm-caisse-panel {
-  border-radius: 0.75rem;
+  border-radius: 0.62rem;
 }
 
 .adm-pos-search-panel {
   border-color: rgba(15, 118, 110, 0.22);
-  box-shadow: 0 18px 35px rgba(15, 118, 110, 0.08);
+  box-shadow: var(--pos-panel-shadow);
 }
 
 .adm-pos-section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.9rem;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
 }
 
 .adm-pos-section-heading h2 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
 }
 
 .adm-pos-section-heading p {
   margin: 0.2rem 0 0;
   color: var(--adm-text-soft);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
 }
 
 .adm-pos-section-heading__actions {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.45rem;
   flex-shrink: 0;
 }
 
@@ -203,31 +219,39 @@
 .adm-caisse-scan-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.75rem;
+  gap: 0.55rem;
   align-items: center;
 }
 
 .adm-caisse-scan-input input {
-  min-height: 3rem;
-  font-size: 1rem;
+  min-height: 2.55rem;
+  font-size: 0.95rem;
+}
+
+.adm-pos-search-panel .adm-search {
+  min-height: 2.55rem;
+}
+
+.adm-pos-search-panel .mt-3 {
+  margin-top: 0.55rem !important;
 }
 
 .adm-pos-categories {
   display: flex;
-  gap: 0.55rem;
+  gap: 0.4rem;
   overflow-x: auto;
-  padding-bottom: 0.35rem;
+  padding-bottom: 0.2rem;
 }
 
 .adm-pos-category {
   flex: 0 0 auto;
-  padding: 0.5rem 1rem;
-  border-radius: 0.65rem;
+  padding: 0.38rem 0.75rem;
+  border-radius: 0.5rem;
   border: 1px solid var(--adm-border);
   background: #fff;
   color: var(--adm-text);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   white-space: nowrap;
 }
 
@@ -239,23 +263,23 @@
 
 .adm-pos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
-  gap: 0.85rem;
-  max-height: calc(100vh - 21rem);
-  min-height: 20rem;
+  grid-template-columns: repeat(auto-fill, minmax(10.75rem, 1fr));
+  gap: 0.55rem;
+  max-height: calc(100vh - 18rem);
+  min-height: 17rem;
   overflow-y: auto;
-  padding-right: 0.25rem;
+  padding-right: 0.18rem;
 }
 
 .adm-pos-tile {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.5rem;
-  min-height: 7.6rem;
-  padding: 1rem;
+  gap: 0.38rem;
+  min-height: 8.15rem;
+  padding: 0.58rem;
   border: 1px solid var(--adm-border);
-  border-radius: 0.75rem;
+  border-radius: 0.55rem;
   background: #fff;
   text-align: left;
   transition:
@@ -274,9 +298,9 @@
 }
 
 .adm-pos-tile:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: var(--pos-accent);
-  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.12);
+  box-shadow: 0 9px 18px rgba(15, 118, 110, 0.11);
 }
 
 .adm-pos-tile:disabled:hover {
@@ -288,10 +312,10 @@
 .adm-pos-tile__image {
   display: grid;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 5 / 3;
   place-items: center;
   overflow: hidden;
-  border-radius: 0.6rem;
+  border-radius: 0.42rem;
   color: var(--adm-text-soft);
   background: var(--adm-surface-soft);
 }
@@ -305,30 +329,47 @@
 .adm-pos-tile strong {
   display: block;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
+  font-size: 0.88rem;
+  min-height: 2.1em;
+  overflow: hidden;
 }
 
 .adm-pos-tile small {
   display: block;
   color: var(--adm-text-soft);
+  font-size: 0.74rem;
 }
 
 .adm-pos-tile__price {
+  display: grid;
+  justify-items: end;
   font-weight: 700;
   color: var(--pos-accent-strong);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.adm-pos-tile__price small {
+  color: var(--adm-text-soft);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .adm-pos-tile__meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.45rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .adm-pos-stock,
 .adm-stock-line {
   color: var(--adm-text-soft);
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 600;
 }
 
@@ -336,55 +377,219 @@
   color: var(--adm-danger);
 }
 
+.adm-pos-price-selector {
+  display: grid;
+  gap: 0.42rem;
+  margin-top: 0.75rem;
+}
+
+.adm-pos-price-selector > span {
+  color: var(--adm-text-soft);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.adm-pos-price-selector__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.adm-pos-price-option {
+  min-height: 2.1rem;
+  padding: 0.32rem 0.72rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 0.45rem;
+  background: #fff;
+  color: var(--adm-text-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.adm-pos-price-option--active {
+  border-color: var(--pos-accent);
+  background: #e8f7f4;
+  color: var(--pos-accent-strong);
+}
+
 .adm-pos-sidebar {
   position: sticky;
   top: 5.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.65rem;
+  min-width: 0;
   max-height: calc(100vh - 6rem);
   overflow-y: auto;
 }
 
 .adm-pos-validate {
   width: 100%;
-  margin-top: 1rem;
-  min-height: 3.2rem;
-  font-size: 1rem;
+  margin-top: 0.7rem;
+  min-height: 2.8rem;
+  font-size: 0.95rem;
 }
 
 .adm-pos-ticket-panel,
 .adm-pos-payment-panel {
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--pos-panel-shadow);
+}
+
+.adm-pos-ticket-panel {
+  border-top: 3px solid var(--pos-accent);
 }
 
 .adm-caisse-cart {
-  max-height: 17rem;
+  max-height: 19rem;
   overflow-y: auto;
   padding-right: 0.25rem;
 }
 
 .adm-caisse-cart-row {
-  border-radius: 0.7rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.58rem 0.62rem;
+  border: 1px solid var(--adm-border);
+  border-radius: 0.5rem;
+  background: var(--pos-ticket-bg);
+}
+
+.adm-caisse-cart-row + .adm-caisse-cart-row {
+  margin-top: 0.45rem;
+}
+
+.adm-caisse-cart-row__info {
+  min-width: 0;
+}
+
+.adm-caisse-cart-row__info strong,
+.adm-caisse-cart-row__info small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.adm-caisse-cart-row__info strong {
+  font-size: 0.86rem;
+  line-height: 1.2;
+}
+
+.adm-caisse-cart-row__info small {
+  font-size: 0.72rem;
+}
+
+.adm-caisse-line-price-type {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.38rem;
+}
+
+.adm-caisse-line-price-type span {
+  color: var(--adm-text-soft);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.adm-caisse-line-price-type .adm-select {
+  min-height: 2rem;
+  padding-block: 0.2rem;
+  font-size: 0.75rem;
 }
 
 .adm-caisse-cart-row__qty {
-  min-width: 6.75rem;
+  display: inline-grid;
+  grid-template-columns: 2rem 1.8rem 2rem;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid var(--adm-border);
+  border-radius: 0.45rem;
+  background: #fff;
+}
+
+.adm-caisse-cart-row__qty .adm-icon-button {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.35rem;
+}
+
+.adm-caisse-cart-row__qty span {
+  text-align: center;
+  font-weight: 800;
+  color: var(--adm-text);
+}
+
+.adm-caisse-cart-row__amount {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+  padding-top: 0.4rem;
+  border-top: 1px dashed rgba(148, 163, 184, 0.35);
+}
+
+.adm-caisse-cart-row__amount strong {
+  color: var(--pos-accent-strong);
+  font-size: 0.9rem;
+}
+
+.adm-caisse-cart-row__amount .adm-link-button {
+  padding: 0.22rem 0.48rem;
+  border-radius: 0.4rem;
+  font-size: 0.72rem;
 }
 
 .adm-caisse-totaux {
-  border-radius: 0.7rem;
-  background: var(--adm-surface-soft);
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  padding: 0.65rem;
+  border-radius: 0.55rem;
+  background: #eef8f6;
+}
+
+.adm-caisse-totaux > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.adm-caisse-totaux span {
+  color: var(--adm-text-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.adm-caisse-totaux strong {
+  color: var(--adm-text);
+  font-size: 0.9rem;
+}
+
+.adm-caisse-totaux > div:last-child {
+  margin-top: 0.25rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(15, 118, 110, 0.22);
+}
+
+.adm-caisse-totaux > div:last-child strong {
+  color: var(--pos-accent-strong);
+  font-size: 1.18rem;
 }
 
 .adm-pos-payment-panel {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 .adm-pos-payment-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 17rem;
-  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr) 15.5rem;
+  gap: 0.85rem;
   align-items: start;
 }
 
@@ -395,7 +600,7 @@
 .adm-pos-payment-layout__summary {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.6rem;
   position: sticky;
   top: 0.5rem;
 }
@@ -403,10 +608,10 @@
 .adm-caisse-due-banner {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  padding: 0.9rem 1.1rem;
+  gap: 0.45rem;
+  padding: 0.68rem 0.78rem;
   border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: 0.7rem;
+  border-radius: 0.55rem;
   background: rgba(245, 158, 11, 0.08);
 }
 
@@ -424,13 +629,13 @@
 
 .adm-caisse-due-banner span {
   color: var(--adm-text-soft);
-  font-size: 0.76rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .adm-caisse-due-banner strong {
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   color: var(--pos-warn);
 }
 
@@ -446,26 +651,26 @@
 .adm-caisse-paiements {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.45rem;
 }
 
 .adm-caisse-paiement-row {
   display: grid;
   grid-template-columns: minmax(8.5rem, 1.1fr) minmax(9rem, 1.15fr) minmax(8rem, 1.1fr) auto;
-  gap: 0.6rem;
+  gap: 0.45rem;
   align-items: start;
-  padding: 0.75rem;
+  padding: 0.55rem;
   border: 1px solid var(--adm-border);
-  border-radius: 0.7rem;
+  border-radius: 0.5rem;
   background: #fff;
 }
 
 .adm-caisse-paiement-row--header {
-  padding: 0 0.75rem;
+  padding: 0 0.55rem;
   border: none;
   background: transparent;
   color: var(--adm-text-soft);
-  font-size: 0.74rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -504,7 +709,18 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding-top: 1.6rem;
+  padding-top: 1.35rem;
+}
+
+.adm-caisse-history-actions-col,
+.adm-caisse-history-actions-cell {
+  min-width: 12.5rem;
+  width: 12.5rem;
+}
+
+.adm-caisse-history-actions-cell .adm-inline-actions {
+  justify-content: flex-start;
+  min-width: 0;
 }
 
 @media (max-width: 1100px) {
@@ -518,6 +734,10 @@
   }
 
   .adm-pos-grid {
+    max-height: none;
+  }
+
+  .adm-caisse-cart {
     max-height: none;
   }
 
@@ -572,6 +792,16 @@
   .adm-caisse-paiement-row__actions {
     justify-content: flex-end;
     padding-top: 0;
+  }
+
+  .adm-caisse-cart-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-caisse-cart-row__qty,
+  .adm-caisse-cart-row__amount {
+    justify-self: stretch;
+    align-items: stretch;
   }
 }
 

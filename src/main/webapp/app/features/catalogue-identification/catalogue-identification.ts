@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslateModule } from '@ngx-translate/core';
 import dayjs from 'dayjs/esm';
+import JsBarcode from 'jsbarcode';
 import { firstValueFrom } from 'rxjs';
 
 import { UiPermissionService } from 'app/core/services/ui-permission.service';
@@ -272,7 +273,9 @@ export default class CatalogueIdentificationComponent implements OnInit {
   }
 
   imageProduitSrc(produit: IProduit | null | undefined): string | null {
-    return produit?.image && produit.imageContentType ? `data:${produit.imageContentType};base64,${produit.image}` : null;
+    return produit?.image && produit.imageContentType
+      ? `data:${produit.imageContentType};base64,${produit.image}`
+      : 'content/images/default-article.svg';
   }
 
   reinitialiserFiltres(): void {
@@ -539,5 +542,161 @@ export default class CatalogueIdentificationComponent implements OnInit {
     } finally {
       this.enregistrement.set(false);
     }
+  }
+
+  async imprimerLotEtiquettes(lotSynthese: LotEtiquetteSynthese): Promise<void> {
+    if (lotSynthese.etiquettes.length === 0) {
+      this.message.set({ type: 'info', key: 'catalogueIdentification.messages.noLabelsInBatch' });
+      return;
+    }
+
+    const fenetreImpression = window.open('', '_blank', 'width=920,height=720');
+    if (!fenetreImpression) {
+      this.message.set({ type: 'danger', key: 'catalogueIdentification.messages.printWindowFailed' });
+      return;
+    }
+
+    const etiquettesHtml = lotSynthese.etiquettes
+      .flatMap(etiquette => {
+        const produitComplet = this.produitParId(etiquette.produit?.id);
+        const produit = produitComplet ?? etiquette.produit;
+        const quantite = Math.max(1, Number(etiquette.quantite ?? 1));
+        const codePrincipal = this.codePrincipalProduit(produit?.id);
+        const code = codePrincipal?.code ?? produitComplet?.codeInterne ?? '';
+        const codeBarresSvg = this.genererCodeBarresSvg(code, codePrincipal?.type);
+
+        return Array.from(
+          { length: quantite },
+          () => `<section class="label">
+  <div class="label__shop">${this.echapperHtml(produitComplet?.boutique?.nom ?? '')}</div>
+  <div class="label__name">${this.echapperHtml(produit?.designation ?? 'Article')}</div>
+  <div class="label__price">${this.echapperHtml(this.formatMontant(produitComplet?.prixVente))}</div>
+  <div class="barcode">${codeBarresSvg}</div>
+  <div class="label__code">${this.echapperHtml(code || '--')}</div>
+</section>`,
+        );
+      })
+      .join('');
+
+    const titre = this.echapperHtml(lotSynthese.lot.reference ?? 'Etiquettes');
+    fenetreImpression.document.open();
+    fenetreImpression.document.write(`<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>${titre}</title>
+    <style>
+      @page { size: A4; margin: 9mm; }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #111827; background: #fff; font-family: Arial, sans-serif; }
+      .sheet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+      .label {
+        min-height: 39mm;
+        padding: 4mm;
+        border: 1px solid #111827;
+        break-inside: avoid;
+        display: grid;
+        align-content: space-between;
+        gap: 1.5mm;
+      }
+      .label__shop { font-size: 8px; font-weight: 700; text-transform: uppercase; }
+      .label__name { min-height: 18px; font-size: 11px; font-weight: 700; line-height: 1.15; }
+      .label__price { font-size: 13px; font-weight: 800; }
+      .barcode {
+        display: flex;
+        justify-content: center;
+        min-height: 42px;
+        overflow: hidden;
+      }
+      .barcode svg { display: block; width: 100%; max-width: 48mm; height: 42px; }
+      .barcode__fallback { font-family: "Courier New", monospace; font-size: 10px; overflow-wrap: anywhere; }
+      .label__code { font-family: "Courier New", monospace; font-size: 8px; text-align: center; overflow-wrap: anywhere; }
+      @media screen {
+        body { padding: 18px; background: #f8fafc; }
+        .sheet {
+          max-width: 210mm;
+          margin: 0 auto;
+          padding: 9mm;
+          background: #fff;
+          box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="sheet">${etiquettesHtml}</main>
+    <script>
+      window.addEventListener('load', () => {
+        window.focus();
+        window.print();
+      });
+    </script>
+  </body>
+</html>`);
+    fenetreImpression.document.close();
+    this.message.set({ type: 'success', key: 'catalogueIdentification.messages.labelPrintOpened' });
+  }
+
+  codePrincipalProduit(produitId: number | null | undefined): ICodeBarresProduit | undefined {
+    if (!produitId) {
+      return undefined;
+    }
+
+    return (
+      this.codesBarres().find(code => code.produit?.id === produitId && code.actif && code.principal) ??
+      this.codesBarres().find(code => code.produit?.id === produitId && code.actif)
+    );
+  }
+
+  libelleCodeArticle(produitId: number | null | undefined): string {
+    return this.codePrincipalProduit(produitId)?.code ?? '';
+  }
+
+  formatMontant(valeur: number | null | undefined): string {
+    return typeof valeur === 'number' ? `${valeur.toLocaleString('fr-FR')} F CFA` : '--';
+  }
+
+  private genererCodeBarresSvg(code: string | null | undefined, type: keyof typeof TypeCodeBarres | null | undefined): string {
+    const valeur = code?.trim();
+    if (!valeur) {
+      return '<span class="barcode__fallback">--</span>';
+    }
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const format = this.formatJsBarcode(type, valeur);
+
+    try {
+      JsBarcode(svg, valeur, {
+        format,
+        displayValue: false,
+        height: 38,
+        margin: 0,
+        width: format === 'CODE128' ? 1.25 : 1.5,
+      });
+      return svg.outerHTML;
+    } catch {
+      return `<span class="barcode__fallback">${this.echapperHtml(valeur)}</span>`;
+    }
+  }
+
+  private formatJsBarcode(type: keyof typeof TypeCodeBarres | null | undefined, code: string): 'EAN13' | 'EAN8' | 'CODE128' {
+    if (type === TypeCodeBarres.EAN13 && /^\d{13}$/.test(code)) {
+      return 'EAN13';
+    }
+
+    if (type === TypeCodeBarres.EAN8 && /^\d{8}$/.test(code)) {
+      return 'EAN8';
+    }
+
+    return 'CODE128';
+  }
+
+  private echapperHtml(valeur: string): string {
+    return valeur
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
   }
 }

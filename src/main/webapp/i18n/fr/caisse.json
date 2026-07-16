@@ -25,6 +25,7 @@
       "reprint": "Reimprimer",
       "reprinting": "Reimpression...",
       "reprintTicket": "Reimprimer le ticket",
+      "printTicket": "Imprimer le ticket",
       "viewTicketLarge": "Voir le ticket en grand",
       "registerReturn": "Enregistrer un retour",
       "processing": "Traitement...",
@@ -76,7 +77,9 @@
       "items": "Articles",
       "product": "Produit",
       "currentStatus": "Statut actuel",
-      "requiredReason": "Motif obligatoire"
+      "requiredReason": "Motif obligatoire",
+      "priceType": "Type de prix",
+      "appliedPriceType": "Tarif appliqué"
     },
     "placeholders": {
       "passengerReference": "Numero client ou passager",
@@ -199,6 +202,7 @@
     },
     "ticket": {
       "title": "ADM Manage - Ticket de caisse",
+      "receiptPrefix": "Ticket",
       "number": "Numero",
       "date": "Date",
       "shop": "Boutique",
@@ -235,6 +239,9 @@
       "selectSaleBeforeReprint": "Selectionnez une vente avant de lancer une reimpression.",
       "ticketReprinted": "Le ticket a ete regenere et la reimpression a ete enregistree.",
       "reprintError": "La reimpression du ticket a echoue.",
+      "ticketPrinted": "La fenetre d'impression du ticket est ouverte.",
+      "printError": "Impossible d'ouvrir la fenetre d'impression. Verifiez le bloqueur de pop-up.",
+      "selectTicketBeforePrint": "Aucun ticket disponible a imprimer.",
       "saleCancelled": "La vente a ete annulee avec succes.",
       "saleReturned": "Le retour de vente a ete enregistre.",
       "operationError": "L'operation n'a pas pu etre finalisee.",

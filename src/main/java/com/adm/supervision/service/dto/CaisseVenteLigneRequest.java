@@ -21,6 +21,9 @@ public class CaisseVenteLigneRequest implements Serializable {
     @Size(max = 80)
     private String codeBarresScanne;
 
+    @Size(max = 80)
+    private String typePrix;
+
     public Long getProduitId() {
         return produitId;
     }
@@ -51,5 +54,13 @@ public class CaisseVenteLigneRequest implements Serializable {
 
     public void setCodeBarresScanne(String codeBarresScanne) {
         this.codeBarresScanne = codeBarresScanne;
+    }
+
+    public String getTypePrix() {
+        return typePrix;
+    }
+
+    public void setTypePrix(String typePrix) {
+        this.typePrix = typePrix;
     }
 }

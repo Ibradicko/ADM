@@ -144,7 +144,9 @@ export class Produit implements OnInit {
   }
 
   imageProduitSrc(produit: IProduit): string | null {
-    return produit.image && produit.imageContentType ? `data:${produit.imageContentType};base64,${produit.image}` : null;
+    return produit.image && produit.imageContentType
+      ? `data:${produit.imageContentType};base64,${produit.image}`
+      : 'content/images/default-article.svg';
   }
 
   formatMontant(valeur: number | null | undefined): string {

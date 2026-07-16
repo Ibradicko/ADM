@@ -10,6 +10,7 @@ import com.adm.supervision.domain.MouvementStock;
 import com.adm.supervision.domain.PaiementVente;
 import com.adm.supervision.domain.Produit;
 import com.adm.supervision.domain.StockProduit;
+import com.adm.supervision.domain.TarifProduit;
 import com.adm.supervision.domain.TicketCaisse;
 import com.adm.supervision.domain.User;
 import com.adm.supervision.domain.Vente;
@@ -19,6 +20,7 @@ import com.adm.supervision.domain.enumeration.StatutPaiement;
 import com.adm.supervision.domain.enumeration.StatutVente;
 import com.adm.supervision.domain.enumeration.TypeActionAudit;
 import com.adm.supervision.domain.enumeration.TypeMouvementStock;
+import com.adm.supervision.domain.enumeration.TypePrix;
 import com.adm.supervision.repository.BoutiqueRepository;
 import com.adm.supervision.repository.ExploitationBoutiqueRepository;
 import com.adm.supervision.repository.LigneMouvementStockRepository;
@@ -29,6 +31,7 @@ import com.adm.supervision.repository.MouvementStockRepository;
 import com.adm.supervision.repository.PaiementVenteRepository;
 import com.adm.supervision.repository.ProduitRepository;
 import com.adm.supervision.repository.StockProduitRepository;
+import com.adm.supervision.repository.TarifProduitRepository;
 import com.adm.supervision.repository.TicketCaisseRepository;
 import com.adm.supervision.repository.VenteRepository;
 import com.adm.supervision.service.dto.CaissePosteArticleDTO;
@@ -48,6 +51,7 @@ import com.adm.supervision.service.mapper.VenteMapper;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -99,6 +103,7 @@ public class VenteService {
     private final ModePaiementRefRepository modePaiementRefRepository;
     private final PaiementVenteRepository paiementVenteRepository;
     private final TicketCaisseRepository ticketCaisseRepository;
+    private final TarifProduitRepository tarifProduitRepository;
     private final ExploitationBoutiqueRepository exploitationBoutiqueRepository;
     private final RedevanceWorkflowService redevanceWorkflowService;
     private final BoutiqueMapper boutiqueMapper;
@@ -123,6 +128,7 @@ public class VenteService {
         ModePaiementRefRepository modePaiementRefRepository,
         PaiementVenteRepository paiementVenteRepository,
         TicketCaisseRepository ticketCaisseRepository,
+        TarifProduitRepository tarifProduitRepository,
         ExploitationBoutiqueRepository exploitationBoutiqueRepository,
         RedevanceWorkflowService redevanceWorkflowService,
         BoutiqueMapper boutiqueMapper,
@@ -146,6 +152,7 @@ public class VenteService {
         this.modePaiementRefRepository = modePaiementRefRepository;
         this.paiementVenteRepository = paiementVenteRepository;
         this.ticketCaisseRepository = ticketCaisseRepository;
+        this.tarifProduitRepository = tarifProduitRepository;
         this.exploitationBoutiqueRepository = exploitationBoutiqueRepository;
         this.redevanceWorkflowService = redevanceWorkflowService;
         this.boutiqueMapper = boutiqueMapper;
@@ -357,9 +364,17 @@ public class VenteService {
             stockParProduit.merge(stock.getProduit().getId(), quantite, BigDecimal::add);
         }
 
+        Map<Long, Map<String, BigDecimal>> tarifsParProduit = tarifsActifsParProduit(produits);
+
         List<CaissePosteArticleDTO> articles = produits
             .stream()
-            .map(produit -> toArticleDTO(produit, stockParProduit.getOrDefault(produit.getId(), BigDecimal.ZERO)))
+            .map(produit ->
+                toArticleDTO(
+                    produit,
+                    stockParProduit.getOrDefault(produit.getId(), BigDecimal.ZERO),
+                    tarifsParProduit.getOrDefault(produit.getId(), Map.of())
+                )
+            )
             .toList();
 
         CaissePosteContexteDTO contexte = new CaissePosteContexteDTO();
@@ -402,7 +417,7 @@ public class VenteService {
             .orElse(boutiquesAccessibles.get(0));
     }
 
-    private CaissePosteArticleDTO toArticleDTO(Produit produit, BigDecimal stockDisponible) {
+    private CaissePosteArticleDTO toArticleDTO(Produit produit, BigDecimal stockDisponible, Map<String, BigDecimal> tarifsParType) {
         CaissePosteArticleDTO dto = new CaissePosteArticleDTO();
         dto.setProduitId(produit.getId());
         dto.setCodeInterne(produit.getCodeInterne());
@@ -411,12 +426,36 @@ public class VenteService {
         dto.setImage(produit.getImage());
         dto.setImageContentType(produit.getImageContentType());
         dto.setPrixVente(produit.getPrixVente());
+        dto.setTarifsParType(tarifsParType);
         if (produit.getGroupeArticle() != null) {
             dto.setGroupeArticleId(produit.getGroupeArticle().getId());
             dto.setGroupeArticleLibelle(produit.getGroupeArticle().getLibelle());
         }
         dto.setStockDisponible(stockDisponible);
         return dto;
+    }
+
+    private Map<Long, Map<String, BigDecimal>> tarifsActifsParProduit(List<Produit> produits) {
+        List<Long> produitIds = produits
+            .stream()
+            .map(Produit::getId)
+            .filter(id -> id != null)
+            .toList();
+        if (produitIds.isEmpty()) {
+            return Map.of();
+        }
+
+        LocalDate today = LocalDate.now();
+        Map<Long, Map<String, BigDecimal>> resultat = new HashMap<>();
+        for (TarifProduit tarif : tarifProduitRepository.findByProduit_IdInAndActifTrue(produitIds)) {
+            if (tarif.getProduit() == null || tarif.getProduit().getId() == null || !tarifEstApplicable(tarif, today)) {
+                continue;
+            }
+            resultat
+                .computeIfAbsent(tarif.getProduit().getId(), ignored -> new HashMap<>())
+                .put(tarif.getTypePrix().name(), scaleMoney(tarif.getMontant()));
+        }
+        return resultat;
     }
 
     /**
@@ -657,8 +696,9 @@ public class VenteService {
                 "invalidDiscount",
                 "La remise ne peut pas etre negative"
             );
+            TypePrix typePrix = resoudreTypePrix(lineRequest.getTypePrix());
             BigDecimal unitPrice = nonNegativeMoney(
-                produit.getPrixVente(),
+                prixApplicable(produit, typePrix),
                 "produit",
                 "invalidSalePrice",
                 "Le prix de vente du produit doit etre renseigne"
@@ -716,6 +756,40 @@ public class VenteService {
         return payments;
     }
 
+    private BigDecimal prixApplicable(Produit produit, TypePrix typePrix) {
+        LocalDate today = LocalDate.now();
+        return tarifProduitRepository
+            .findByProduit_IdAndActifTrue(produit.getId())
+            .stream()
+            .filter(tarif -> tarif.getTypePrix() == typePrix)
+            .filter(tarif -> tarifEstApplicable(tarif, today))
+            .max(Comparator.comparing(TarifProduit::getDateDebut))
+            .map(TarifProduit::getMontant)
+            .orElse(produit.getPrixVente());
+    }
+
+    private TypePrix resoudreTypePrix(String typePrix) {
+        if (typePrix == null || typePrix.isBlank()) {
+            return TypePrix.STANDARD;
+        }
+
+        try {
+            return TypePrix.valueOf(typePrix.trim());
+        } catch (IllegalArgumentException exception) {
+            throw new BusinessValidationException("typePrix", "invalidType", "Type de prix invalide");
+        }
+    }
+
+    private boolean tarifEstApplicable(TarifProduit tarif, LocalDate date) {
+        return (
+            tarif.getMontant() != null &&
+            tarif.getTypePrix() != null &&
+            tarif.getDateDebut() != null &&
+            !tarif.getDateDebut().isAfter(date) &&
+            (tarif.getDateFin() == null || !tarif.getDateFin().isBefore(date))
+        );
+    }
+
     private BigDecimal positiveMoney(BigDecimal value, String entity, String key, String message) {
         BigDecimal amount = nonNegativeMoney(value, entity, key, message);
         if (amount.signum() <= 0) {
@@ -748,7 +822,7 @@ public class VenteService {
 
     private String buildTicketContent(Vente vente, List<LigneVente> lignes, List<PaiementVente> paiements) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Ticket ADM\n");
+        builder.append("Ticket ").append(vente.getBoutique().getNom()).append('\n');
         builder.append("Numero: ").append(vente.getNumeroTicket()).append('\n');
         builder.append("Date: ").append(vente.getDateHeure()).append('\n');
         builder.append("Boutique: ").append(vente.getBoutique().getNom()).append('\n');

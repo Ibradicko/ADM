@@ -188,6 +188,22 @@
               </button>
             </div>
 
+            <div class="adm-pos-price-selector">
+              <span jhiTranslate="caisse.fields.appliedPriceType">Tarif appliqué</span>
+              <div class="adm-pos-price-selector__options">
+                @for (typePrix of typesPrix; track typePrix) {
+                  <button
+                    type="button"
+                    class="adm-pos-price-option"
+                    [class.adm-pos-price-option--active]="typePrixActif() === typePrix"
+                    (click)="selectionnerTypePrix(typePrix)"
+                  >
+                    {{ 'admSupervisionVentesApp.TypePrix.' + typePrix | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+
             <label class="adm-search adm-search--panel mt-3">
               <fa-icon icon="search" />
               <input
@@ -280,7 +296,10 @@
                           | translate: { count: stockDisponible(article.produitId) - quantiteDansPanier(article.produitId) }
                       }}
                     </span>
-                    <span class="adm-pos-tile__price">{{ formatMontant(article.prixVente) }}</span>
+                    <span class="adm-pos-tile__price">
+                      {{ formatMontant(prixArticle(article)) }}
+                      <small>{{ libelleTypePrix(typePrixActif()) }}</small>
+                    </span>
                   </div>
                 </button>
               }
@@ -311,7 +330,7 @@
               </div>
             } @else {
               <div class="adm-caisse-cart">
-                @for (ligne of panier(); track ligne.article.produitId) {
+                @for (ligne of panier(); track ligne.article.produitId + '-' + ligne.typePrix) {
                   <div class="adm-caisse-cart-row">
                     <div class="adm-caisse-cart-row__info">
                       <strong>{{ formatValeur(ligne.article.designation) }}</strong>
@@ -321,20 +340,32 @@
                           - {{ 'caisse.scan.short' | translate }} {{ ligne.codeBarresScanne }}
                         }
                       </small>
+                      <label class="adm-caisse-line-price-type">
+                        <span jhiTranslate="caisse.fields.priceType">Type de prix</span>
+                        <select
+                          class="adm-select"
+                          [ngModel]="ligne.typePrix"
+                          (ngModelChange)="changerTypePrixLigne(ligne.article.produitId, ligne.typePrix, $event)"
+                        >
+                          @for (typePrix of typesPrix; track typePrix) {
+                            <option [value]="typePrix">{{ 'admSupervisionVentesApp.TypePrix.' + typePrix | translate }}</option>
+                          }
+                        </select>
+                      </label>
                       <small class="adm-stock-line">
                         {{ 'caisse.stock.inStock' | translate: { count: stockDisponible(ligne.article.produitId) } }}
                       </small>
                     </div>
 
                     <div class="adm-caisse-cart-row__qty">
-                      <button type="button" class="adm-icon-button" (click)="decrementerQuantite(ligne.article.produitId)">
+                      <button type="button" class="adm-icon-button" (click)="decrementerQuantite(ligne.article.produitId, ligne.typePrix)">
                         <fa-icon icon="times" />
                       </button>
                       <span>{{ ligne.quantite }}</span>
                       <button
                         type="button"
                         class="adm-icon-button"
-                        (click)="incrementerQuantite(ligne.article.produitId)"
+                        (click)="incrementerQuantite(ligne.article.produitId, ligne.typePrix)"
                         [disabled]="!peutAjouterProduit(ligne.article)"
                       >
                         <fa-icon icon="plus" />
@@ -342,11 +373,11 @@
                     </div>
 
                     <div class="adm-caisse-cart-row__amount">
-                      <strong>{{ formatMontant((ligne.article.prixVente ?? 0) * ligne.quantite) }}</strong>
+                      <strong>{{ formatMontant(ligne.prixUnitaire * ligne.quantite) }}</strong>
                       <button
                         type="button"
                         class="adm-link-button"
-                        (click)="retirerProduit(ligne.article.produitId)"
+                        (click)="retirerProduit(ligne.article.produitId, ligne.typePrix)"
                         jhiTranslate="caisse.actions.remove"
                       >
                         Retirer
@@ -379,6 +410,9 @@
                 <div>
                   <h2 jhiTranslate="caisse.generatedTicket.title">Dernier ticket genere</h2>
                 </div>
+                <button type="button" class="adm-button adm-button--primary adm-button--small" (click)="imprimerTicket(ticket)">
+                  {{ 'caisse.actions.printTicket' | translate }}
+                </button>
               </div>
               <div class="adm-caisse-ticket">
                 <div class="adm-caisse-ticket__meta">
@@ -563,7 +597,7 @@
                     <th jhiTranslate="caisse.history.columns.tenant">Locataire</th>
                     <th jhiTranslate="caisse.history.columns.netTotal">Total net</th>
                     <th jhiTranslate="caisse.history.columns.status">Statut</th>
-                    <th jhiTranslate="caisse.history.columns.actions">Actions</th>
+                    <th class="adm-caisse-history-actions-col" jhiTranslate="caisse.history.columns.actions">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -584,7 +618,7 @@
                           {{ statutVenteLabelKey(vente.statut) | translate }}
                         </span>
                       </td>
-                      <td>
+                      <td class="adm-caisse-history-actions-cell">
                         <div class="adm-inline-actions">
                           <button
                             type="button"
@@ -665,6 +699,15 @@
                     <button type="button" class="adm-button adm-button--ghost adm-button--block" (click)="ouvrirModalTicket()">
                       {{ 'caisse.actions.viewTicketLarge' | translate }}
                     </button>
+                    @if (ticketVenteSelectionnee()) {
+                      <button
+                        type="button"
+                        class="adm-button adm-button--primary adm-button--block"
+                        (click)="imprimerTicket(ticketVenteSelectionnee())"
+                      >
+                        {{ 'caisse.actions.printTicket' | translate }}
+                      </button>
+                    }
                     <button
                       type="button"
                       class="adm-button adm-button--ghost adm-button--block"
@@ -766,6 +809,13 @@
                     </div>
                     <pre>{{ ticketSelectionne.contenu }}</pre>
                   </div>
+                  <button
+                    type="button"
+                    class="adm-button adm-button--primary adm-button--block mt-3"
+                    (click)="imprimerTicket(ticketSelectionne)"
+                  >
+                    {{ 'caisse.actions.printTicket' | translate }}
+                  </button>
                 </article>
               }
             } @else {
@@ -834,14 +884,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (ligne of panier(); track ligne.article.produitId) {
+                  @for (ligne of panier(); track ligne.article.produitId + '-' + ligne.typePrix) {
                     <tr>
                       <td>
                         <strong>{{ formatValeur(ligne.article.designation) }}</strong>
                         <small class="d-block text-muted">{{ formatValeur(ligne.article.codeInterne) }}</small>
                       </td>
                       <td>{{ ligne.quantite }}</td>
-                      <td>{{ formatMontant((ligne.article.prixVente ?? 0) * ligne.quantite) }}</td>
+                      <td>{{ formatMontant(ligne.prixUnitaire * ligne.quantite) }}</td>
                     </tr>
                   }
                 </tbody>
@@ -971,6 +1021,11 @@
             <button type="button" class="adm-button adm-button--ghost" (click)="fermerModal()" jhiTranslate="entity.action.close">
               Fermer
             </button>
+            @if (ticketVenteSelectionnee(); as ticketSelectionne) {
+              <button type="button" class="adm-button adm-button--ghost" (click)="imprimerTicket(ticketSelectionne)">
+                {{ 'caisse.actions.printTicket' | translate }}
+              </button>
+            }
             <button
               type="button"
               class="adm-button adm-button--primary"
